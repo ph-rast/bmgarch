@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1557246241307.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4040728116",
+    "id" : "F36CB2F8",
+    "lastKnownWriteTime" : 1557258343,
+    "last_content_update" : 1557258343,
+    "path" : "~/UZH/R/Packages/BMGARCH/R/bmgarch.R",
+    "project_path" : "R/bmgarch.R",
+    "properties" : {
+        "cursorPosition" : "11,22",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

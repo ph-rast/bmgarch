@@ -1,0 +1,11 @@
+#' Title
+#'
+#' @param p 
+#'
+#' @return values
+#' @export
+#'
+#' @examples testfun(bla)
+testfun = function(p = 'CCC'){
+  if(p == 'CCC') print('yeah') else print('no way!')
+}

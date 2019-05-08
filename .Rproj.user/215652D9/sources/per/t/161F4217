@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1557259338380.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3461816702",
+    "id" : "161F4217",
+    "lastKnownWriteTime" : 1557259543,
+    "last_content_update" : 1557259543748,
+    "path" : "~/UZH/R/Packages/BMGARCH/R/print.R",
+    "project_path" : "R/print.R",
+    "properties" : {
+        "cursorPosition" : "27,1",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

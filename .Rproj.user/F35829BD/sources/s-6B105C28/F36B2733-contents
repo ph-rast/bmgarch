@@ -1,0 +1,13 @@
+#' Multivariate GARCH with three different parameterizations. CCC, DCC, and BEKK
+#' 
+#' Some more comments
+#' 
+#' @param parameterization 
+#'
+#' @return bmgarch object 
+#' @export
+#'
+#' @examples bmgarch(parameterization = c('CCC', 'DCC', 'BEKK')
+bmgarch = function(parameterization = 'CCC'){
+    if(parameterization == 'CCC') print('constant correlation') else 'Alles Anderes'
+}
