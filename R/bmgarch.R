@@ -70,7 +70,8 @@ bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000,
                        elapsed_time = rstan::get_elapsed_time(model_fit),
                        date = date(),
                        ahead = ahead,
-                       nt = stan_data$nt)
+                       nt = stan_data$nt,
+                       TS_length = stan_data$T)
   class(return_fit) <- "bmgarch"
   return(return_fit)
 }
