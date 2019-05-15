@@ -6,8 +6,22 @@
 ##' @param CrI 
 ##' @return Summary object
 ##' @author philippe
-summary.bmgarch = function(object, CrI = c(0.05, 0.95) ){
+summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     cat( "Model:", paste0(object$param, "-MGARCH\n"))
+    if( object$param == 'CCC') {
+        cat("Basic specification: H_t = D_t R D_t", "\n")
+            cat("               diag(D_t) = sqrt(h_ii,t) = c_h + a_h*y^2_[t-1] + b_h*h_[ii,t-1]", "\n")
+    } else {
+        if( object$param == 'DCC') {
+            cat("Basic specification: H_t = D_t R_t D_t", "\n")
+            cat("               diag(D_t) = sqrt(h_ii,t) = c_h + a_h*y^2_[t-1] + b_h*h_[ii,t-1]", "\n")
+            cat("               R_t = Q^[-1]_t Q_t Q^[-1]_t = ( 1 - a_q - b_q)S + a_q(u_[t-1]u'_[t-1]) + b_q(Q_[t-1])", "\n")
+        } else {
+            if( object$param == 'BEKK' ) {
+                cat("Basic specification: H_t = C + A'[y_(t-1)*y'_(t-1)]A + B'H_(t-1)B", "\n")
+            }
+        }
+    }
     cat("---\n")
     cat("Iterations: ", object$iter, "\n")
     cat("Chains: ", object$chains, "\n")
@@ -15,14 +29,17 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95) ){
     cat("Elapsed time (min):",
     round((max(object$elapsed_time[,1]) + max(object$elapsed_time[,2]))/60, 2) , "\n\n")
 
-    ## Shared objects among models
+    ## Shared objects
     nt = object$nt
     short_names = substr(object$TS_names, 1, 2)
-     ## extract and print only off-diagonal elements
+    ## extract and printonly off-diagonal elements
     cormat_index = matrix(1:(nt*nt), nrow = nt)
     corr_only = cormat_index[lower.tri(cormat_index)]
+    diag_only = diag(cormat_index)
+    ## obtain all combinations of TS varnames for A and B in BEKK
+    full_varnames = expand.grid( short_names, short_names)
     ## obtain off-diagonal TS varnames
-    od_varnames = expand.grid( short_names, short_names)[corr_only, ]
+    od_varnames = full_varnames[corr_only, ]
 
     
     ## depending on parameteriztion, different parameters will be returned:
@@ -51,7 +68,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95) ){
         ## Assign new rownames
         rownames(garch_out) = rn
         ## print garch parameters
-        print(round( garch_out, 2) )
+        print(round( garch_out, digits = digits) )
         cat("\n\n")
 
         ###############################
@@ -68,14 +85,14 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95) ){
                                rownames(corr_out) =
                                    paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
                            }
-        print(round( corr_out, 2) )
+        print(round( corr_out, digits = digits) )
         cat("\n\n")
         
         ###############################
         ## Location parameters       ##
         ###############################
         cat("ARMA(1,1) estimates on the location:", "\n\n")
-        print(round( model_summary[arma_index,], 2) )
+        print(round( model_summary[arma_index,], digits = digits) )
         cat("\n\n") } else {
                         
     #########
@@ -107,7 +124,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95) ){
         ## Assign new rownames
         rownames(garch_h_out) = rn
         ## print garch parameters
-        print(round( garch_h_out, 2) )
+        print(round( garch_h_out, digits = digits) )
         cat("\n\n")
 
         ##########################
@@ -125,7 +142,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95) ){
         ## Assign new rownames
         rownames(garch_q_out) = rn
         ## print garch parameters
-        print(round( garch_q_out, 2) )
+        print(round( garch_q_out, digits = digits) )
         cat("\n\n")
 
         cat("Unconditional correlation 'S' in Q:", "\n\n")
@@ -138,41 +155,107 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95) ){
                                rownames(S_out) =
                                    paste( paste0("S_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
                            }
-        print(round( S_out, 2) )
+        print(round( S_out, digits = digits) )
         cat("\n\n")
 
         ###############################
         ## Location parameters       ##
         ###############################       
         cat("ARMA(1,1) estimates on the location:", "\n\n")
-        print(round( model_summary[arma_index,], 2) )
+        print(round( model_summary[arma_index,], digits = digits) )
         cat("\n\n") } else {
 
     ##########              
     ## BEKK ##
     ##########
     if(object$param == 'BEKK') {
-        model_bekk = rstan::summary(object$model_fit,
+        model_summary = rstan::summary(object$model_fit,
                                     pars = c('Cnst', 'A', 'B', 'corC', 'b0', 'b1', 'b2', 'b3', 'b4', 'lp__'),
-                                    probs = CrI)$summary }
-                            
-        garch_h_index  = grep("_h", rownames(model_summary) )
-        cond_corr_index = grep("R", rownames(model_summary) )
+                                    probs = CrI)$summary 
+
+        garch_C_index  = grep("Cnst", rownames(model_summary) )
+        garch_R_index  = grep("corC", rownames(model_summary) )                            
+        garch_A_index  = grep("A", rownames(model_summary) )
+        garch_B_index  = grep("B", rownames(model_summary) )                        
         arma_index = grep("b[0-9]", rownames(model_summary) )
-                            
-        cat("GARCH(1,1) estimates for conditional variance:", "\n\n")
-        print(round( model_summary[garch_h_index,], 2) )
+
+        #######################
+        ## Garch parameters  ##
+        #######################
+        
+        cat("---\n\n")
+
+        cat("Constant correlation, R (diag[C]*R*diag[C]):", "\n\n")
+        R_out = model_summary[garch_R_index[corr_only],]
+        if ( nt == 2 ) {
+            tmp = matrix( R_out, nrow = 1 )
+            rownames(tmp) = paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
+            colnames(tmp) = names(R_out)
+            R_out = tmp } else {
+                               rownames(R_out) =
+                                   paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
+                           }
+        print(round( R_out, digits = digits) )
         cat("\n\n")
-                            
-        cat("Conditional correlation(s):", "\n\n")
-        print(round( model_summary[cond_corr_index,], 2) )
+
+        cat("Constant variances (diag[C]):", "\n\n")
+        C_out = model_summary[garch_C_index[diag_only],]
+        if ( nt == 2 ) {
+            tmp = matrix( C_out, nrow = 2 )
+            rownames(tmp) = paste0("var_", short_names )
+            colnames(tmp) = names(C_out)
+            C_out = tmp } else {
+                            rownames(C_out) = paste0("var_", short_names )
+                           }
+        print(round( C_out, digits = digits) )
         cat("\n\n")
-                           
+
+        #############
+        ## A and B ##
+        #############
+
+        #######
+        ## A ##
+        #######
+        cat("GARCH(1,1) estimates for A:", "\n\n")
+
+        A_out = model_summary[garch_A_index,]
+        if ( nt == 2 ) {
+            tmp = matrix( A_out, nrow = 4 )
+            rownames(tmp) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+            colnames(tmp) = names(A_out)
+            A_out = tmp } else {
+                            rownames(A_out) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+                            }
+        print(round( A_out, digits = digits) )
+        cat("\n\n")
+        
+        #######
+        ## B ##
+        #######
+        cat("GARCH(1,1) estimates for B:", "\n\n")
+
+        B_out = model_summary[garch_B_index,]
+        if ( nt == 2 ) {
+            tmp = matrix( B_out, nrow = 4 )
+            rownames(tmp) = paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+            colnames(tmp) = names(B_out)
+            B_out = tmp } else {
+                            rownames(B_out) = paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+                            }
+        print(round( B_out, digits = digits) )
+        cat("\n\n")
+        
+        #####################
+        ## ARMA parameters ##
+        #####################
         cat("ARMA(1,1) estimates on the location:", "\n\n")
-        print(round( model_summary[arma_index,], 2) )
+        print(round( model_summary[arma_index,], digits = digits) )
         cat("\n\n")
-    }}
+        }
+    }
+   }
     
     cat("Log density posterior estimate:", "\n\n")
-    print(round( model_summary[grep("lp__", rownames(model_summary) ),], 2) )
+    print(round( model_summary[grep("lp__", rownames(model_summary) ),], digits = digits) )
 }
