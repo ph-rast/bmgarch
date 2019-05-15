@@ -71,7 +71,8 @@ bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000,
                        date = date(),
                        ahead = ahead,
                        nt = stan_data$nt,
-                       TS_length = stan_data$T)
+                       TS_length = stan_data$T,
+                       TS_names = colnames(stan_data$rts) )
   class(return_fit) <- "bmgarch"
   return(return_fit)
 }
