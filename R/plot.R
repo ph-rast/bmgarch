@@ -100,6 +100,12 @@ plot.bmgarch = function(object, type = "means"){
             } 
          }
     }
+
+    ## Return plt for use in other functions
+    return_plot = list( past_data = df,
+                       retro_plot = plt)
+    class(return_plot) <- "plot.bmgarch"
+    invisible(return_plot)
 }
 
 

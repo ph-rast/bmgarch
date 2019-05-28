@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+src/*.o
+src/*.so
+src/*.dll
+.Rproj.user/
+
+## Ignore roxygen generated files
+man/
+NAMESPACE

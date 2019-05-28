@@ -12,18 +12,17 @@ standardQuote()
 
 
 getSymbols("TWTR")
-TWTR$TWTR.Open
+TWTR$TWTR.Open[1:10]
 
 getSymbols("FB")
-FB$FB.Open
+FB$FB.Open[1:10]
 
 getSymbols("GOOG")
-GOOG$GOOG.Open
+GOOG$GOOG.Open[1:10]
 
-dim(cbind(FB$FB.Open, GOOG$GOOG.Open))
-upper <- max(dim(cbind(FB$FB.Open,  TWTR$TWTR.Open)))
+upper <- max(dim(cbind(FB$FB.Open,  TWTR$TWTR.Open,  GOOG$GOOG.Open)))
 upper
-lower <- upper-500
+lower <- upper-300
 leaveout = 0
 r2 <- cbind(FB$FB.Open, TWTR$TWTR.Open, GOOG$GOOG.Open)[lower:(upper-leaveout),] ## remove the last leaveout days
 
@@ -44,13 +43,14 @@ names(r2)
 
 
 
-fit1 = bmgarch(data = r2[,1:2], iterations = 350, parameterization = 'DCC')
+fit1 = bmgarch(data = r2[,1:2], iterations = 1500, parameterization = 'DCC')
 
 summary(fit1)
 plot(fit1, type = 'cvar') 
-plot(fit1 ) 
+plot(fit1, type = 'means' ) 
+plot(fit1, type = 'ccor' ) 
 
-
+forecast(fit1, ahead = 20)
 
 ## Cf. https://groups.google.com/forum/#!topic/stan-users/tWQdtndbSnA for failed initalization: init_r < 2
 bekk_fit_0 <- sampling(bekk_mod, data = standat, verbose = TRUE, iter = 2000, control = list(adapt_delta = .99), init_r = 1, chains = 4)
