@@ -45,12 +45,12 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     ## depending on parameteriztion, different parameters will be returned:
     if(object$param == 'CCC') {
         model_summary = rstan::summary(object$model_fit,
-                                       pars = c('c_h', 'a_h', 'b_h', 'R', 'b0', 'b1', 'b2', 'b3', 'b4', 'lp__'),
+                                       pars = c('c_h', 'a_h', 'b_h', 'R', 'phi0', 'phi', 'theta', 'lp__'),
                                        probs = CrI)$summary
         
         garch_h_index  = grep("_h", rownames(model_summary) )
         cond_corr_index = grep("R", rownames(model_summary) )
-        arma_index = grep("b[0-9]", rownames(model_summary) )
+        arma_index = grep("^phi|^theta", rownames(model_summary) )
 
         ##############################
         ## GARCH parameters of CCC  ##
@@ -100,13 +100,13 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     #########
     if(object$param == 'DCC') {
         model_summary = rstan::summary(object$model_fit,
-                                       pars = c('a_q', 'b_q', 'c_h', 'a_h', 'b_h', 'S', 'b0', 'b1', 'b2', 'b3', 'b4', 'lp__'),
+                                       pars = c('a_q', 'b_q', 'c_h', 'a_h', 'b_h', 'S', 'phi0', 'phi', 'theta', 'lp__'),
                                        probs = CrI)$summary
             
         garch_h_index  = grep("_h", rownames(model_summary) )
         garch_q_index  = grep("_q", rownames(model_summary) )
         S_index = grep("S", rownames(model_summary) )
-        arma_index = grep("b[0-9]", rownames(model_summary) )
+        arma_index = grep("^phi|^theta", rownames(model_summary) )
 
         ##############################
         ## GARCH parameters of DCC  ##
@@ -170,14 +170,14 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     ##########
     if(object$param == 'BEKK') {
         model_summary = rstan::summary(object$model_fit,
-                                    pars = c('Cnst', 'A', 'B', 'corC', 'b0', 'b1', 'b2', 'b3', 'b4', 'lp__'),
+                                    pars = c('Cnst', 'A', 'B', 'corC', 'phi0', 'phi', 'theta', 'lp__'),
                                     probs = CrI)$summary 
 
         garch_C_index  = grep("Cnst", rownames(model_summary) )
         garch_R_index  = grep("corC", rownames(model_summary) )                            
         garch_A_index  = grep("A", rownames(model_summary) )
         garch_B_index  = grep("B", rownames(model_summary) )                        
-        arma_index = grep("b[0-9]", rownames(model_summary) )
+        arma_index = grep("^phi|^theta", rownames(model_summary) )
 
         #######################
         ## Garch parameters  ##

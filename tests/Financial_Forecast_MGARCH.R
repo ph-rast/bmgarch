@@ -50,7 +50,8 @@ plot(fit1, type = 'cvar')
 plot(fit1, type = 'means' ) 
 plot(fit1, type = 'ccor' ) 
 
-forecast(fit1, ahead = 20)
+plt = forecast(fit1, ahead = 2)
+plt + ggplot2::coord_cartesian( xlim = c(250, 320))
 
 ## Cf. https://groups.google.com/forum/#!topic/stan-users/tWQdtndbSnA for failed initalization: init_r < 2
 bekk_fit_0 <- sampling(bekk_mod, data = standat, verbose = TRUE, iter = 2000, control = list(adapt_delta = .99), init_r = 1, chains = 4)

@@ -1,17 +1,6 @@
 ##' .. content for \description{} (no empty lines) ..
 ##'
 ##' .. content for \details{} ..
-##' @param x stan objec
-##' @keywords internal
-.qtile = function(x){
-  cis = quantile(x, c(.025, .975) )
-  return(cis)
-}
-
-
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
 ##' @title Plot 
 ##' @param object stan object
 ##' @param type Plot past expected means (`means`), or past conditional volatilyt (`cvar'), or past conditinoal covariance ('cov')
@@ -36,7 +25,7 @@ plot.bmgarch = function(object, type = "means"){
                                        dim = c(size[1], size[2]))
              estimated_mean[,i] <- colMeans(rstan::extract(object$model_fit)[['mu']][,,i])
             ## Note: CIs will be overwritten - only stores CI's for current i
-            CIs = apply(rstan::extract(object$model_fit)[['mu']][,,i], 2, .qtile )
+            CIs = apply(rstan::extract(object$model_fit)[['mu']][,,i], 2, bmgarch:::.qtile )
             df = data.frame(mu = estimated_mean[,i], CIu = CIs[1,], CIl = CIs[2,])
             df$period = 1:nrow(df)
             plt[[i]] = ggplot(data = df, aes(x = period, y = mu))  + labs(y = 'Conditional Means',
@@ -59,7 +48,7 @@ plot.bmgarch = function(object, type = "means"){
                 for( i in 1:(object$nt-1) ) {
                     for( j in (i+1):object$nt ){
                         cond_corr = apply(rstan::extract(object$model_fit)[['corH']][ , , i, j], 2, mean )
-                        ci_corr = apply(rstan::extract(object$model_fit)[['corH']][ , , i, j], 2, .qtile )
+                        ci_corr = apply(rstan::extract(object$model_fit)[['corH']][ , , i, j], 2, bmgarch:::.qtile )
                         df = data.frame(cond_corr, lower = ci_corr[1,], upper = ci_corr[2,] )
                         df$period = 1:nrow(df)
                         df[1,] = NA
@@ -82,7 +71,7 @@ plot.bmgarch = function(object, type = "means"){
                 for ( i in 1:object$nt ) {
                     ## average conditional variance across iterations
                     mean_var = apply(rstan::extract(object$model_fit)[['H']][ , , i, i], 2, mean )
-                    ci_var = apply(rstan::extract(object$model_fit)[['H']][ , , i, i], 2, .qtile )
+                    ci_var = apply(rstan::extract(object$model_fit)[['H']][ , , i, i], 2, bmgarch:::.qtile )
                     df = data.frame(mean_var, lower = ci_var[1,], upper = ci_var[2,] )
                     df$period = 1:nrow(df)
                     df[1,] = NA

@@ -1,17 +1,6 @@
 ##' .. content for \description{} (no empty lines) ..
 ##'
 ##' .. content for \details{} ..
-##' @title Internal function to be used in sweep()
-##' @param x Value to be squared
-##' @return Squared value
-##' @author philippe
-.square = function(x){
-    x^2
-}
-
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
 ##' @title Forecasting mean and variance 
 ##' @param object Fitted bmgarch object
 ##' @param ahead Periods to be forecasted ahead
@@ -20,17 +9,13 @@
 ##' @importFrom ggplot2 geom_point
 ##' @importFrom ggplot2 geom_errorbar
 forecast = function(object, ahead){
-    b0 = rstan::extract(object$model_fit)[['b0']]
-    b1 = rstan::extract(object$model_fit)[['b1']]
-    b2 = rstan::extract(object$model_fit)[['b2']]
-    b3 = rstan::extract(object$model_fit)[['b3']]
-    b4 = rstan::extract(object$model_fit)[['b4']]
+    phi0 = rstan::extract(object$model_fit)[['phi0']]
+    phi = rstan::extract(object$model_fit)[['phi']]
+    theta = rstan::extract(object$model_fit)[['theta']]
 
     ## for a GARCH 1,1 we only need last mu and last rts
     mu = rstan::extract(object$model_fit)[['mu']][, object$TS_length, ]
-    rts = array( object$RTS_last ) ## TS object needs to be turned in to array for reversing
-    rev = rev(rts)
-
+    rts = array( object$RTS_last , dim = c(object$nt, 1) ) 
 
     ##################
     ## DCC Forecast ##
@@ -51,17 +36,21 @@ forecast = function(object, ahead){
     Q = rstan::extract(object$model_fit)[['Q']][, object$TS_length, ,]
 
     mu_p = array(NA, dim = c( nrow(c_h), ahead, object$nt) )
-    ## stan:  mu_p[1,] =  b0 + b1 .* (rts[T, ]-mu[T,]) + b2 .* (rev[T, ] - (sum(mu[T,]) - mu[T,]) ) + b3 .* rts[T,] +  b4 .* rev[T, ];    
-    mu_p[, 1, ] = b0 + b1 * ( -sweep( mu, 2, rts ) ) + b2 * ( -sweep( mu[ ,rev(1:ncol(mu))], 2, rev )[1,] ) +
-        sweep( b3, 2, rts, '*') + sweep( b4, 2, rev, '*')
+    ## stan:   phi0 + phi * rts[t-1, ] + (rts[t-1, ] - mu[t-1,]) - theta * (rts[t-1, ] - mu[t-1,]) ;
 
+    ## Initialize Movein Average array
+    MA = array( NA, dim = c(nrow(theta), object$nt) )
+    
+    mu_p[, 1, ] = phi0 + t( apply(phi, 1, FUN = function(x){ x %*% rts } ) ) +  ( -sweep( mu, 2, rts ) ) -
+        t( sapply(1:nrow(theta), function(i) bmgarch:::.f_MA( MA, theta, mu, rts, i ) ) )  
+    
     ## stan: for(d in 1:nt){
     ## stan: rr_p[1, d] = square( rts[T, d] - mu[T, d] )
     ## stan: D_p[1, d] = sqrt( c_h[d] + a_h[d]*rr_p[1, d] +  b_h[d]*D[T,d] );
-    rr = t( apply( sweep( mu, 2, rts ), 1, .square) )
+    rr = t( apply( sweep( mu, 2, rts ), 1, bmgarch:::.square) )
 
     D_p = array(NA, dim = c( nrow(c_h), ahead, object$nt) )
-    D_p[,1,] = c_h + a_h * rr + b_h * D
+    D_p[,1,] = sqrt( c_h + a_h * rr + b_h * D )
 
     ## stan: }
     ## stan: Q_p[1,] = (1 - a_q - b_q) * S + a_q * (u[T,] * u[T,]') + b_q * Q[T,];
@@ -82,10 +71,14 @@ forecast = function(object, ahead){
     if(ahead >= 2){
         for( p in 2:ahead ){
             rev_p = rts_p[,p-1, rev(1:ncol( mu_p[,p-1,] ))]
-            mu_p[, p, ] = b0 + b1 * ( rts_p[,p-1,] - mu_p[, p-1, ] ) + b2 * ( rev_p - mu_p[ , p-1, rev(1:ncol(mu_p[,p-1,]))] ) +
-                b3 * rts_p[, p-1, ]  + b4*rev_p
+            mu_p[, p, ] =
+                phi0  +
+                t( sapply(1:nrow( theta ), function(i) bmgarch:::.f_array_x_mat(mat_out = MA, array_obj = phi, mat_obj = rts_p[,p-1,], i) )  ) +
+                ( rts_p[,p-1,] - mu ) -
+                t( sapply(1:nrow( theta ), function(i) bmgarch:::.f_array_x_mat( MA, theta, ( rts_p[,p-1,] - mu_p[,p-1,]) , i ) ) )
+            
             rr = (rts_p[,p-1,] - mu_p[, p-1, ])^2
-            D_p[ , p , ] = c_h + a_h * rr + b_h * D_p[,p-1,]
+            D_p[ , p , ] = sqrt( c_h + a_h * rr + b_h * D_p[,p-1,] )
             
             ## Loop through iteartions
 
@@ -104,6 +97,9 @@ forecast = function(object, ahead){
                 
                 H_p[i, p ,,] = diag( D_p[i,p, ] ) %*% R_p[i, p, ,] %*% diag( D_p[i,p, ] )
                 
+## todo -> this might be a temporary fix: Check forecast for sanity
+               if( is.infinite( H_p[i, p ,,] )[1,1] ) H_p[i, p ,,] = diag(object$nt)
+                
                 rts_p[i,p,]  = mvtnorm::rmvnorm( 1, mean = mu_p[i, p, ], sigma = H_p[i, p ,,] )
             }
         }
@@ -115,7 +111,7 @@ forecast = function(object, ahead){
     
     for ( p in 1:ahead){
         pred_means[p, ] = colMeans( rts_p[, p, ] )
-        pred_ci[p, ,] =  apply( rts_p[, p, ], 2, FUN = .qtile )
+        pred_ci[p, ,] =  apply( rts_p[, p, ], 2, FUN = bmgarch:::.qtile )
     }
 
     print( list( pred_means, pred_ci ) )
@@ -131,7 +127,7 @@ forecast = function(object, ahead){
 
     rts_data = object$RTS_full
 
-    ## TODO go into plot and define df as array, so that is saves the df for each TS?
+    ## TODO go into plot and define df as array, so that it saves the df for each TS?
     #df = retro_plot$past_data
 
     

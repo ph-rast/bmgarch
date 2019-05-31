@@ -37,11 +37,10 @@ parameters {
   //
   vector[nt] A_log;
   vector[nt] B_log;
-  vector[nt] b0;
-  vector[nt] b1;
-  vector[nt] b2;
-  vector[nt] b3;
-  vector[nt] b4;
+  // ARMA parameters
+  vector[nt] phi0; 
+  matrix[nt,nt] phi;
+  matrix[nt,nt] theta;
 }
 transformed parameters {
   cholesky_factor_cov[nt] L_H[T];
@@ -69,10 +68,11 @@ transformed parameters {
   // Initialize
   H[1,] = sigma1;              //rts[,1]*transpose(rts[,1]); // Initial state
   L_H[1,] = cholesky_decompose(H[1,]); // cf. p 69 in stan manual for how to index
-  mu[1,] = b0 + b1 .* (rts[1, ] - b0) + b2 .* ( rev[1, ] - ( sum(b0) - b0) ) + b3 .* rts[1, ] + b4 .* rev[1, ]; // "reverse" b0 vector
+  // = AR + MA 
+  mu[1,] = phi0 + phi * rts[1, ] + (rts[1, ] - phi0) - theta * (rts[1, ] - phi0) ;
   //
   for (t in 2:T){
-    mu[t, ] = b0 + b1 .* (rts[t-1, ] -  mu[t-1,]) + b2 .* ( rev[t-1, ] - ( sum(mu[t-1,]) - mu[t-1, ] ) ) + b3 .* rts[t-1,] +  b4 .* rev[t-1, ]; 
+    mu[t, ] = phi0 + phi * rts[t-1, ] + (rts[t-1, ] - mu[t-1,]) - theta * (rts[t-1, ] - mu[t-1,]) ;
     rr[t-1,] = ( rts[t-1,] - mu[t-1,] )*( rts[t-1,] - mu[t-1,] )';
     //  H[t,] = multiply_lower_tri_self_transpose(Cnst) + A' * rr[t-1,] * A + B' * H[t-1,] * B;
     H[t,] = Cnst + A' * rr[t-1,] * A + B' * H[t-1,] * B;    
@@ -81,11 +81,9 @@ transformed parameters {
 }
 model {
   // priors
-  to_vector(b4) ~ normal(0, 1);
-  to_vector(b3) ~ normal(0, 1);
-  to_vector(b2) ~ normal(0, 1);
-  to_vector(b1) ~ normal(0, 1);
-  to_vector(b0) ~ normal(0, 1);
+  to_vector(theta) ~ normal(0, 1);
+  to_vector(phi) ~ normal(0, 1);
+  to_vector(phi0) ~ normal(0, 1);
   Cnst ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
   for( k in 1:nt){
     target += uniform_lpdf(Av[k] | -Ca[k], Ca[k]) + log( 2*Ca[k] ) + log_inv_logit( A_log[k] ) + log1m_inv_logit( A_log[k] );
@@ -119,7 +117,7 @@ generated quantities {
      log_lik[t] = multi_normal_lpdf(rts[t,] | mu[t,], H[t,]);
   }
 // Forecast
-   mu_p[1,] =  b0 + b1 .* (rts[T, ]-mu[T,]) + b2 .* (rev[T, ] - (sum(mu[T,]) - mu[T,]) ) + b3 .* rts[T,] +  b4 .* rev[T, ];  
+   mu_p[1,] =  phi0 + phi * rts[T, ] + (rts[T, ]-mu[T,]) - theta * (rts[T, ]-mu[T,]);
    rr_p[1,] = ( rts[T,] - mu[T,] )*transpose( rts[T,] - mu[T,] );
     H_p[1,] = Cnst + transpose(A)*rr_p[1,]*A + transpose(B)*H[T,]*B ;    
   L_H_p[1,] = cholesky_decompose(H_p[1,]);
@@ -128,7 +126,7 @@ generated quantities {
       for ( p in 2:ahead) {
         rev_p[2] = rts_p[p-1, 1];
         rev_p[1] = rts_p[p-1, 2];
-        mu_p[p,] =  b0 + b1 .* ( rts_p[p - 1, ] - mu_p[p-1] ) + b2 .* (rev_p - (sum(rev_p) - mu_p[p-1, ]) ) + b3 .* rts_p[p-1,] +  b4 .* rev_p;  
+	mu_p[p,] =  phi0 + phi * rts_p[p - 1, ] + ( rts_p[p - 1, ] - mu_p[p-1] ) - theta * ( rts_p[p - 1, ] - mu_p[p-1] );
         rr_p[p,] = ( rts_p[p - 1,] - mu_p[p - 1,] )*transpose( rts_p[p - 1,] - mu_p[p - 1,] );
          H_p[p,] = Cnst + transpose(A)*rr_p[p,]*A + transpose(B)*H_p[p-1,]*B ;  
        L_H_p[p,] = cholesky_decompose(H_p[p,]);
