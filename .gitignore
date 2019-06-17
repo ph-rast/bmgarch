@@ -10,3 +10,4 @@ src/*.dll
 ## Ignore roxygen generated files
 man/
 NAMESPACE
+tests/
