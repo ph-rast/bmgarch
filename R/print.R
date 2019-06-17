@@ -203,7 +203,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         if ( nt == 2 ) {
             tmp = matrix( C_out, nrow = 2 )
             rownames(tmp) = paste0("var_", short_names )
-            colnames(tmp) = names(C_out)
+            colnames(tmp) = colnames(C_out)
             C_out = tmp } else {
                             rownames(C_out) = paste0("var_", short_names )
                            }
@@ -223,7 +223,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         if ( nt == 2 ) {
             tmp = matrix( A_out, nrow = 4 )
             rownames(tmp) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
-            colnames(tmp) = names(A_out)
+            colnames(tmp) = colnames(A_out)
             A_out = tmp } else {
                             rownames(A_out) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
                             }
@@ -239,7 +239,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         if ( nt == 2 ) {
             tmp = matrix( B_out, nrow = 4 )
             rownames(tmp) = paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
-            colnames(tmp) = names(B_out)
+            colnames(tmp) = colnames(B_out)
             B_out = tmp } else {
                             rownames(B_out) = paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
                             }

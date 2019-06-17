@@ -48,6 +48,17 @@
 ##' .. content for \details{} ..
 ##' @param x stan objec
 ##' @keywords internal
+.cp = function(x){
+    cls = length( x )
+    x_a = array( x, dim = c(cls, 1) )
+    x_a %*% t( x_a )
+}
+
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @param x stan objec
+##' @keywords internal
 .qtile = function(x){
   cis = quantile(x, c(.025, .975) )
   return(cis)

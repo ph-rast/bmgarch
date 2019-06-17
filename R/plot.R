@@ -3,7 +3,7 @@
 ##' .. content for \details{} ..
 ##' @title Plot 
 ##' @param object stan object
-##' @param type Plot past expected means (`means`), or past conditional volatilyt (`cvar'), or past conditinoal covariance ('cov')
+##' @param type Plot past expected means ("means"), or past conditional volatilyt ("cvar"), or past conditinoal correlation ("ccor")
 ##' @return Plot
 ##' @author philippe
 ##' @importFrom ggplot2 ggplot
