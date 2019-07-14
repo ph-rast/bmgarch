@@ -6,8 +6,9 @@
 #' @return bmgarch object 
 #' @export
 #' @keywords internal
-standat = function(data, ahead){
+standat = function(data, ahead, standardize_data){
     if(dim(data)[1] < dim(data)[2]) data = t(data)
+    if(standardize_data) {
     ## Standardize time-series
     stdx = scale(data)
     centered_data = attr(stdx, "scaled:center")
@@ -19,6 +20,14 @@ standat = function(data, ahead){
                           ahead = ahead,
                           centered_data = centered_data,
                           scaled_data = scaled_data)
+    } else {
+      ## Unstandardized
+      return_standat = list(T = nrow(data),
+                            rts = data,
+                            sigma1 = cov(data),
+                            nt = ncol(data),
+                            ahead = ahead)
+    }
     return(return_standat)
 }
 
@@ -34,8 +43,8 @@ standat = function(data, ahead){
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’. See the documentation in ‘stan’.
 ##' @return An object of S4 class ‘stanfit’ representing the fitted results.
 ##' @author philippe
-bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000, chains = 4, ...){
-    return_standat = standat(data, ahead)
+bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000, chains = 4, standardize_data = TRUE, ...){
+    return_standat = standat(data, ahead, standardize_data)
     stan_data  = return_standat[ c('T', 'rts', 'sigma1', 'nt', 'ahead')] 
   if(parameterization == 'CCC') model_fit <- rstan::sampling(stanmodels$CCCMGARCH, data = stan_data,
                                                       verbose = TRUE,
@@ -43,13 +52,14 @@ bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000,
                                                       control = list(adapt_delta = .99),
                                                       init_r = 1,
                                                       chains = chains) else {
-  if( parameterization == 'DCC' ) model_fit <- rstan::sampling(stanmodels$DCCMGARCH, data = stan_data,
+  if( parameterization == 'DCC' ) model_fit <- rstan::sampling(stanmodels$DCCMGARCHt, data = stan_data,
                                                       verbose = TRUE,
                                                       iter = iterations,
                                                       control = list(adapt_delta = .99),
                                                       init_r = 1,
                                                       chains = chains) else {
-  if( parameterization == 'BEKK' ) model_fit <- rstan::sampling(stanmodels$BEKKMGARCH, data = stan_data,
+  if( parameterization == 'BEKK' ) model_fit <- rstan::sampling(stanmodels$BEKKMGARCHt, 
+                                                      data = stan_data,
                                                       verbose = TRUE,
                                                       iter = iterations,
                                                       control = list(adapt_delta = .99),
