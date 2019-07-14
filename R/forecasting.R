@@ -26,7 +26,7 @@ forecast = function(object, ahead){
     ## Initialize Moving Average array
     MA = array( NA, dim = c(nrow(theta), object$nt) )
 
-    mu_p[, 1, ] = phi0 + t( apply(phi, 1, FUN = function(x){ x %*% rts } ) ) +  ( -sweep( mu, 2, rts ) ) -
+    mu_p[, 1, ] = phi0 + t( apply(phi, 1, FUN = function(x){ x %*% rts } ) ) + 
         t( sapply(1:nrow(theta), function(i) bmgarch:::.f_MA( MA, theta, mu, rts, i ) ) )  
 
     ## init rts_p 
@@ -84,7 +84,6 @@ forecast = function(object, ahead){
                 mu_p[, p, ] =
                     phi0  +
                     t( sapply(1:nrow( theta ), function(i) bmgarch:::.f_array_x_mat(mat_out = MA, array_obj = phi, mat_obj = rts_p[,p-1,], i) )  ) +
-                    ( rts_p[,p-1,] - mu ) -
                     t( sapply(1:nrow( theta ), function(i) bmgarch:::.f_array_x_mat( MA, theta, ( rts_p[,p-1,] - mu_p[,p-1,]) , i ) ) )
                 
                 rr = (rts_p[,p-1,] - mu_p[, p-1, ])^2
@@ -155,7 +154,6 @@ forecast = function(object, ahead){
                              phi0  +
                              t( sapply(1:nrow( theta ),
                                        function(i) bmgarch:::.f_array_x_mat(mat_out = MA, array_obj = phi, mat_obj = rts_p[,p-1,], i) )  ) +
-                             ( rts_p[,p-1,] - mu ) -
                              t( sapply(1:nrow( theta ),
                                        function(i) bmgarch:::.f_array_x_mat( MA, theta, ( rts_p[,p-1,] - mu_p[,p-1,]) , i ) ) )
                          rr = (rts_p[,p-1,] - mu_p[, p-1, ])^2
@@ -207,7 +205,6 @@ forecast = function(object, ahead){
                                       t( sapply(1:nrow( theta ),
                                                 function(i) bmgarch:::.f_array_x_mat(mat_out = MA, array_obj = phi,
                                                                                                       mat_obj = rts_p[,p-1,], i) )  ) +
-                                      ( rts_p[,p-1,] - mu ) -
                                       t( sapply(1:nrow( theta ),
                                                 function(i) bmgarch:::.f_array_x_mat( MA, theta, ( rts_p[,p-1,] - mu_p[,p-1,]) , i ) ) )
                                   ## Scale
