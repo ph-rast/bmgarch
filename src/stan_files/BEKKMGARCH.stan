@@ -69,10 +69,10 @@ transformed parameters {
   H[1,] = sigma1;              //rts[,1]*transpose(rts[,1]); // Initial state
   L_H[1,] = cholesky_decompose(H[1,]); // cf. p 69 in stan manual for how to index
   // = AR + MA 
-  mu[1,] = phi0 + phi * rts[1, ] + (rts[1, ] - phi0) - theta * (rts[1, ] - phi0) ;
+  mu[1,] = phi0 + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
   //
   for (t in 2:T){
-    mu[t, ] = phi0 + phi * rts[t-1, ] + (rts[t-1, ] - mu[t-1,]) - theta * (rts[t-1, ] - mu[t-1,]) ;
+    mu[t, ] = phi0 + phi * rts[t-1, ] +  theta * (rts[t-1, ] - mu[t-1,]) ;
     rr[t-1,] = ( rts[t-1,] - mu[t-1,] )*( rts[t-1,] - mu[t-1,] )';
     //  H[t,] = multiply_lower_tri_self_transpose(Cnst) + A' * rr[t-1,] * A + B' * H[t-1,] * B;
     H[t,] = Cnst + A' * rr[t-1,] * A + B' * H[t-1,] * B;    
@@ -117,7 +117,7 @@ generated quantities {
      log_lik[t] = multi_normal_lpdf(rts[t,] | mu[t,], H[t,]);
   }
 // Forecast
-   mu_p[1,] =  phi0 + phi * rts[T, ] + (rts[T, ]-mu[T,]) - theta * (rts[T, ]-mu[T,]);
+   mu_p[1,] =  phi0 + phi * rts[T, ] +  theta * (rts[T, ]-mu[T,]);
    rr_p[1,] = ( rts[T,] - mu[T,] )*transpose( rts[T,] - mu[T,] );
     H_p[1,] = Cnst + transpose(A)*rr_p[1,]*A + transpose(B)*H[T,]*B ;    
   L_H_p[1,] = cholesky_decompose(H_p[1,]);
@@ -126,7 +126,7 @@ generated quantities {
       for ( p in 2:ahead) {
         rev_p[2] = rts_p[p-1, 1];
         rev_p[1] = rts_p[p-1, 2];
-	mu_p[p,] =  phi0 + phi * rts_p[p - 1, ] + ( rts_p[p - 1, ] - mu_p[p-1] ) - theta * ( rts_p[p - 1, ] - mu_p[p-1] );
+	mu_p[p,] =  phi0 + phi * rts_p[p - 1, ] +  theta * ( rts_p[p - 1, ] - mu_p[p-1] );
         rr_p[p,] = ( rts_p[p - 1,] - mu_p[p - 1,] )*transpose( rts_p[p - 1,] - mu_p[p - 1,] );
          H_p[p,] = Cnst + transpose(A)*rr_p[p,]*A + transpose(B)*H_p[p-1,]*B ;  
        L_H_p[p,] = cholesky_decompose(H_p[p,]);
