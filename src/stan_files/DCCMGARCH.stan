@@ -47,7 +47,7 @@ transformed parameters {
   vector[nt] Q_sdi[T];
   vector[nt] u[T];
   // Initialize t=1
-  mu[1,] = phi0 + phi * rts[1, ] + (rts[1, ] - phi0) - theta * (rts[1, ] - phi0) ;
+  mu[1,] = phi0 + phi * rts[1, ] +  theta * (rts[1, ] - phi0) ;
   u[1,] = diagonal(sigma1);
   D[1,] = diagonal(sigma1);
   Q[1,] = sigma1;
@@ -57,7 +57,7 @@ transformed parameters {
   Q_sdi[1] = rep_vector(1.0, nt);
   // iterations geq 2
   for (t in 2:T){
-    mu[t, ] = phi0 + phi * rts[t-1, ] + (rts[t-1, ] - mu[t-1,]) - theta * (rts[t-1, ] - mu[t-1,]) ;
+    mu[t, ] = phi0 + phi * rts[t-1, ] +  theta * (rts[t-1, ] - mu[t-1,]) ;
     for(d in 1:nt){ 
       rr[t-1,d] = square( rts[t-1,d] - mu[t-1,d] );
       // GARCH(1,1) for diag in D: take sqrt to keep params in variance metric, elements denoted as h in paper
@@ -108,7 +108,7 @@ generated quantities {
      log_lik[t] = multi_normal_lpdf(rts[t,] | mu[t,], H[t,]);
   }
 // Forecast
-  mu_p[1,] =  phi0 + phi * rts[T, ] + (rts[T, ]-mu[T,]) - theta * (rts[T, ]-mu[T,]);
+  mu_p[1,] =  phi0 + phi * rts[T, ] +  theta * (rts[T, ]-mu[T,]);
   for(d in 1:nt){
       rr_p[1, d] = square( rts[T, d] - mu[T, d] );
        D_p[1, d] = sqrt( c_h[d] + a_h[d]*rr_p[1, d] +  b_h[d]*D[T,d] );
@@ -125,7 +125,7 @@ generated quantities {
     for ( p in 2:ahead) {
       rev_p[2] = rts_p[p-1, 1];
       rev_p[1] = rts_p[p-1, 2];
-      mu_p[p,] =  phi0 + phi * rts_p[p - 1, ] + ( rts_p[p - 1, ] - mu_p[p-1] ) - theta * ( rts_p[p - 1, ] - mu_p[p-1] );
+      mu_p[p,] =  phi0 + phi * rts_p[p - 1, ] +  theta * ( rts_p[p - 1, ] - mu_p[p-1] );
       for(d in 1:nt){
 	rr_p[p, d] = square( rts_p[p-1, d] - mu_p[p-1, d] );
 	D_p[p, d] = sqrt( c_h[d] + a_h[d]*rr_p[p-1, d] +  b_h[d]*D_p[p-1,d] );
