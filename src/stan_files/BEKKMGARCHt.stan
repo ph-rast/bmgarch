@@ -68,10 +68,10 @@ transformed parameters {
   // Initialize
   H[1,] = sigma1;              //rts[,1]*transpose(rts[,1]); // Initial state
   // = AR + MA 
-  mu[1,] = phi0 + phi * rts[1, ] + (rts[1, ] - phi0) - theta * (rts[1, ] - phi0) ;
+  mu[1,] = phi0 + phi * rts[1, ] +  theta * (rts[1, ] - phi0) ;
   //
   for (t in 2:T){
-    mu[t, ] = phi0 + phi * rts[t-1, ] + (rts[t-1, ] - mu[t-1,]) - theta * (rts[t-1, ] - mu[t-1,]) ;
+    mu[t, ] = phi0 + phi * rts[t-1, ] +  theta * (rts[t-1, ] - mu[t-1,]) ;
     rr[t-1,] = ( rts[t-1,] - mu[t-1,] )*( rts[t-1,] - mu[t-1,] )';
     //  H[t,] = multiply_lower_tri_self_transpose(Cnst) + A' * rr[t-1,] * A + B' * H[t-1,] * B;
     H[t,] = Cnst + A' * rr[t-1,] * A + B' * H[t-1,] * B;    
@@ -114,7 +114,7 @@ generated quantities {
      log_lik[t] = multi_student_t_lpdf(rts[t,] | nu, mu[t,], H[t,]);
   }
 // Forecast
-   mu_p[1,] =  phi0 + phi * rts[T, ] + (rts[T, ]-mu[T,]) - theta * (rts[T, ]-mu[T,]);
+   mu_p[1,] =  phi0 + phi * rts[T, ] + theta * (rts[T, ]-mu[T,]);
    rr_p[1,] = ( rts[T,] - mu[T,] )*transpose( rts[T,] - mu[T,] );
     H_p[1,] = Cnst + transpose(A)*rr_p[1,]*A + transpose(B)*H[T,]*B ;    
   rts_p[1,] = multi_student_t_rng(nu, mu_p[1,], H_p[1,]);
@@ -122,7 +122,7 @@ generated quantities {
       for ( p in 2:ahead) {
         rev_p[2] = rts_p[p-1, 1];
         rev_p[1] = rts_p[p-1, 2];
-	mu_p[p,] =  phi0 + phi * rts_p[p - 1, ] + ( rts_p[p - 1, ] - mu_p[p-1] ) - theta * ( rts_p[p - 1, ] - mu_p[p-1] );
+	mu_p[p,] =  phi0 + phi * rts_p[p - 1, ] +  theta * ( rts_p[p - 1, ] - mu_p[p-1] );
         rr_p[p,] = ( rts_p[p - 1,] - mu_p[p - 1,] )*transpose( rts_p[p - 1,] - mu_p[p - 1,] );
          H_p[p,] = Cnst + transpose(A)*rr_p[p,]*A + transpose(B)*H_p[p-1,]*B ;  
        rts_p[p,] = multi_student_t_rng(nu, mu_p[p,], H_p[p,]);
