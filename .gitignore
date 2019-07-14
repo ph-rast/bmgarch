@@ -2,9 +2,10 @@
 .Rhistory
 .RData
 .Ruserdata
-src/*.o
-src/*.so
-src/*.dll
+*.o
+*.so
+*.hpp
+*.dll
 .Rproj.user/
 
 ## Ignore roxygen generated files
