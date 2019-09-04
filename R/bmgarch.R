@@ -43,6 +43,7 @@ standat = function(data, ahead, standardize_data){
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’. See the documentation in ‘stan’.
 ##' @return An object of S4 class ‘stanfit’ representing the fitted results.
 ##' @author philippe
+##' @export
 bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000, chains = 4, standardize_data = TRUE, ...){
     return_standat = standat(data, ahead, standardize_data)
     stan_data  = return_standat[ c('T', 'rts', 'sigma1', 'nt', 'ahead')] 
@@ -52,13 +53,13 @@ bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000,
                                                       control = list(adapt_delta = .99),
                                                       init_r = 1,
                                                       chains = chains) else {
-  if( parameterization == 'DCC' ) model_fit <- rstan::sampling(stanmodels$DCCMGARCHt, data = stan_data,
+  if( parameterization == 'DCC' ) model_fit <- rstan::sampling(stanmodels$DCCMGARCH, data = stan_data,
                                                       verbose = TRUE,
                                                       iter = iterations,
                                                       control = list(adapt_delta = .99),
                                                       init_r = 1,
                                                       chains = chains) else {
-  if( parameterization == 'BEKK' ) model_fit <- rstan::sampling(stanmodels$BEKKMGARCHt, 
+  if( parameterization == 'BEKK' ) model_fit <- rstan::sampling(stanmodels$BEKKMGARCH, 
                                                       data = stan_data,
                                                       verbose = TRUE,
                                                       iter = iterations,

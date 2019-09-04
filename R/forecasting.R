@@ -1,6 +1,3 @@
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
 ##' @title Forecasting mean and variance 
 ##' @param object Fitted bmgarch object
 ##' @param ahead Periods to be forecasted ahead
@@ -8,6 +5,7 @@
 ##' @author philippe
 ##' @importFrom ggplot2 geom_point
 ##' @importFrom ggplot2 geom_errorbar
+##' @export
 forecast = function(object, ahead){
 
     ## Global objects used in forecasts: Location object (mu) is the same for all parameterizations

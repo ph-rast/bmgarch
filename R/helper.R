@@ -1,7 +1,4 @@
 ## obtain MA piece for Forecasting
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
 ##' @title Multiply matrices in array with a vector 
 ##' @param MA 
 ##' @param theta 
@@ -16,9 +13,6 @@
     MA[i,] = t( theta[i, ,] %*% res[i,] )
 }
 
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
 ##' @title Multiply matrices in array with a vector -- generic
 ##' @param mat_out 
 ##' @param array_obj 
@@ -31,9 +25,6 @@
     mat_out[i,] = t( array_obj[i, ,] %*% mat_obj[i,] )
 }
 
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
 ##' @title Internal function to be used in sweep()
 ##' @param x Value to be squared
 ##' @return Squared value
@@ -43,9 +34,7 @@
     x^2
 }
 
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
+##' @title Internal function 
 ##' @param x stan objec
 ##' @keywords internal
 .cp = function(x){
@@ -54,10 +43,8 @@
     x_a %*% t( x_a )
 }
 
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
-##' @param x stan objec
+##' @title Internal function to be used
+##' @param x 
 ##' @keywords internal
 .qtile = function(x){
   cis = quantile(x, c(.025, .975) )

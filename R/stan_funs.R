@@ -1,8 +1,5 @@
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
-##' @title 
-##' @return 
+##' @title Generate Stan code 
+##' @return stan code
 ##' @author philippe
 ##' @keywords internal
 ##' @importFrom glue glue

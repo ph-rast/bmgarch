@@ -1,6 +1,3 @@
-##' .. content for \description{} (no empty lines) ..
-##'
-##' .. content for \details{} ..
 ##' @title Plot 
 ##' @param object stan object
 ##' @param type Plot past expected means ("means"), or past conditional volatilyt ("cvar"), or past conditinoal correlation ("ccor")
@@ -12,6 +9,7 @@
 ##' @importFrom ggplot2 aes
 ##' @importFrom ggplot2 labs
 ##' @importFrom ggplot2 coord_cartesian
+##' @export
 plot.bmgarch = function(object, type = "means"){
     plt = list()
     if ( type == 'means' ) {
