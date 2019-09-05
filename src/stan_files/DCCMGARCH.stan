@@ -14,7 +14,6 @@ data {
   int<lower=1> nt;                    // number of time series
   vector[nt] rts[T];  // multivariate time-series
   int<lower=0> ahead; // how many ahead predictions 
-  matrix[nt,nt] sigma1;
 }
 transformed data {
   // Reverse the rts vector
@@ -35,6 +34,12 @@ parameters {
   real<lower=0, upper = 1 > a_q; // do the mudulus thing here
   real<lower=0, upper = (1 - a_q) > b_q; //
   corr_matrix[nt] S;  // DCC keeps this constant as it is obtained from step 1. This will probably not work here (i.e. will be overwritten T times)
+  // Q1 init
+  cov_matrix[nt] Q1_init;
+  // D1 init
+  vector[nt] D1_init;
+  // u1 init
+  vector[nt] u1_init;   
 }
 transformed parameters {
   cholesky_factor_cov[nt] L_H[T];
@@ -48,9 +53,9 @@ transformed parameters {
   vector[nt] u[T];
   // Initialize t=1
   mu[1,] = phi0 + phi * rts[1, ] +  theta * (rts[1, ] - phi0) ;
-  u[1,] = diagonal(sigma1);
-  D[1,] = diagonal(sigma1);
-  Q[1,] = sigma1;
+  u[1,] = u1_init;
+  D[1,] = D1_init;
+  Q[1,] = Q1_init;
   L_H[1,] = cholesky_decompose(Q[1,]);
   H[1] = L_H[1]*L_H[1]';
   R[1] = diag_matrix(rep_vector(1.0, nt));
@@ -74,6 +79,11 @@ transformed parameters {
 }
 model {
   // priors
+  // Prior for initial state
+  Q1_init ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
+  to_vector(D1_init) ~ lognormal(0, 1);
+  to_vector(u1_init) ~ lognormal(0, 1);
+  
   to_vector(theta) ~ normal(0, 1);
   to_vector(phi) ~ normal(0, 1);
   to_vector(phi0) ~ normal(0, 1);

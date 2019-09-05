@@ -14,7 +14,6 @@ data {
   int<lower=1> nt;    // number of time series
   vector[nt] rts[T];  // multivariate time-series
   int<lower=0> ahead; // how many ahead predictions 
-  matrix[nt,nt] sigma1;
 }
 transformed data {
   // Reverse the rts vector
@@ -41,6 +40,8 @@ parameters {
   vector[nt] phi0; 
   matrix[nt,nt] phi;
   matrix[nt,nt] theta;
+  // H1 init
+  cov_matrix[nt] H1_init;  
 }
 transformed parameters {
   cholesky_factor_cov[nt] L_H[T];
@@ -66,7 +67,7 @@ transformed parameters {
   A = append_col(Ap, Av);
   B = append_col(Bp, Bv);
   // Initialize
-  H[1,] = sigma1;              // Initial state
+  H[1,] = H1_init;
   L_H[1,] = cholesky_decompose(H[1,]); // cf. p 69 in stan manual for how to index
   // = AR + MA 
   mu[1,] = phi0 + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
@@ -81,6 +82,8 @@ transformed parameters {
 }
 model {
   // priors
+  // Prior for initial state
+  H1_init ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
   to_vector(theta) ~ normal(0, 1);
   to_vector(phi) ~ normal(0, 1);
   to_vector(phi0) ~ normal(0, 1);

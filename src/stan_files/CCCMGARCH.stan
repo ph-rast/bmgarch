@@ -14,7 +14,6 @@ data {
   int<lower=1> nt;                    // number of time series
   vector[nt] rts[T];  // multivariate time-series
   int<lower=0> ahead; // how many ahead predictions 
-  cov_matrix[nt] sigma1;
 }
 transformed data {
   // Reverse the rts vector
@@ -32,7 +31,9 @@ parameters {
   vector<lower=0 >[nt] a_h;
   vector<lower=0 >[nt] b_h; // not sure if this upper def works with vectors
   // GARCH q parameters 
-  corr_matrix[nt] R;  
+  corr_matrix[nt] R;
+  // D1 init
+  vector[nt] D1_init;    
 }
 transformed parameters {
   //cholesky_factor_cov[nt] L_H[T];
@@ -45,7 +46,7 @@ transformed parameters {
     mu[1,] = phi0 + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
   
   //u[1,] = diagonal(sigma1);
-  D[1,] = diagonal(sigma1);
+  D[1,] = D1_init;
   H[1,] = quad_form_diag(R,     D[1,]);  // H = DRD; 
   // iterations geq 2
   for (t in 2:T){
@@ -59,6 +60,7 @@ transformed parameters {
 }
 model {
   // priors
+  to_vector(D1_init) ~ lognormal(0, 1);
   to_vector(theta) ~ normal(0, 1);
   to_vector(phi) ~ normal(0, 1);
   to_vector(phi0) ~ normal(0, 1);
