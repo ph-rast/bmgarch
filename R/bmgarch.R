@@ -6,7 +6,7 @@
 #' @return bmgarch object 
 #' @export
 #' @keywords internal
-standat = function(data, ahead, standardize_data){
+standat = function(data, ahead, standardize_data, distribution){
     if(dim(data)[1] < dim(data)[2]) data = t(data)
     if(standardize_data) {
     ## Standardize time-series
@@ -15,18 +15,18 @@ standat = function(data, ahead, standardize_data){
     scaled_data = attr(stdx, "scaled:scale")
     return_standat = list(T = nrow(stdx),
                           rts = stdx,
-                          sigma1 = cov(stdx),
                           nt = ncol(stdx),
                           ahead = ahead,
                           centered_data = centered_data,
-                          scaled_data = scaled_data)
+                          scaled_data = scaled_data,
+                          distribution = distribution)
     } else {
       ## Unstandardized
       return_standat = list(T = nrow(data),
                             rts = data,
-                            sigma1 = cov(data),
                             nt = ncol(data),
-                            ahead = ahead)
+                            ahead = ahead,
+                            distribution = distribution)
     }
     return(return_standat)
 }
@@ -44,9 +44,12 @@ standat = function(data, ahead, standardize_data){
 ##' @return An object of S4 class ‘stanfit’ representing the fitted results.
 ##' @author philippe
 ##' @export
-bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000, chains = 4, standardize_data = TRUE, ...){
-    return_standat = standat(data, ahead, standardize_data)
-    stan_data  = return_standat[ c('T', 'rts', 'sigma1', 'nt', 'ahead')] 
+bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000, chains = 4, standardize_data = TRUE,
+                   distribution = 'Normal', ...) {
+    num_dist = if ( distribution == 'Normal' ) 0 else {
+               if ( distribution == 'student_t' ) 1  else { print('Enter "Normal" or "student_t"') } }
+    return_standat = standat(data, ahead, standardize_data, distribution = num_dist )
+    stan_data  = return_standat[ c('T', 'rts', 'nt', 'ahead', 'distribution')] 
   if(parameterization == 'CCC') model_fit <- rstan::sampling(stanmodels$CCCMGARCH, data = stan_data,
                                                       verbose = TRUE,
                                                       iter = iterations,
