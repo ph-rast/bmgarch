@@ -46,10 +46,12 @@ standat = function(data, ahead, standardize_data, distribution){
 ##' @export
 bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000, chains = 4, standardize_data = TRUE,
                    distribution = 'Normal', ...) {
-    num_dist = if ( distribution == 'Normal' ) 0 else {
-               if ( distribution == 'student_t' ) 1  else { print('Enter "Normal" or "student_t"') } }
+    num_dist = NA
+    if ( distribution == 'Normal' ) num_dist = 0 else {
+               if ( distribution == 'student_t' ) num_dist = 1 else warning( '\n\n Specify distribution: Normal or student_t \n\n', immediate. = TRUE) }
     return_standat = standat(data, ahead, standardize_data, distribution = num_dist )
-    stan_data  = return_standat[ c('T', 'rts', 'nt', 'ahead', 'distribution')] 
+    stan_data  = return_standat[ c('T', 'rts', 'nt', 'ahead', 'distribution')]
+
   if(parameterization == 'CCC') model_fit <- rstan::sampling(stanmodels$CCCMGARCH, data = stan_data,
                                                       verbose = TRUE,
                                                       iter = iterations,
@@ -69,8 +71,9 @@ bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000,
                                                       control = list(adapt_delta = .99),
                                                       init_r = 1,
                                                       chains = chains) else {
-  return( 'Not a valid model specification. Select CCC, DCC, or BEKK.' )}
-      }                                                                 }
+  warning( 'Not a valid model specification. Select CCC, DCC, or BEKK.' )}
+                                                                       }
+                                                                       }
     ## Model fit is based on standardized values.
     mns = return_standat$centered_data
     sds = return_standat$scaled_data
@@ -79,6 +82,7 @@ bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000,
     ## orig_scale = orig_sd + array(rep(mns, each = aussi[[1]]$T), dim = c(aussi[[1]]$T, aussi[[1]]$nt) )
     return_fit <- list(model_fit = model_fit,
                        param = parameterization,
+                       distribution = distribution,
                        iter = iterations,
                        chains = chains,
                        elapsed_time = rstan::get_elapsed_time(model_fit),
@@ -89,6 +93,6 @@ bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000,
                        TS_names = colnames(stan_data$rts),
                        RTS_last = stan_data$rts[stan_data$T,],
                        RTS_full = stan_data$rts)
-  class(return_fit) <- "bmgarch"
-  return(return_fit)
+    class(return_fit) <- "bmgarch"
+    return(return_fit)
 }

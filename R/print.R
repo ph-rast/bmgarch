@@ -20,6 +20,8 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
             }
         }
     }
+    cat("\n")
+    cat("Distribution: ", object$distribution, "\n")
     cat("---\n")
     cat("Iterations: ", object$iter, "\n")
     cat("Chains: ", object$chains, "\n")

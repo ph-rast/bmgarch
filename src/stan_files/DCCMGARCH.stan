@@ -101,7 +101,7 @@ model {
     for(t in 1:T){
       rts[t,] ~ multi_normal_cholesky(mu[t,], L_H[t,]);
     }
-  } else if ( distribution == 0 ) {
+  } else if ( distribution == 1 ) {
     for(t in 1:T){
       rts[t,] ~ multi_student_t(nu, mu[t,], L_H[t,]*L_H[t,]');
     }
