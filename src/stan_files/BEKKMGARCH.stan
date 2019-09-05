@@ -66,7 +66,7 @@ transformed parameters {
   A = append_col(Ap, Av);
   B = append_col(Bp, Bv);
   // Initialize
-  H[1,] = sigma1;              //rts[,1]*transpose(rts[,1]); // Initial state
+  H[1,] = sigma1;              // Initial state
   L_H[1,] = cholesky_decompose(H[1,]); // cf. p 69 in stan manual for how to index
   // = AR + MA 
   mu[1,] = phi0 + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
