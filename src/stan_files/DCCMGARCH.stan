@@ -1,13 +1,6 @@
 // DCC-Parameterization
 functions { 
-  matrix cov2cor(matrix C){
-    int dm = rows(C);
-    matrix[dm,dm] s;
-    matrix[dm,dm] R;
-    s = diag_matrix( 1 ./ sqrt(diagonal(C)) );
-    R = s*C*s ; //quad_form_diag(C, s);
-    return R;
-  }
+#include /functions/cov2cor.stan
 }
 data {
   int<lower=2> T;
@@ -118,7 +111,7 @@ generated quantities {
   vector[nt] u_p[ahead-1];
 
   // retrodict
-  #include /generated/retrodict_H.stan
+#include /generated/retrodict_H.stan
 
   // Forecast
   mu_p[1,] =  phi0 + phi * rts[T, ] +  theta * (rts[T, ]-mu[T,]);

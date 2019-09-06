@@ -46,7 +46,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     if(object$param == 'CCC') {
         model_summary = rstan::summary(object$model_fit,
                                        pars = c('c_h', 'a_h', 'b_h', 'R', 'phi0', 'phi', 'theta', 'lp__'),
-                                       probs = CrI)$summary
+                                       probs = CrI)$summary[, -2 ] # drop se_mean with [,-2]
         
         garch_h_index  = grep("_h", rownames(model_summary) )
         cond_corr_index = grep("R", rownames(model_summary) )
@@ -101,7 +101,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     if(object$param == 'DCC') {
         model_summary = rstan::summary(object$model_fit,
                                        pars = c('a_q', 'b_q', 'c_h', 'a_h', 'b_h', 'S', 'phi0', 'phi', 'theta', 'lp__'),
-                                       probs = CrI)$summary
+                                       probs = CrI)$summary[, -2]
             
         garch_h_index  = grep("_h", rownames(model_summary) )
         garch_q_index  = grep("_q", rownames(model_summary) )
@@ -171,7 +171,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     if(object$param == 'BEKK') {
         model_summary = rstan::summary(object$model_fit,
                                     pars = c('Cnst', 'A', 'B', 'corC', 'phi0', 'phi', 'theta', 'lp__'),
-                                    probs = CrI)$summary 
+                                    probs = CrI)$summary[, -2 ] 
 
         garch_C_index  = grep("Cnst", rownames(model_summary) )
         garch_R_index  = grep("corC", rownames(model_summary) )                            
@@ -255,7 +255,12 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         }
     }
    }
-    
+
+    nu = rstan::summary(object$model_fit, pars = c('nu'))$summary[,'mean']
+    if( object$num_dist == 1) {
+        cat("Degrees of freedom constant 'nu' in student_t:", round( nu, digits = 2), "\n\n")
+    }
+
     cat("Log density posterior estimate:", "\n\n")
     print(round( model_summary[grep("lp__", rownames(model_summary) ),], digits = digits) )
 }

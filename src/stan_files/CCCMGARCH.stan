@@ -1,13 +1,6 @@
 // CCC-Parameterization
 functions { 
-  matrix cov2cor(matrix C){
-    int dm = rows(C);
-    matrix[dm,dm] s;
-    matrix[dm,dm] R;
-    s = diag_matrix( 1 ./ sqrt(diagonal(C)) );
-    R = s*C*s ; //quad_form_diag(C, s);
-    return R;
-  }
+#include /functions/cov2cor.stan
 }
 data {
   int<lower=2> T;
@@ -88,19 +81,8 @@ generated quantities {
   cov_matrix[nt] H_p[ahead];
   vector[2] rev_p = [0,0]';
 // retrodict
-  if ( distribution == 0 ){
-    for (t in 1:T) {
-      rts_out[,t] = multi_normal_rng(mu[t,], H[t,]);
-      corH[t,] = cov2cor(H[t,]);
-      log_lik[t] = multi_normal_lpdf(rts[t,] | mu[t,], H[t,]);
-    }
-  } else if ( distribution == 1 ) {
-    for (t in 1:T) {
-      rts_out[,t] = multi_student_t_rng(nu, mu[t,], H[t,]);
-      corH[t,] = cov2cor(H[t,]);
-      log_lik[t] = multi_student_t_lpdf(rts[t,] | nu, mu[t,], H[t,]);
-    }
-  }
+#include /generated/retrodict_H.stan
+  
 // Forecast
   mu_p[1,] =  phi0 + phi * rts[T, ] +  theta * (rts[T, ]-mu[T,]);
   for(d in 1:nt){
