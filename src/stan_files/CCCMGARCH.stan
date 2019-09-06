@@ -13,14 +13,10 @@ data {
   int<lower=2> T;
   int<lower=1> nt;                    // number of time series
   vector[nt] rts[T];  // multivariate time-series
-  int<lower=0> ahead; // how many ahead predictions 
+  int<lower=0> ahead; // how many ahead predictions
+  int<lower=0, upper=1> distribution; // 0 = Normal; 1 = student_t
 }
 transformed data {
-  // Reverse the rts vector
-  vector[nt] rev[T];
-  for( i in 1:nt ) {
-    rev[,i] = rts[,nt-i+1];
-  }  
 }
 parameters { 
   vector[nt] phi0; 
@@ -33,7 +29,8 @@ parameters {
   // GARCH q parameters 
   corr_matrix[nt] R;
   // D1 init
-  vector[nt] D1_init;    
+  vector[nt] D1_init;
+  real< lower = 2 > nu; // nu for student_t
 }
 transformed parameters {
   //cholesky_factor_cov[nt] L_H[T];
@@ -43,8 +40,7 @@ transformed parameters {
   vector[nt] mu[T];
   vector[nt] D[T];
   // Initialize t=1
-    mu[1,] = phi0 + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
-  
+  mu[1,] = phi0 + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
   //u[1,] = diagonal(sigma1);
   D[1,] = D1_init;
   H[1,] = quad_form_diag(R,     D[1,]);  // H = DRD; 
@@ -60,6 +56,8 @@ transformed parameters {
 }
 model {
   // priors
+  if ( distribution == 1 )
+    nu ~ normal( nt, 50 );
   to_vector(D1_init) ~ lognormal(0, 1);
   to_vector(theta) ~ normal(0, 1);
   to_vector(phi) ~ normal(0, 1);
@@ -68,8 +66,14 @@ model {
   to_vector(b_h) ~ normal(0, .5);
   R ~ lkj_corr(nt);
   // likelihood
-  for(t in 1:T){
-    rts[t,] ~ multi_normal(mu[t,], H[t,]);
+  if ( distribution == 0 ) {
+    for(t in 1:T){
+      rts[t,] ~ multi_normal(mu[t,], H[t,]);
+    }
+  } else if ( distribution == 1 ) {
+    for(t in 1:T){
+      rts[t,] ~ multi_student_t(nu, mu[t,], H[t,]);
+    }
   }
 }
 generated quantities {
@@ -84,10 +88,18 @@ generated quantities {
   cov_matrix[nt] H_p[ahead];
   vector[2] rev_p = [0,0]';
 // retrodict
-  for (t in 1:T) {
-    rts_out[,t] = multi_normal_rng(mu[t,], H[t,]);
-       corH[t,] = cov2cor(H[t,]);
-     log_lik[t] = multi_normal_lpdf(rts[t,] | mu[t,], H[t,]);
+  if ( distribution == 0 ){
+    for (t in 1:T) {
+      rts_out[,t] = multi_normal_rng(mu[t,], H[t,]);
+      corH[t,] = cov2cor(H[t,]);
+      log_lik[t] = multi_normal_lpdf(rts[t,] | mu[t,], H[t,]);
+    }
+  } else if ( distribution == 1 ) {
+    for (t in 1:T) {
+      rts_out[,t] = multi_student_t_rng(nu, mu[t,], H[t,]);
+      corH[t,] = cov2cor(H[t,]);
+      log_lik[t] = multi_student_t_lpdf(rts[t,] | nu, mu[t,], H[t,]);
+    }
   }
 // Forecast
   mu_p[1,] =  phi0 + phi * rts[T, ] +  theta * (rts[T, ]-mu[T,]);
@@ -95,8 +107,12 @@ generated quantities {
       rr_p[1, d] = square( rts[T, d] - mu[T, d] );
        D_p[1, d] = sqrt( c_h[d] + a_h[d]*rr_p[1, d] +  b_h[d]*D[T,d] );
     }
-  H_p[1,] = quad_form_diag(R, D_p[1]); 
-  rts_p[1,] = multi_normal_rng(mu_p[1,], H_p[1,]);
+  H_p[1,] = quad_form_diag(R, D_p[1]);
+  if ( distribution == 0 ) {
+    rts_p[1,] = multi_normal_rng(mu_p[1,], H_p[1,]);
+  } else if ( distribution == 1 ) {
+    rts_p[1,] = multi_student_t_rng(nu, mu_p[1,], H_p[1,]);
+  }
   //
   if(ahead >= 2) {
     for ( p in 2:ahead) {
@@ -107,8 +123,12 @@ generated quantities {
 	rr_p[p, d] = square( rts_p[p-1, d] - mu_p[p-1, d] );
 	D_p[p, d] = sqrt( c_h[d] + a_h[d]*rr_p[p-1, d] +  b_h[d]*D_p[p-1,d] );
       }
-      H_p[p,] = quad_form_diag(R, D_p[p]); 
-      rts_p[p,] = multi_normal_rng(mu_p[p,], H_p[p,]);
+      H_p[p,] = quad_form_diag(R, D_p[p]);
+      if ( distribution == 0 ) {
+	rts_p[p,] = multi_normal_rng(mu_p[p,], H_p[p,]);
+      } else if ( distribution == 1 ) {
+	rts_p[p,] = multi_student_t_rng(nu, mu_p[p,], H_p[p,]);
+      }
     }
   }
 }

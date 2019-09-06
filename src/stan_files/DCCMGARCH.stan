@@ -17,11 +17,6 @@ data {
   int<lower=0, upper=1> distribution; // 0 = Normal; 1 = student_t
 }
 transformed data {
-  /* // Reverse the rts vector */
-  /* vector[nt] rev[T]; */
-  /* for( i in 1:nt ) { */
-  /*   rev[,i] = rts[,nt-i+1]; */
-  /* }   */
 }
 parameters { 
   vector[nt] phi0; 
@@ -85,11 +80,9 @@ model {
   Q1_init ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
   to_vector(D1_init) ~ lognormal(0, 1);
   to_vector(u1_init) ~ lognormal(0, 1);
-  if ( distribution == 0 ) {
-    nu ~ normal( 2, 0.0000001);
-  } else if ( distribution == 1 ){
-    nu ~ normal( 3, 30 );
-      }
+  // Prior on nu for student_t
+  if ( distribution == 1 )
+    nu ~ normal( nt, 50 );
   to_vector(theta) ~ normal(0, 1);
   to_vector(phi) ~ normal(0, 1);
   to_vector(phi0) ~ normal(0, 1);
@@ -123,21 +116,11 @@ generated quantities {
   vector[nt] Q_sdi_p[ahead];
   corr_matrix[nt] R_p[ahead];
   vector[nt] u_p[ahead-1];
-// retrodict
-  if ( distribution == 0 ){ 
-    for (t in 1:T) {
-      rts_out[,t] = multi_normal_rng(mu[t,], H[t,]);
-      corH[t,] = cov2cor(H[t,]);
-      log_lik[t] = multi_normal_lpdf(rts[t,] | mu[t,], H[t,]);
-    }
-  } else if ( distribution == 1 ) {
-    for (t in 1:T) {
-      rts_out[,t] = multi_student_t_rng(nu, mu[t,], H[t,]);
-      corH[t,] = cov2cor(H[t,]);
-      log_lik[t] = multi_student_t_lpdf(rts[t,] | nu, mu[t,], H[t,]);
-    }
-  }
-// Forecast
+
+  // retrodict
+  #include /generated/retrodict_H.stan
+
+  // Forecast
   mu_p[1,] =  phi0 + phi * rts[T, ] +  theta * (rts[T, ]-mu[T,]);
   for(d in 1:nt){
       rr_p[1, d] = square( rts[T, d] - mu[T, d] );
