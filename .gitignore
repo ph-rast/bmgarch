@@ -8,7 +8,3 @@
 *.dll
 .Rproj.user/
 
-## Ignore roxygen generated files
-man/
-NAMESPACE
-tests/
