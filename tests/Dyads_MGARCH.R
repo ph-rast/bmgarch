@@ -138,6 +138,8 @@ sigma1 <- var(r)
 
 ## Fit Model
 bekk_fit = bmgarch(data = r, parameterization = "BEKK", iterations = 100)
+summary(bekk_fit)
+
 
 pst <- rstan::summary(bekk_fit$model_fit, pars = c('Cnst', 'A', 'B', 'corC',  'phi0', 'phi', 'theta', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
 pst
