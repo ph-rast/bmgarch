@@ -8,6 +8,7 @@
 #' @keywords internal
 standat = function(data, ahead, standardize_data, distribution){
     if(dim(data)[1] < dim(data)[2]) data = t(data)
+    if ( is.null( colnames( data ) ) ) colnames( data ) = paste0('t', 1:ncol( data ) )
     if(standardize_data) {
     ## Standardize time-series
     stdx = scale(data)
@@ -44,7 +45,12 @@ standat = function(data, ahead, standardize_data, distribution){
 ##' @return An object of S4 class ‘stanfit’ representing the fitted results.
 ##' @author philippe
 ##' @export
-bmgarch = function(data, parameterization = 'CCC', ahead = 1, iterations = 1000, chains = 4, standardize_data = TRUE,
+bmgarch = function(data,
+                   parameterization = 'CCC',
+                   ahead = 1,
+                   iterations = 1000,
+                   chains = 4,
+                   standardize_data = TRUE,
                    distribution = 'Normal', ...) {
     num_dist = NA
     if ( distribution == 'Normal' ) num_dist = 0 else {
