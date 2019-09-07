@@ -5,13 +5,16 @@ functions {
 data {
   int<lower=2> T;
   int<lower=1> nt;                    // number of time series
+  int<lower=1> Q; // MA component in MGARCH(P,Q), matrix A
+  int<lower=1> P; // AR component in MGARCH(P,Q), matirx B
   vector[nt] rts[T];  // multivariate time-series
   int<lower=0> ahead; // how many ahead predictions
   int<lower=0, upper=1> distribution; // 0 = Normal; 1 = student_t
 }
 transformed data {
 }
-parameters { 
+parameters {
+  // ARMA parameters
   vector[nt] phi0; 
   matrix[nt,nt] phi;
   matrix[nt,nt] theta;
@@ -19,11 +22,12 @@ parameters {
   vector<lower=0>[nt] c_h; 
   vector<lower=0 >[nt] a_h;
   vector<lower=0 >[nt] b_h; // not sure if this upper def works with vectors
-  // GARCH q parameters 
+  // GARCH constant correlation 
   corr_matrix[nt] R;
   // D1 init
   vector[nt] D1_init;
-  real< lower = 2 > nu; // nu for student_t
+  // DF constant nu for student t
+  real< lower = 2 > nu; 
 }
 transformed parameters {
   //cholesky_factor_cov[nt] L_H[T];
