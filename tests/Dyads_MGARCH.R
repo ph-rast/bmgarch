@@ -137,7 +137,7 @@ sigma1 <- var(r)
 
 
 ## Fit Model
-bekk_fit = bmgarch(data = r, parameterization = "BEKK", iterations = 100)
+bekk_fit = bmgarch(data = r, parameterization = "CCC", iterations = 1000, Q = 1)
 summary(bekk_fit)
 
 
