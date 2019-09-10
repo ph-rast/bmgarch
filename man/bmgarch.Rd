@@ -4,8 +4,9 @@
 \alias{bmgarch}
 \title{Bayesian Multivariate GARCH}
 \usage{
-bmgarch(data, parameterization = "CCC", ahead = 1, iterations = 1000,
-  chains = 4, standardize_data = TRUE, distribution = "Normal", ...)
+bmgarch(data, parameterization = "CCC", P = 1, Q = 1, ahead = 1,
+  iterations = 1000, chains = 4, standardize_data = TRUE,
+  distribution = "Normal", ...)
 }
 \arguments{
 \item{data}{A time-series or matrix object containing observations at the same interval.}

@@ -13,14 +13,9 @@
 plot.bmgarch = function(object, type = "means"){
     plt = list()
     if ( type == 'means' ) {
-        size <- dim(rstan::extract(object$model_fit)[['rts_p']])
-        ## obtain predicted values from all chains 
-        forecasted_ts = array(NA, dim = c(size[1], object$nt))
         estimated_mean = array(NA, dim = c(object$TS_length, object$nt))
         CIs = array(NA, dim = c(object$TS_length, object$nt))
         for ( i in 1:object$nt ){
-            forecasted_ts[,i] <- array(rstan::extract(object$model_fit)[['rts_p']][,1:object$ahead, i],
-                                       dim = c(size[1], size[2]))
              estimated_mean[,i] <- colMeans(rstan::extract(object$model_fit)[['mu']][,,i])
             ## Note: CIs will be overwritten - only stores CI's for current i
             CIs = apply(rstan::extract(object$model_fit)[['mu']][,,i], 2, bmgarch:::.qtile )
@@ -38,9 +33,9 @@ plot.bmgarch = function(object, type = "means"){
         }
     } else {
         if ( type == 'ccor' ) {
-            ## if (object$param == 'CCC') {
-            ##     print('Correlation is constant for CCC - no plot generated')
-            ## } else {
+             if (object$param == 'CCC') {
+                 warning('Correlation is constant for CCC - no plot generated') 
+             } else {
                 ## only makes sense if model is not CCC
                 ## 
                 for( i in 1:(object$nt-1) ) {
@@ -64,6 +59,7 @@ plot.bmgarch = function(object, type = "means"){
                         }                           
                     }
                 }
+             }
         } else {
             if ( type == 'cvar' ) {
                 for ( i in 1:object$nt ) {

@@ -110,9 +110,12 @@ for(i in redo){
     # plot(1:nrow(rl2), rl2[,1], type = 'l')
     # lines(1:nrow(rl2), rl2[,2], col = 'red')
      
-    fit1 = bmgarch(data = r, parameterization = "BEKK", iterations = 20, distribution = 'student_t')
+    fit1 = bmgarch(data = r, parameterization = "CCC", iterations = 500, distribution = 'student_t', Q = 3, P = 3)
     summary(fit1)
-   rstan::summary(fit1$model_fit, pars = c('nu', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
+    rstan::summary(fit1$model_fit, pars = c('nu', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
+
+    class(fit1)
+    plot( fit1, type = 'means' )
     
     # summary(fit1, CrI = c(0.025, .975))
     # bmgarch::plot.bmgarch(fit1, type = 'cvar')

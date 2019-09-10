@@ -20,8 +20,8 @@ parameters {
   matrix[nt,nt] theta;
   // GARCH h parameters on variance metric
   vector<lower=0>[nt] c_h; 
-  vector<lower=0 >[nt] a_h[Q];
-  vector<lower=0 >[nt] b_h[P]; // not sure if this upper def works with vectors
+  vector<lower=0, upper = 1 >[nt] a_h[Q];
+  vector<lower=0, upper = 1 >[nt] b_h[P]; // actually: 1 - a_h, across all Q and P...
   // GARCH constant correlation 
   corr_matrix[nt] R;
   // D1 init
@@ -36,7 +36,11 @@ transformed parameters {
   vector[nt] rr[T-1];
   vector[nt] mu[T];
   vector[nt] D[T];
+  real<lower = 0> vd;
+  real<lower = 0> ma_d = 0.0;
+  real<lower = 0> ar_d = 0.0;
   // Initialize t=1
+  // Check "Order Sensitivity and Repeated Variables" in stan reference manual
   mu[1,] = phi0 + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
   //u[1,] = diagonal(sigma1);
   D[1,] = D1_init;
@@ -47,10 +51,16 @@ transformed parameters {
     mu[t, ] = phi0 + phi * rts[t-1, ] + theta * (rts[t-1, ] - mu[t-1,]) ;
     // scale: SD's of D
     for (d in 1:nt) {
-      for (q in 1:min(t-1, Q) ) {
+      // MA component
+      for (q in 1:min( t-1, Q) ) {
 	rr[t-q, d] = square( rts[t-q, d] - mu[t-q, d] );
-	D[t, d] = sqrt( c_h[d] + a_h[q, d]*rr[t-q, d] +  b_h[1, d]*D[t-1, d] );
+	ma_d = ma_d + a_h[q, d]*rr[t-q, d] ;
       }
+      for (p in 1:min( t-1, P) ) {
+	ar_d = ar_d + b_h[p, d]*D[t-p, d];
+      }
+      vd = c_h[d] + ma_d + ar_d;
+      D[t, d] = sqrt( vd );
     }
   H[t,] = quad_form_diag(R,     D[t,]);  // H = DRD;
   }
@@ -70,11 +80,13 @@ model {
   // likelihood
   if ( distribution == 0 ) {
     for(t in 1:T){
-      rts[t,] ~ multi_normal(mu[t,], H[t,]);
+      //      rts[t,] ~ multi_normal(mu[t,], H[t,]);
+      target += multi_normal_lpdf( rts[t, ] | mu[t,], H[t,]);
     }
   } else if ( distribution == 1 ) {
     for(t in 1:T){
-      rts[t,] ~ multi_student_t(nu, mu[t,], H[t,]);
+      //      rts[t,] ~ multi_student_t(nu, mu[t,], H[t,]);
+      target += multi_student_t_lpdf( rts[t, ] | nu, mu[t,], H[t,]);
     }
   }
 }
