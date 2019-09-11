@@ -21,12 +21,12 @@ parameters {
   row_vector[nt-2] Ap1k[Q];
   matrix[nt-1, nt-1] Ap_sub[Q];
   //
-  real<lower = 0, upper = 1> Bp11;
-  row_vector[nt-2] Bp1k;
-  matrix[nt-1, nt-1] Bp_sub;
+  real<lower = 0, upper = 1> Bp11[P];
+  row_vector[nt-2] Bp1k[P];
+  matrix[nt-1, nt-1] Bp_sub[P];
   //
   vector[nt] A_log[Q];
-  vector[nt] B_log;
+  vector[nt] B_log[P];
   // ARMA parameters
   vector[nt] phi0; 
   matrix[nt,nt] phi;
@@ -41,29 +41,35 @@ transformed parameters {
   matrix[nt,nt] rr[T-1];
   vector[nt] mu[T];
   matrix[nt, nt] A[Q];
-  matrix[nt, nt] B;
+  matrix[nt, nt] B[P];
   vector[nt] Ca[Q]; // Upper (and lower) boundary for A 
   vector[nt] Av[Q];
-  vector[nt] Cb; // Upper (and lower) boundary for B
-  vector[nt] Bv; 
+  vector[nt] Cb[P]; // Upper (and lower) boundary for B
+  vector[nt] Bv[P]; 
   matrix[nt, nt -1 ] Ap[Q];
-  matrix[nt, nt -1 ] Bp;
+  matrix[nt, nt -1 ] Bp[P];
   matrix[nt, nt] A_part = diag_matrix( rep_vector(0.0, nt));
-  for( q in 1:Q )
+  matrix[nt, nt] B_part = diag_matrix( rep_vector(0.0, nt));  
+  for ( q in 1:Q )
     Ap[q] = append_row(append_col(Ap11[q], Ap1k[q]), Ap_sub[q]);
-  Bp = append_row(append_col(Bp11, Bp1k), Bp_sub);
+  for ( p in 1:P )
+    Bp[p] = append_row(append_col(Bp11[p], Bp1k[p]), Bp_sub[p]);
   for ( i in 1:nt) {
-    for( q in 1:Q ){
+    for ( q in 1:Q ){
       Ca[q,i] = sqrt( 1 - dot_self(Ap[q,i]) );
       Av[q,i] = -Ca[q,i] + 2*Ca[q,i] * inv_logit( A_log[q,i] );
     }
-    Cb[i] = sqrt( 1 - dot_self(Bp[i]) );
-    Bv[i] = -Cb[i] + 2*Cb[i] * inv_logit( B_log[i] );
+    for ( p in 1:P ){ 
+      Cb[p,i] = sqrt( 1 - dot_self(Bp[p,i]) );
+      Bv[p,i] = -Cb[p,i] + 2*Cb[p,i] * inv_logit( B_log[p,i] );
+    }
   }
+  
   for ( q in 1:Q ) 
     A[q] = append_col(Ap[q], Av[q]);
-  
-  B = append_col(Bp, Bv);
+
+  for ( p in 1:P )
+    B[p] = append_col(Bp[p], Bv[p]);
 
   // Initialize
   H[1,] = H1_init;
@@ -77,8 +83,11 @@ transformed parameters {
     for (q in 1:min( t-1, Q) ) {
       rr[t-q,] = ( rts[t-q,] - mu[t-q,] )*( rts[t-q,] - mu[t-q,] )';
       A_part = A_part + A[q]' * rr[t-q,] * A[q];
-	}
-      H[t,] = Cnst +  A_part + B' * H[t-1,] * B;    
+    }
+    for (p in 1:min( t-1, P) ) {
+      B_part =  B[p]' * H[t-p,] * B[p];
+    }
+    H[t,] = Cnst +  A_part +  B_part;   
     L_H[t,] = cholesky_decompose(H[t,]);
   }
 }
@@ -98,7 +107,9 @@ model {
      for( q in 1:Q ) {
        target += uniform_lpdf(Av[q,k] | -Ca[q,k], Ca[q,k]) + log( 2*Ca[q,k] ) + log_inv_logit( A_log[q,k] ) + log1m_inv_logit( A_log[q,k] );
      }
-     target += uniform_lpdf(Bv[k] | -Cb[k], Cb[k]) + log( 2*Cb[k] ) + log_inv_logit( B_log[k] ) + log1m_inv_logit( B_log[k] ); 
+     for ( p in 1:P ) {
+       target += uniform_lpdf(Bv[p,k] | -Cb[p,k], Cb[p,k]) + log( 2*Cb[p,k] ) + log_inv_logit( B_log[p,k] ) + log1m_inv_logit( B_log[p,k] );
+     }
   }
   // likelihood
   if ( distribution == 0 ) {

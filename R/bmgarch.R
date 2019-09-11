@@ -62,7 +62,7 @@ bmgarch = function(data,
     if ( distribution == 'Normal' ) num_dist = 0 else {
                if ( distribution == 'student_t' ) num_dist = 1 else warning( '\n\n Specify distribution: Normal or student_t \n\n', immediate. = TRUE) }
     return_standat = standat(data, P, Q, ahead, standardize_data, distribution = num_dist )
-    stan_data  = return_standat[ c('T', 'rts', 'nt', 'ahead', 'distribution')]
+    stan_data  = return_standat[ c('T', 'rts', 'nt', 'ahead', 'distribution', 'P', 'Q')]
 
   if(parameterization == 'CCC') model_fit <- rstan::sampling(stanmodels$CCCMGARCH, data = stan_data,
                                                       verbose = TRUE,
@@ -105,7 +105,9 @@ bmgarch = function(data,
                        TS_length = stan_data$T,
                        TS_names = colnames(stan_data$rts),
                        RTS_last = stan_data$rts[stan_data$T,],
-                       RTS_full = stan_data$rts)
+                       RTS_full = stan_data$rts,
+                       mgarchQ = stan_data$Q,
+                       mgarchP = stan_data$P)
     class(return_fit) <- "bmgarch"
     return(return_fit)
 }

@@ -257,8 +257,12 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
    }
 
     nu = rstan::summary(object$model_fit, pars = c('nu'))$summary[,'mean']
+    Lnu = round( rstan::summary(object$model_fit, pars = c('nu'))$summary[,'2.5%'], 2)
+    Unu = round( rstan::summary(object$model_fit, pars = c('nu'))$summary[,'97.5%'], 2)
+    
     if( object$num_dist == 1) {
-        cat("Degrees of freedom constant 'nu' in student_t:", round( nu, digits = 2), "\n\n")
+        cat("Df constant student_t: nu =", round( nu, digits = 2), "\n")
+        cat("                nu 95%CrI [", Lnu, ";", Unu, "]","\n\n")
     }
 
     cat("Log density posterior estimate:", "\n\n")
