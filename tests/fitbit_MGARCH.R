@@ -99,7 +99,7 @@ for(i in redo){
     ## Extract Time series per invididul   
     i = 4#13
     i = 35
-    r <-fitsub[fitsub$record_id==sel[i],c('PAf', 'stepsstd')]
+    r <-fitsub[fitsub$record_id==sel[i],c('PAf', 'stepsstd', 'NAf')]
      plot(1:nrow(r), r[,1], type = 'l'); lines(1:nrow(r), r[,2], col = 'red')
     # rl = r
     # cbind(rl, r)

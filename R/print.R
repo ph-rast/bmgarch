@@ -40,6 +40,8 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     full_varnames = expand.grid( short_names, short_names)
     ## obtain off-diagonal TS varnames
     od_varnames = full_varnames[corr_only, ]
+    P = object$mgarchP
+    Q = object$mgarchQ
 
     
     ## depending on parameteriztion, different parameters will be returned:
@@ -217,16 +219,20 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         #######
         ## A ##
         #######
-        cat("GARCH(1,1) estimates for A:", "\n\n")
+        cat(paste0(paste0("MGARCH(", P, ",", Q, ')')), "estimates for A:", "\n\n")
 
+        a = list()
         A_out = model_summary[garch_A_index,]
-        if ( nt == 2 ) {
-            tmp = matrix( A_out, nrow = 4 )
-            rownames(tmp) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
-            colnames(tmp) = colnames(A_out)
-            A_out = tmp } else {
-                            rownames(A_out) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
-                            }
+        #if ( nt == 2 ) {
+            if (Q > 1) {
+                for( q in 1:Q ){
+                    a[[q]] = paste( paste0( paste0("A_", q, "_"), full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+                }
+                rownames(A_out) = unlist( a )
+            } else rownames(A_out) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+        #} else {
+        #    rownames(A_out) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+        #}
         print(round( A_out, digits = digits) )
         cat("\n\n")
         
@@ -249,7 +255,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         #####################
         ## ARMA parameters ##
         #####################
-        cat("ARMA(1,1) estimates on the location:", "\n\n")
+        cat(paste0(paste(paste0("ARMA(", 1), 1, sep = ','), ')'), "estimates on the location:", "\n\n")
         print(round( model_summary[arma_index,], digits = digits) )
         cat("\n\n")
         }
