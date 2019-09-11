@@ -57,13 +57,16 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         ##############################
         ## GARCH parameters of CCC  ##
         ##############################
-        cat("GARCH(1,1) estimates for conditional variance:", "\n\n")
+        cat(paste0(paste0("GARCH(", P, ",", Q, ')')), "estimates for conditional variance:", "\n\n") 
+##        cat("GARCH(1,1) estimates for conditional variance:", "\n\n")
         
         rn = rownames(model_summary[garch_h_index,])
         for ( i in 1:nt ) {
-            replace = grep(paste("\\[", "\\]", sep=as.character(i)), rn)
-            rn[replace] = gsub(paste("\\[", "\\]", sep=as.character(i)), paste0("_", short_names[i]), rn)[replace]
+           # replace = grep(paste("\\[", "\\]", sep=as.character(i)), rn)
+            replace = grep(paste0( as.character(i), "\\]"), rn) 
+        rn[replace] = gsub(paste0( as.character(i), "\\]" ), paste0(short_names[i]), rn)[replace]
         }
+        rn = gsub("\\[", "_", rn)
 
         ## Save into new object to change rownames
         garch_out = model_summary[garch_h_index,]
@@ -223,32 +226,29 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
 
         a = list()
         A_out = model_summary[garch_A_index,]
-        #if ( nt == 2 ) {
             if (Q > 1) {
                 for( q in 1:Q ){
                     a[[q]] = paste( paste0( paste0("A_", q, "_"), full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
                 }
                 rownames(A_out) = unlist( a )
             } else rownames(A_out) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
-        #} else {
-        #    rownames(A_out) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
-        #}
         print(round( A_out, digits = digits) )
         cat("\n\n")
         
         #######
         ## B ##
         #######
-        cat("GARCH(1,1) estimates for B:", "\n\n")
+        cat(paste0(paste0("MGARCH(", P, ",", Q, ')')), "estimates for B:", "\n\n")
 
+        b = list()
         B_out = model_summary[garch_B_index,]
-        if ( nt == 2 ) {
-            tmp = matrix( B_out, nrow = 4 )
-            rownames(tmp) = paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
-            colnames(tmp) = colnames(B_out)
-            B_out = tmp } else {
-                            rownames(B_out) = paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
-                            }
+        ##if ( nt == 2 ) {
+        if (P > 1) {
+            for( p in 1:P ){
+                b[[p]] = paste( paste0( paste0("B_", p, "_"), full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+            }
+            rownames( B_out ) = unlist( b )
+        } else rownames( B_out ) = paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
         print(round( B_out, digits = digits) )
         cat("\n\n")
         

@@ -99,7 +99,7 @@ for(i in redo){
     ## Extract Time series per invididul   
     i = 4#13
     i = 35
-    r <-fitsub[fitsub$record_id==sel[i],c('PAf', 'stepsstd', 'NAf')]
+    r <-fitsub[fitsub$record_id==sel[i],c('PAf', 'stepsstd')]
      plot(1:nrow(r), r[,1], type = 'l'); lines(1:nrow(r), r[,2], col = 'red')
     # rl = r
     # cbind(rl, r)
@@ -109,8 +109,12 @@ for(i in redo){
     # plot(1:nrow(rl2), rl2[,1], type = 'l')
     # lines(1:nrow(rl2), rl2[,2], col = 'red')
      
-    fit1 = bmgarch(data = r, parameterization = "BEKK", iterations = 500, distribution = 'student_t', Q = 2, P = 2)
+    fit1 = bmgarch(data = r, parameterization = "CCC", iterations = 500, distribution = 'student_t', Q = 3, P = 3)
     summary(fit1)
+    library(loo)
+    m2 = loo::loo(fit1$model_fit)
+loo::compare(m1, m2)
+    
     fit1$mgarchQ
     fit1$mgarchP
     
