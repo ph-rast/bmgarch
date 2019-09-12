@@ -2,7 +2,6 @@
 ##' @return stan code
 ##' @author philippe
 ##' @keywords internal
-##' @importFrom glue glue
 
 scode_cov2cor = function(){
     out = "matrix cov2cor(matrix C){
