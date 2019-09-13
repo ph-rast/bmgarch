@@ -36,9 +36,9 @@ transformed parameters {
   vector[nt] rr[T-1];
   vector[nt] mu[T];
   vector[nt] D[T];
-  real<lower = 0> vd;
-  real<lower = 0> ma_d = 0.0;
-  real<lower = 0> ar_d = 0.0;
+  real<lower = 0> vd[nt];
+  real<lower = 0> ma_d[nt];
+  real<lower = 0> ar_d[nt];
   // Initialize t=1
   // Check "Order Sensitivity and Repeated Variables" in stan reference manual
   mu[1,] = phi0 + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
@@ -51,18 +51,21 @@ transformed parameters {
     mu[t, ] = phi0 + phi * rts[t-1, ] + theta * (rts[t-1, ] - mu[t-1,]) ;
     // scale: SD's of D
     for (d in 1:nt) {
+      vd[d] = 0.0;
+      ma_d[d] = 0.0;
+      ar_d[d] = 0.0;
       // MA component
       for (q in 1:min( t-1, Q) ) {
 	rr[t-q, d] = square( rts[t-q, d] - mu[t-q, d] );
-	ma_d = ma_d + a_h[q, d]*rr[t-q, d] ;
+	ma_d[d] = ma_d[d] + a_h[q, d]*rr[t-q, d] ;
       }
       for (p in 1:min( t-1, P) ) {
-	ar_d = ar_d + b_h[p, d]*D[t-p, d];
+	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d];
       }
-      vd = c_h[d] + ma_d + ar_d;
-      D[t, d] = sqrt( vd );
+      vd[d] = c_h[d] + ma_d[d] + ar_d[d];
+      D[t, d] = sqrt( vd[d] );
     }
-  H[t,] = quad_form_diag(R,     D[t,]);  // H = DRD;
+  H[t,] = quad_form_diag(R, D[t,]);  // H = DRD;
   }
 }
 
