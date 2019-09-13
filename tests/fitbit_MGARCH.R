@@ -21,11 +21,11 @@ stem(fitbit$Max_TemperatureF)
 variables = names(fitbit)[9:29]
 
 length(variables)
-op <- par(mfcol = c(3,7))
-for(i in 1:length(variables)) {
-    plot(fitbit[fitbit$record_id ==1, variables[i]], type = 'l', main = variables[i])
-}
-op
+#op <- par(mfcol = c(3,7))
+#for(i in 1:length(variables)) {
+#    plot(fitbit[fitbit$record_id ==1, variables[i]], type = 'l', main = variables[i])
+#}
+                                        #op
 
 
 ## Bivariate mgarch for one individual. Ts are steps and some variable
@@ -87,6 +87,7 @@ length(sel)
 results <- array(NA, dim = c(length(sel),27))
 resultsCI <- array(NA, dim = c(length(sel),54))
 ahead = 1
+
 dev.off()
 
 ## loop through sel participants
@@ -109,7 +110,7 @@ for(i in redo){
     # plot(1:nrow(rl2), rl2[,1], type = 'l')
     # lines(1:nrow(rl2), rl2[,2], col = 'red')
      
-    fit1 = bmgarch(data = r, parameterization = "CCC", iterations = 500, distribution = 'student_t', Q = 3, P = 3)
+    fit1 = bmgarch(data = r, parameterization = "CCC", iterations = 100, distribution = 'student_t', Q = 2, P = 2)
     summary(fit1)
     library(loo)
     m2 = loo::loo(fit1$model_fit)

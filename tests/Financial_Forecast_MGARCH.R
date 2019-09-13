@@ -43,7 +43,7 @@ names(r2)
 
 
 
-fit1 = bmgarch(data = r2[,1:2], iterations = 1500, parameterization = 'DCC')
+fit1 = bmgarch(data = r2[,1:3], iterations = 500, parameterization = 'CCC', P = 2, Q = 2)
 
 summary(fit1)
 plot(fit1, type = 'cvar') 
