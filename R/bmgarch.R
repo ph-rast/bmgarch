@@ -6,9 +6,11 @@
 #' @return bmgarch object 
 #' @export
 #' @keywords internal
-standat = function(data, P, Q, ahead, standardize_data, distribution){
+standat = function(data, xH, P, Q, ahead, standardize_data, distribution){
     if(dim(data)[1] < dim(data)[2]) data = t(data)
     if ( is.null( colnames( data ) ) ) colnames( data ) = paste0('t', 1:ncol( data ) )
+    if ( is.null( xH ) ) xH = matrix(0, nrow = nrow( data ), ncol = ncol( data) )
+    if ( dim( xH )[2] != dim( data )[2] ) xH = matrix( xH, nrow = nrow( data ), ncol = ncol( data)) ## Risky, better to throw an error 
     if(standardize_data) {
     ## Standardize time-series
     stdx = scale(data)
@@ -16,6 +18,7 @@ standat = function(data, P, Q, ahead, standardize_data, distribution){
     scaled_data = attr(stdx, "scaled:scale")
     return_standat = list(T = nrow(stdx),
                           rts = stdx,
+                          xH = xH,
                           nt = ncol(stdx),
                           ahead = ahead,
                           centered_data = centered_data,
@@ -27,6 +30,7 @@ standat = function(data, P, Q, ahead, standardize_data, distribution){
       ## Unstandardized
       return_standat = list(T = nrow(data),
                             rts = data,
+                            xH = xH,
                             nt = ncol(data),
                             ahead = ahead,
                             distribution = distribution,
@@ -50,6 +54,7 @@ standat = function(data, P, Q, ahead, standardize_data, distribution){
 ##' @author philippe
 ##' @export
 bmgarch = function(data,
+                   xH = NULL,
                    parameterization = 'CCC',
                    P = 1,
                    Q = 1,
@@ -61,8 +66,8 @@ bmgarch = function(data,
     num_dist = NA
     if ( distribution == 'Normal' ) num_dist = 0 else {
                if ( distribution == 'student_t' ) num_dist = 1 else warning( '\n\n Specify distribution: Normal or student_t \n\n', immediate. = TRUE) }
-    return_standat = standat(data, P, Q, ahead, standardize_data, distribution = num_dist )
-    stan_data  = return_standat[ c('T', 'rts', 'nt', 'ahead', 'distribution', 'P', 'Q')]
+    return_standat = standat(data, xH, P, Q, ahead, standardize_data, distribution = num_dist )
+    stan_data  = return_standat[ c('T', 'xH', 'rts', 'nt', 'ahead', 'distribution', 'P', 'Q')]
 
   if(parameterization == 'CCC') model_fit <- rstan::sampling(stanmodels$CCCMGARCH, data = stan_data,
                                                       verbose = TRUE,

@@ -8,6 +8,7 @@ data {
   int<lower=1> Q; // MA component in MGARCH(P,Q), vector A
   int<lower=1> P; // AR component in MGARCH(P,Q), vector B
   vector[nt] rts[T];  // multivariate time-series
+  vector[nt] xH[T];  // time-varying predictor for conditional H
   int<lower=0> ahead; // how many ahead predictions
   int<lower=0, upper=1> distribution; // 0 = Normal; 1 = student_t
 }
@@ -27,7 +28,9 @@ parameters {
   // D1 init
   vector[nt] D1_init;
   // DF constant nu for student t
-  real< lower = 2 > nu; 
+  real< lower = 2 > nu;
+  // predictor for H
+  real beta[nt]; 
 }
 transformed parameters {
   //cholesky_factor_cov[nt] L_H[T];
@@ -62,7 +65,7 @@ transformed parameters {
       for (p in 1:min( t-1, P) ) {
 	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d];
       }
-      vd[d] = c_h[d] + ma_d[d] + ar_d[d];
+      vd[d] = c_h[d] + beta[d] * xH[t, d] + ma_d[d] + ar_d[d];
       D[t, d] = sqrt( vd[d] );
     }
   H[t,] = quad_form_diag(R, D[t,]);  // H = DRD;
