@@ -13,37 +13,58 @@ standardQuote()
 
 getSymbols("TWTR")
 TWTR$TWTR.Open[1:10]
+tail( TWTR )
+
+class( TWTR )
+
+TWTR$wday = .indexwday( TWTR )
+TWTR$mday = ifelse( TWTR$wday == 1, 1, 0)
 
 getSymbols("FB")
 FB$FB.Open[1:10]
+FB$wday = .indexwday( FB )
+FB$mday = ifelse( FB$wday == 1, 1, 0)
+
 
 getSymbols("GOOG")
 GOOG$GOOG.Open[1:10]
+GOOG$wday = .indexwday( GOOG )
+GOOG$mday = ifelse( GOOG$wday == 1, 1, 0)
+
 
 upper <- max(dim(cbind(FB$FB.Open,  TWTR$TWTR.Open,  GOOG$GOOG.Open)))
 upper
 lower <- upper-300
 leaveout = 0
 r2 <- cbind(FB$FB.Open, TWTR$TWTR.Open, GOOG$GOOG.Open)[lower:(upper-leaveout),] ## remove the last leaveout days
-
 r2
+
+mday = cbind(
+    tail( FB$mday, n = 301 ),
+    tail( TWTR$mday, n = 301 ),
+    tail( GOOG$mday, n = 301 ) )
+
+mday
+
+dim( r2 ); dim( mday )
+
 
 actual <- cbind(FB$FB.Open, TWTR$TWTR.Open)[(upper-(leaveout-1)):upper,] 
 actual
 
-r2 <- na.omit(r2)
-r2
+r2 = scale( r2 ) 
 
-names(r2)
+r2$t = 1:nrow(r2)
+foreign::write.dta( as.data.frame(  r2  ), file = '~/Downloads/test.dta')
 
 ################
 ## BEKK       ##
 ################
 ## Forecasting
+library( bmgarch )
+r2[,1:2]
 
-
-
-fit1 = bmgarch(data = r2[,1:3], iterations = 500, parameterization = 'CCC', P = 2, Q = 2)
+fit1 = bmgarch(data = r2[,1:2], xH = NULL, iterations = 500, parameterization = 'DCC', P = 1, Q = 1)
 
 summary(fit1)
 plot(fit1, type = 'cvar') 

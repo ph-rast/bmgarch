@@ -5,7 +5,6 @@
 ##       Summary: 
 ## ---------------------------------------------------------------------- ##
 rm(list=ls())
-
 ############################
 ## Read person level data ##
 ############################
@@ -29,11 +28,11 @@ load(file = "~/UZH/Projekte/M_GARCH/WORK/-DATASETS/DERIVED/ddip.rda")
 dyads <- unique(ddip.lag$ID_DYAD)
 dyads
 
-
+str(ddip.lag)
 
 i=1
 id <- unique(ddip.lag[ddip.lag$ID_DYAD==dyads[i], "ID_INDIV"])
-out <- merge(x=ddip.lag[ddip.lag$ID_INDIV==id[1],], y=ddip.lag[ddip.lag$ID_INDIV==id[2],], by = 'DATE')
+out <- merge(x=ddip.lag[ddip.lag$ID_INDIV==id[1],], y=ddip.lag[ddip.lag$ID_INDIV==id[2],], by = 'DAY')
 names(out)
 dim(out)
 
@@ -42,17 +41,16 @@ header <- unlist(strsplit(names(out[2:30]), '.x'))
 header
 colnames(out[2:30]) <- header
 names(out[31:59]) <- header
-colnames(out) <- c('date', header, header)
-out
+colnames(out) <- c('DAY', header, header)
+out[1:10,]
 
-out <- rbind(out[2:30],out[31:59]) 
-
+out <- rbind(out[1:30],out[c(1, 31:59)]) 
 
 for(i in 2:length(dyads)){
     id <- unique(ddip.lag[ddip.lag$ID_DYAD==dyads[i], "ID_INDIV"])
-    out2 <- merge(x=ddip.lag[ddip.lag$ID_INDIV==id[1],], y=ddip.lag[ddip.lag$ID_INDIV==id[2],], by = 'DATE')
-    colnames(out2) <- c('date', header, header)
-    out2 <- rbind(out2[2:30],out2[31:59]) 
+    out2 <- merge(x=ddip.lag[ddip.lag$ID_INDIV==id[1],], y=ddip.lag[ddip.lag$ID_INDIV==id[2],], by = 'DAY')
+    colnames(out2) <- c('DAY', header, header)
+    out2 <- rbind(out2[1:30],out2[c(1, 31:59)]) 
     out <- rbind(out, out2)
 }
     
@@ -70,7 +68,7 @@ ddip.full$ID_DYAD
 
 ddip.full2 <- ddip.full[!is.na(ddip.full[,'ID_DYAD']),]
 
-ddip.full2[1:50, ]
+ddip.full2[1:150, 1:5]
 
 
 ## Selecton only those with at least 85 days
@@ -83,10 +81,19 @@ length(sel)
 ddip.lag <- subset(ddip.full2, subset = ID_DYAD %in% sel)
 names(ddip.lag)
 
-## DAY does not mean that days are consecutive. Could  be: 1, 2, 5, 19, 85
-tst <- ddip.lag[ddip.lag$ID_DYAD == sel[27], 1:5]
-length(unique(sort(tst$DAY)))
+## DAY does not mean that days are consecutive. Could  be: 1, 2, 5, 19, 85 
+i_nobs_fem = NA
+i_nobs_mal = NA
+for(i in 1:length(sel) ){
+    tst <- ddip.lag[ddip.lag$ID_DYAD == sel[i], 1:5]
+    ind <- unique(tst$ID_INDIV)
+    fem <- tst[tst$ID_INDIV==ind[1],]
+    mal <- tst[tst$ID_INDIV==ind[2],]
+    i_nobs_fem[i] = length(unique(sort(fem$DAY)))
+    i_nobs_mal[i] = length(unique(sort(mal$DAY)))
+}
 
+cbind(i_nobs_fem, i_nobs_mal)
 
 ## drop unused dasets:
 rm(list = c('ddip.full2', 'ddip.full', 'ddip.l23', 'tst'))
@@ -115,7 +122,7 @@ ddip.lag$pa_rel_std <- scale(ddip.lag$pa_rel)
 
 
 ## Select one dyad
-i = 38
+i = 10
 partner <- unique(ddip.lag[ddip.lag$ID_DYAD==sel[i], "ID_INDIV"])
 partner
 ## Extract Time series per invididul in dyad
@@ -135,11 +142,16 @@ r <- cbind(r1, r2)
 #r2 <- cbind(( (r - mean(c(r,pred))) / sd(r)), ( (pred - mean(c(r,pred))) / sd(r)))
 sigma1 <- var(r)
 
+r = data.frame(r)
+r$t = 1:nrow(r)
+r
+foreign::write.dta( as.data.frame(  r  ), file = '~/Downloads/dyad10.dta')
 
 ## Fit Model
-bekk_fit = bmgarch(data = r, parameterization = "CCC", iterations = 1000, Q = 1)
+bekk_fit = bmgarch(data = r[,1:2], parameterization = "DCC", iterations = 500, P = 2, Q = 2)
 summary(bekk_fit)
 
+plot(bekk_fit, type = 'cvar')
 
 pst <- rstan::summary(bekk_fit$model_fit, pars = c('Cnst', 'A', 'B', 'corC',  'phi0', 'phi', 'theta', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
 pst

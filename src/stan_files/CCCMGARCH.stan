@@ -22,7 +22,7 @@ parameters {
   // GARCH h parameters on variance metric
   vector<lower=0>[nt] c_h; 
   vector<lower=0, upper = 1 >[nt] a_h[Q];
-  vector<lower=0, upper = 1 >[nt] b_h[P]; // actually: 1 - a_h, across all Q and P...
+  vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
   // GARCH constant correlation 
   corr_matrix[nt] R;
   // D1 init

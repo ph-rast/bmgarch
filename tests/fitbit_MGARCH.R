@@ -53,6 +53,7 @@ subs
 
 ## Get Days of Week for WE effect in stressed
 fitsub$weekday <- weekdays(as.Date(fitsub$fitbitDate, '%Y-%m-%d'))
+fitsub$we_dummy = ifelse( fitsub$weekday == "Saturday" | fitsub$weekday == "Sunday", 1, 0)
 
 
 ## obtain max day count per person:
@@ -66,7 +67,7 @@ for( i in 1:length(ids) ){
 
 fitsub[fitsub$record_id==37,'PAf'][48] <- 0
 
-fitsub
+head(fitsub)
 
 
 ########################################
@@ -88,7 +89,7 @@ results <- array(NA, dim = c(length(sel),27))
 resultsCI <- array(NA, dim = c(length(sel),54))
 ahead = 1
 
-dev.off()
+names(fitsub)
 
 ## loop through sel participants
 total <- length(sel)
@@ -97,11 +98,21 @@ pb <- txtProgressBar(min = 0, max = total, style = 3)
 for(i in 1:length(sel)){
 
 for(i in redo){
+
     ## Extract Time series per invididul   
     i = 4#13
-    i = 35
-    r <-fitsub[fitsub$record_id==sel[i],c('PAf', 'stepsstd')]
-     plot(1:nrow(r), r[,1], type = 'l'); lines(1:nrow(r), r[,2], col = 'red')
+    i = 10
+    r <- fitsub[fitsub$record_id==sel[i],c('Max_TemperatureF', 'NAf')]
+    xH <- fitsub[fitsub$record_id==sel[i],c('we_dummy')] 
+    dim( r )
+    r
+
+    plot(1:nrow(r), r[,1], type = 'l'); lines(1:nrow(r), r[,2], col = 'red')
+    rug(x = xH*fitsub[fitsub$record_id==sel[i], 'day'])
+
+xH = cbind( xH, xH )
+    xH
+    
     # rl = r
     # cbind(rl, r)
     # rl[,1]= quantmod::Lag(r[,1], 1)
@@ -110,8 +121,9 @@ for(i in redo){
     # plot(1:nrow(rl2), rl2[,1], type = 'l')
     # lines(1:nrow(rl2), rl2[,2], col = 'red')
      
-    fit1 = bmgarch(data = r, parameterization = "CCC", iterations = 100, distribution = 'student_t', Q = 2, P = 2)
+    fit1 = bmgarch(data = r, xH = xH, parameterization = "BEKK", iterations = 500, distribution = 'student_t', Q = 1, P = 1)
     summary(fit1)
+
     library(loo)
     m2 = loo::loo(fit1$model_fit)
 loo::compare(m1, m2)
@@ -119,7 +131,7 @@ loo::compare(m1, m2)
     fit1$mgarchQ
     fit1$mgarchP
     
-    round(rstan::summary(fit1$model_fit, pars = c('A', 'B', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')], 2)
+    round(rstan::summary(fit1$model_fit, pars = c( 'beta', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')], 2)
 
     class(fit1)
     plot( fit1, type = 'means' )
