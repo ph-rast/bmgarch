@@ -7,10 +7,21 @@
 #' @export
 #' @keywords internal
 standat = function(data, xH, P, Q, ahead, standardize_data, distribution){
+
     if(dim(data)[1] < dim(data)[2]) data = t(data)
     if ( is.null( colnames( data ) ) ) colnames( data ) = paste0('t', 1:ncol( data ) )
+
+    ## Tests on predictor
+    ## Pass in a 0 matrix, so that stan does not complain
     if ( is.null( xH ) ) xH = matrix(0, nrow = nrow( data ), ncol = ncol( data) )
-    if ( dim( xH )[2] != dim( data )[2] ) xH = matrix( xH, nrow = nrow( data ), ncol = ncol( data)) ## Risky, better to throw an error 
+    ## Match dimension of predictor to TS. If only one vector is given, it's assumed that it is the same for all TS's
+    if (  is.null( ncol( xH ) ) ) {
+        warning("xH is assumed constant across TS's")
+        xH = matrix( xH, nrow = nrow( data ), ncol = ncol( data)) ## Risky, better to throw an error
+    } else { ## xH is not a vector  - check if it is of right dimension
+        if( dim( xH )[2] != dim( data )[2] ) warning('xH is not of right dimension - adapt xH dimension to match number of TS')
+        }
+
     if(standardize_data) {
     ## Standardize time-series
     stdx = scale(data)
@@ -62,10 +73,10 @@ bmgarch = function(data,
                    iterations = 1000,
                    chains = 4,
                    standardize_data = TRUE,
-                   distribution = 'Normal', ...) {
+                   distribution = 'Student_t', ...) {
     num_dist = NA
-    if ( distribution == 'Normal' ) num_dist = 0 else {
-               if ( distribution == 'student_t' ) num_dist = 1 else warning( '\n\n Specify distribution: Normal or student_t \n\n', immediate. = TRUE) }
+    if ( distribution == 'Gaussian' ) num_dist = 0 else {
+            if ( distribution == 'student_t' | distribution == 'Student_t') num_dist = 1 else warning( '\n\n Specify distribution: Gaussian or Student_t \n\n', immediate. = TRUE) }
     return_standat = standat(data, xH, P, Q, ahead, standardize_data, distribution = num_dist )
     stan_data  = return_standat[ c('T', 'xH', 'rts', 'nt', 'ahead', 'distribution', 'P', 'Q')]
 
