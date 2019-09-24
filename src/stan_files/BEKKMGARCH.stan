@@ -8,10 +8,21 @@ data {
   int<lower=1> Q; // MA component in MGARCH(P,Q), matrix A
   int<lower=1> P; // AR component in MGARCH(P,Q), matrix B  
   vector[nt] rts[T];  // multivariate time-series
+  vector[nt] xH[T];  // time-varying predictor for conditional H
   int<lower=0> ahead; // how many ahead predictions
   int<lower=0, upper=1> distribution; // 0 = Normal; 1 = student_t
 }
 transformed data {
+  matrix[nt, nt] xH_m[T];
+  real<lower = 0> xH_marker = 0.0;
+  real<lower = 0> cp;
+  for( t in 1:T ){
+    xH_m[t] = diag_matrix( xH[t] );
+  // add a variable that notes if xH is null or actually a predictor
+    cp = sum( xH[t] );
+    if( cp != 0)
+      xH_marker = xH_marker + 1;
+  }
 }
 parameters { 
   //  cholesky_factor_cov[nt] Cnst; // Const is symmetric, A, B, are not
@@ -34,6 +45,8 @@ parameters {
   // H1 init
   cov_matrix[nt] H1_init;
   real< lower = 2 > nu; // nu for student_t
+  // predictor for H
+  cov_matrix[nt] beta;
 }
 transformed parameters {
   cholesky_factor_cov[nt] L_H[T];
@@ -85,9 +98,12 @@ transformed parameters {
       A_part = A_part + A[q]' * rr[t-q,] * A[q];
     }
     for (p in 1:min( t-1, P) ) {
-      B_part =  B[p]' * H[t-p,] * B[p];
+      B_part = B_part + B[p]' * H[t-p,] * B[p];
     }
-    H[t,] = Cnst +  A_part +  B_part;   
+    if( xH_marker == 0 ) {
+      H[t,] = Cnst + A_part +  B_part;} else {
+      H[t,] = Cnst + beta * xH_m[t]  + A_part +  B_part;
+    }
     L_H[t,] = cholesky_decompose(H[t,]);
   }
 }
