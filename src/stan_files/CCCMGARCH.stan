@@ -80,8 +80,6 @@ model {
   to_vector(theta) ~ normal(0, 1);
   to_vector(phi) ~ normal(0, 1);
   to_vector(phi0) ~ normal(0, 1);
-  //to_vector(a_h) ~ normal(0, .5);
-  //to_vector(b_h) ~ normal(0, .5);
   R ~ lkj_corr(nt);
   // likelihood
   if ( distribution == 0 ) {
