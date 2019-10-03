@@ -11,14 +11,16 @@ data {
   vector[nt] xH[T];  // time-varying predictor for conditional H
   int<lower=0> ahead; // how many ahead predictions
   int<lower=0, upper=1> distribution; // 0 = Normal; 1 = student_t
+  int<lower=0, upper=1> meanstructure; // Select model for location
 }
 transformed data {
+#include /transformed_data/xh_marker.stan  
 }
 parameters {
   // ARMA parameters
   vector[nt] phi0; 
-  matrix[nt,nt] phi;
-  matrix[nt,nt] theta;
+  matrix[meanstructure ? nt : 0, meanstructure ? nt : 0 ] phi;
+  matrix[meanstructure ? nt : 0, meanstructure ? nt : 0 ] theta;
   // GARCH h parameters on variance metric
   vector<lower=0>[nt] c_h; 
   vector<lower=0, upper = 1 >[nt] a_h[Q];
@@ -26,11 +28,11 @@ parameters {
   // GARCH constant correlation 
   corr_matrix[nt] R;
   // D1 init
-  vector[nt] D1_init;
+  vector<lower = 0>[nt] D1_init;
   // DF constant nu for student t
   real< lower = 2 > nu;
-  // predictor for H
-  real beta[nt]; 
+  // predictor for H 
+  vector[ xH_marker >= 1 ? nt : 0 ] beta; 
 }
 transformed parameters {
   //cholesky_factor_cov[nt] L_H[T];
@@ -44,14 +46,20 @@ transformed parameters {
   real<lower = 0> ar_d[nt];
   // Initialize t=1
   // Check "Order Sensitivity and Repeated Variables" in stan reference manual
-  mu[1,] = phi0 + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
-  //u[1,] = diagonal(sigma1);
+  mu[1,] = phi0; // + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
+  //u[1,] = diagonal(sigma1);  
   D[1,] = D1_init;
   H[1,] = quad_form_diag(R, D[1,]);  // H = DRD; 
   // iterations geq 2
   for (t in 2:T){
+
     // location:
+    if( meanstructure == 1 ){
     mu[t, ] = phi0 + phi * rts[t-1, ] + theta * (rts[t-1, ] - mu[t-1,]) ;
+    } else if ( meanstructure == 0 ){
+      mu[t, ] = phi0;
+    }
+    
     // scale: SD's of D
     for (d in 1:nt) {
       vd[d] = 0.0;
@@ -65,7 +73,11 @@ transformed parameters {
       for (p in 1:min( t-1, P) ) {
 	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d];
       }
+      if ( xH_marker >= 1) {
       vd[d] = c_h[d] + beta[d] * xH[t, d] + ma_d[d] + ar_d[d];
+      } else if ( xH_marker == 0) {
+      	vd[d] = c_h[d]  + ma_d[d] + ar_d[d];
+      }
       D[t, d] = sqrt( vd[d] );
     }
   H[t,] = quad_form_diag(R, D[t,]);  // H = DRD;
@@ -74,6 +86,7 @@ transformed parameters {
 
 model {
   // priors
+  to_vector(beta) ~ normal(0, 3);
   if ( distribution == 1 )
     nu ~ normal( nt, 50 );
   to_vector(D1_init) ~ lognormal(0, 1);
