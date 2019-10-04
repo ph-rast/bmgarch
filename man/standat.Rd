@@ -4,7 +4,8 @@
 \alias{standat}
 \title{Standardize input data to facilitate computation}
 \usage{
-standat(data, P, Q, ahead, standardize_data, distribution)
+standat(data, xH, P, Q, ahead, standardize_data, distribution,
+  meanstructure)
 }
 \arguments{
 \item{data}{Time-series data}

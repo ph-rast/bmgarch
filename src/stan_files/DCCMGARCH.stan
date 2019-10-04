@@ -3,20 +3,15 @@ functions {
 #include /functions/cov2cor.stan
 }
 data {
-  int<lower=2> T;
-  int<lower=1> nt;                    // number of time series
-  int<lower=1> Q; // MA component in GARCH(P,Q) for diagonal D
-  int<lower=1> P; // AR component in GARCH(P,Q) for diagonla D  
-  vector[nt] rts[T];  // multivariate time-series
-  int<lower=0> ahead; // how many ahead predictions
-  int<lower=0, upper=1> distribution; // 0 = Normal; 1 = student_t
+#include /data/data.stan
 }
 transformed data {
+#include /transformed_data/xh_marker.stan
 }
-parameters { 
-  vector[nt] phi0; 
-  matrix[nt,nt] phi;
-  matrix[nt,nt] theta;
+parameters {
+  // ARMA parameters
+#include /parameters/arma.stan
+
   // GARCH h parameters on variance metric
   vector<lower=0>[nt] c_h; 
   vector<lower=0 >[nt] a_h[Q];
@@ -31,7 +26,11 @@ parameters {
   vector[nt] D1_init;
   // u1 init
   vector[nt] u1_init;
+
   real< lower = 2 > nu; // nu for student_t
+
+  // predictor for diag variance in D
+  vector[ xH_marker >= 1 ? nt : 0 ] beta;  
 }
 transformed parameters {
   cholesky_factor_cov[nt] L_H[T];
@@ -46,8 +45,9 @@ transformed parameters {
   real<lower = 0> vd[nt];
   real<lower = 0> ma_d[nt];
   real<lower = 0> ar_d[nt];  
+
   // Initialize t=1
-  mu[1,] = phi0 + phi * rts[1, ] +  theta * (rts[1, ] - phi0) ;
+  mu[1,] = phi0;
   u[1,] = u1_init;
   D[1,] = D1_init;
   Qr[1,] = Qr1_init;
@@ -55,23 +55,33 @@ transformed parameters {
   H[1] = L_H[1]*L_H[1]';
   R[1] = diag_matrix(rep_vector(1.0, nt));
   Qr_sdi[1] = rep_vector(1.0, nt);
+
   // iterations geq 2
   for (t in 2:T){
-    mu[t, ] = phi0 + phi * rts[t-1, ] +  theta * (rts[t-1, ] - mu[t-1,]) ;
+// Meanstructure model:
+#include /model_components/mu.stan
+
     for(d in 1:nt){
       vd[d] = 0.0;
       ma_d[d] = 0.0;
       ar_d[d] = 0.0;
-      // MA component
+      // GARCH MA component
       for (q in 1:min( t-1, Q) ) {
 	rr[t-q, d] = square( rts[t-q, d] - mu[t-q, d] );
 	ma_d[d] = ma_d[d] + a_h[q, d]*rr[t-q, d] ;
       }
-      // AR component
+      // GARCH AR component
       for (p in 1:min( t-1, P) ) {
 	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d];
       }
-      vd[d] = c_h[d] +  ma_d[d] + ar_d[d];
+
+      // Predictor on diag (given in xH)
+      if ( xH_marker >= 1) {
+      vd[d] = c_h[d] + beta[d] * xH[t, d] + ma_d[d] + ar_d[d];
+      } else if ( xH_marker == 0) {
+      	vd[d] = c_h[d]  + ma_d[d] + ar_d[d];
+      }
+
       D[t, d] = sqrt( vd[d] );
     }
     u[t,] = diag_matrix(D[t,]) \ (rts[t,]- mu[t,]); // cf. comment about taking inverses in stan manual p. 482 re:Inverses - inv(D)*y = D \ a
@@ -85,6 +95,7 @@ transformed parameters {
 }
 model {
   // priors
+  to_vector(beta) ~ normal(0, 3);
   // Prior for initial state
   Qr1_init ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
   to_vector(D1_init) ~ lognormal(0, 1);
@@ -98,6 +109,7 @@ model {
   //  to_vector(a_h) ~ normal(0, .5);
   //to_vector(b_h) ~ normal(0, .5);
   S ~ lkj_corr(nt);
+
   // likelihood
   if ( distribution == 0 ) {
     for(t in 1:T){

@@ -129,29 +129,42 @@ partner
 r1 <- ddip.lag[ddip.lag$ID_INDIV==partner[1],'pa_rel_std']
 r2 <- ddip.lag[ddip.lag$ID_INDIV==partner[2],'pa_rel_std']
 
+pred <- ddip.lag[ddip.lag$ID_INDIV==partner[2],'na_rel']
 ## ## It seems some have almost no variability in NA (eg. i = 27)
 ## na1 <- ddip.lag[ddip.lag$ID_INDIV==partner[1], 'na_rel']
 ## na2 <- ddip.lag[ddip.lag$ID_INDIV==partner[2], 'na_rel']
 
-plot(r1, type = 'l', ylim = c(-3, 3), main = i)
-lines(r2, col = 'red')
+#plot(r1, type = 'l', ylim = c(-3, 3), main = i)
+#lines(r2, col = 'red')
 
-dev.off()
+#dev.off()
 
 r <- cbind(r1, r2)
 #r2 <- cbind(( (r - mean(c(r,pred))) / sd(r)), ( (pred - mean(c(r,pred))) / sd(r)))
 sigma1 <- var(r)
 
-r = data.frame(r)
-r$t = 1:nrow(r)
+#r = data.frame(r)
+#r$t = 1:nrow(r)
 r
-foreign::write.dta( as.data.frame(  r  ), file = '~/Downloads/dyad10.dta')
+#foreign::write.dta( as.data.frame(  r  ), file = '~/Downloads/dyad10.dta')
 
 ## Fit Model
-bekk_fit = bmgarch(data = r[,1:2], parameterization = "DCC", iterations = 500, P = 2, Q = 2)
+bekk_fit = bmgarch(data = r[,1:2], xH = pred,  parameterization = "CCC", iterations = 500, P = 1, Q = 1,
+                   meanstructure = 'constant')
+
+summary(bekk_fit)
+rstan::summary(bekk_fit$model_fit, pars = c('beta'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
+
+bekk_fit = bmgarch(data = r[,1:2], xH = NULL, parameterization = "BEKK", iterations = 500, P = 1, Q = 1,
+                   meanstructure = 'constant')
+
+bekk_fit = bmgarch(data = r[,1:2], xH = NULL, parameterization = "DCC", iterations = 500, P = 2, Q = 2,
+                   meanstructure = 'arma')
+
+
 summary(bekk_fit)
 
-plot(bekk_fit, type = 'cvar')
+plot(bekk_fit, type = 'ccor')
 
 pst <- rstan::summary(bekk_fit$model_fit, pars = c('Cnst', 'A', 'B', 'corC',  'phi0', 'phi', 'theta', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
 pst

@@ -64,6 +64,16 @@ foreign::write.dta( as.data.frame(  r2  ), file = '~/Downloads/test.dta')
 library( bmgarch )
 r2[,1:2]
 
+r2
+fit_ccc = bmgarch( r2[,1:2], xH = mday[,1:2], parameterization = 'CCC', iterations = 500, P = 2, Q = 3)
+summary(fit_ccc)
+summary(fit_ccc$model_fit, pars = 'beta')$summary[, c(1,4,8,10)]
+
+fit_dcc = bmgarch( r2[,1:2], xH = mday[,1:2], parameterization = 'DCC', iterations = 200, P = 2, Q = 2)
+summary(fit_dcc)
+summary(fit_dcc$model_fit, pars = 'beta')$summary[, c(1,4,8,10)]
+
+
 fit1 = bmgarch(data = r2[,1:2], xH = NULL, iterations = 500, parameterization = 'DCC', P = 1, Q = 1)
 
 summary(fit1)

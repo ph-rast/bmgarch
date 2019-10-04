@@ -58,7 +58,6 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         ## GARCH parameters of CCC  ##
         ##############################
         cat(paste0(paste0("GARCH(", P, ",", Q, ')')), "estimates for conditional variance:", "\n\n") 
-##        cat("GARCH(1,1) estimates for conditional variance:", "\n\n")
         
         rn = rownames(model_summary[garch_h_index,])
         for ( i in 1:nt ) {
@@ -113,16 +112,17 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         S_index = grep("S", rownames(model_summary) )
         arma_index = grep("^phi|^theta", rownames(model_summary) )
 
-        ##############################
+        ## ###########################
         ## GARCH parameters of DCC  ##
-        ##############################
-        cat("GARCH(1,1) estimates for conditional variance on D:", "\n\n")
+        ## ###########################
+        cat(paste0(paste0("GARCH(", P, ",", Q, ')')), "estimates for conditional variance on D:", "\n\n") 
 
         rn = rownames(model_summary[garch_h_index,])
         for ( i in 1:nt ) {
-            replace = grep(paste("\\[", "\\]", sep=as.character(i)), rn)
-            rn[replace] = gsub(paste("\\[", "\\]", sep=as.character(i)), paste0("_", short_names[i]), rn)[replace]
+            replace = grep(paste0( as.character(i), "\\]"), rn) 
+        rn[replace] = gsub(paste0( as.character(i), "\\]" ), paste0(short_names[i]), rn)[replace]
         }
+        rn = gsub("\\[", "_", rn)
 
         ## Save into new object to change rownames
         garch_h_out = model_summary[garch_h_index,]

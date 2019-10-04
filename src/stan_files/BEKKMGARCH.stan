@@ -3,50 +3,39 @@ functions {
 #include /functions/cov2cor.stan
 }
 data {
-  int<lower=2> T;
-  int<lower=1> nt;    // number of time series
-  int<lower=1> Q; // MA component in MGARCH(P,Q), matrix A
-  int<lower=1> P; // AR component in MGARCH(P,Q), matrix B  
-  vector[nt] rts[T];  // multivariate time-series
-  vector[nt] xH[T];  // time-varying predictor for conditional H
-  int<lower=0> ahead; // how many ahead predictions
-  int<lower=0, upper=1> distribution; // 0 = Normal; 1 = student_t
+#include /data/data.stan
 }
 transformed data {
-  matrix[nt, nt] xH_m[T];
-  real<lower = 0> xH_marker = 0.0;
-  real<lower = 0> cp;
-  for( t in 1:T ){
-    xH_m[t] = diag_matrix( xH[t] );
-  // add a variable that notes if xH is null or actually a predictor
-    cp = sum( xH[t] );
-    if( cp != 0)
-      xH_marker = xH_marker + 1;
-  }
+#include /transformed_data/xh_marker.stan 
 }
 parameters { 
+  // ARMA parameters
+#include /parameters/arma.stan
+
   //  cholesky_factor_cov[nt] Cnst; // Const is symmetric, A, B, are not
   cov_matrix[nt] Cnst; // Const is symmetric, A, B, are not  
+
   // construct A, so that one element (a11) can be constrained to be non-negative
   real<lower = 0, upper = 1> Ap11[Q];
   row_vector[nt-2] Ap1k[Q];
   matrix[nt-1, nt-1] Ap_sub[Q];
+
   //
   real<lower = 0, upper = 1> Bp11[P];
   row_vector[nt-2] Bp1k[P];
   matrix[nt-1, nt-1] Bp_sub[P];
+
   //
   vector[nt] A_log[Q];
   vector[nt] B_log[P];
-  // ARMA parameters
-  vector[nt] phi0; 
-  matrix[nt,nt] phi;
-  matrix[nt,nt] theta;
+
+
   // H1 init
   cov_matrix[nt] H1_init;
   real< lower = 2 > nu; // nu for student_t
+
   // predictor for H
-  cov_matrix[nt] beta;
+  cov_matrix[ xH_marker >= 1 ? nt : 0 ] beta;
 }
 transformed parameters {
   cholesky_factor_cov[nt] L_H[T];
@@ -62,7 +51,9 @@ transformed parameters {
   matrix[nt, nt -1 ] Ap[Q];
   matrix[nt, nt -1 ] Bp[P];
   matrix[nt, nt] A_part = diag_matrix( rep_vector(0.0, nt));
-  matrix[nt, nt] B_part = diag_matrix( rep_vector(0.0, nt));  
+  matrix[nt, nt] B_part = diag_matrix( rep_vector(0.0, nt));
+
+  // Define matrix constraints
   for ( q in 1:Q )
     Ap[q] = append_row(append_col(Ap11[q], Ap1k[q]), Ap_sub[q]);
   for ( p in 1:P )
@@ -84,15 +75,17 @@ transformed parameters {
   for ( p in 1:P )
     B[p] = append_col(Bp[p], Bv[p]);
 
-  // Initialize
+  // Initialize model parameters
+  mu[1,] = phi0;
   H[1,] = H1_init;
   L_H[1,] = cholesky_decompose(H[1,]); // cf. p 69 in stan manual for how to index
-  // Means AR + MA 
-  mu[1,] = phi0 + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
 
   //
   for (t in 2:T){
-    mu[t, ] = phi0 + phi * rts[t-1, ] +  theta * (rts[t-1, ] - mu[t-1,]) ;
+    
+    // Meanstructure model:
+#include /model_components/mu.stan
+    
     for (q in 1:min( t-1, Q) ) {
       rr[t-q,] = ( rts[t-q,] - mu[t-q,] )*( rts[t-q,] - mu[t-q,] )';
       A_part = A_part + A[q]' * rr[t-q,] * A[q];
@@ -101,7 +94,8 @@ transformed parameters {
       B_part = B_part + B[p]' * H[t-p,] * B[p];
     }
     if( xH_marker == 0 ) {
-      H[t,] = Cnst + A_part +  B_part;} else {
+      H[t,] = Cnst + A_part +  B_part;
+    } else if( xH_marker >= 1) {
       H[t,] = Cnst + beta * xH_m[t]  + A_part +  B_part;
     }
     L_H[t,] = cholesky_decompose(H[t,]);

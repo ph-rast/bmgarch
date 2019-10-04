@@ -3,41 +3,34 @@ functions {
 #include /functions/cov2cor.stan
 }
 data {
-  int<lower=2> T;
-  int<lower=1> nt;                    // number of time series
-  int<lower=1> Q; // MA component in MGARCH(P,Q), vector A
-  int<lower=1> P; // AR component in MGARCH(P,Q), vector B
-  vector[nt] rts[T];  // multivariate time-series
-  vector[nt] xH[T];  // time-varying predictor for conditional H
-  int<lower=0> ahead; // how many ahead predictions
-  int<lower=0, upper=1> distribution; // 0 = Normal; 1 = student_t
-  int<lower=0, upper=1> meanstructure; // Select model for location
+#include /data/data.stan
 }
 transformed data {
 #include /transformed_data/xh_marker.stan  
 }
 parameters {
-  // ARMA parameters
-  vector[nt] phi0; 
-  matrix[meanstructure ? nt : 0, meanstructure ? nt : 0 ] phi;
-  matrix[meanstructure ? nt : 0, meanstructure ? nt : 0 ] theta;
+ // ARMA parameters
+#include /parameters/arma.stan
+
   // GARCH h parameters on variance metric
   vector<lower=0>[nt] c_h; 
   vector<lower=0, upper = 1 >[nt] a_h[Q];
   vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
+
   // GARCH constant correlation 
   corr_matrix[nt] R;
+
   // D1 init
   vector<lower = 0>[nt] D1_init;
+
   // DF constant nu for student t
   real< lower = 2 > nu;
+
   // predictor for H 
   vector[ xH_marker >= 1 ? nt : 0 ] beta; 
 }
 transformed parameters {
-  //cholesky_factor_cov[nt] L_H[T];
   cov_matrix[nt] H[T];
-  //corr_matrix[nt] R;
   vector[nt] rr[T-1];
   vector[nt] mu[T];
   vector[nt] D[T];
@@ -46,19 +39,15 @@ transformed parameters {
   real<lower = 0> ar_d[nt];
   // Initialize t=1
   // Check "Order Sensitivity and Repeated Variables" in stan reference manual
-  mu[1,] = phi0; // + phi * rts[1, ] + theta * (rts[1, ] - phi0) ;
+  mu[1,] = phi0;
   //u[1,] = diagonal(sigma1);  
   D[1,] = D1_init;
   H[1,] = quad_form_diag(R, D[1,]);  // H = DRD; 
   // iterations geq 2
   for (t in 2:T){
 
-    // location:
-    if( meanstructure == 1 ){
-    mu[t, ] = phi0 + phi * rts[t-1, ] + theta * (rts[t-1, ] - mu[t-1,]) ;
-    } else if ( meanstructure == 0 ){
-      mu[t, ] = phi0;
-    }
+    // Meanstructure model:
+#include /model_components/mu.stan
     
     // scale: SD's of D
     for (d in 1:nt) {

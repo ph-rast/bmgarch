@@ -6,11 +6,20 @@
 #' @return bmgarch object 
 #' @export
 #' @keywords internal
-standat = function(data, xH, P, Q, ahead, standardize_data, distribution){
+standat = function(data, xH, P, Q, ahead, standardize_data, distribution, meanstructure){
 
     if(dim(data)[1] < dim(data)[2]) data = t(data)
     if ( is.null( colnames( data ) ) ) colnames( data ) = paste0('t', 1:ncol( data ) )
 
+    ## Model for meanstructure
+    if( meanstructure == 'constant') {
+        meanstructure = 0
+    } else {
+        if ( meanstructure == 'arma') {
+            meanstructure = 1
+        }
+    }
+                                                       
     ## Tests on predictor
     ## Pass in a 0 matrix, so that stan does not complain
     if ( is.null( xH ) ) xH = matrix(0, nrow = nrow( data ), ncol = ncol( data) )
@@ -36,7 +45,8 @@ standat = function(data, xH, P, Q, ahead, standardize_data, distribution){
                           scaled_data = scaled_data,
                           distribution = distribution,
                           P = P,
-                          Q = Q)
+                          Q = Q,
+                          meanstructure = meanstructure)
     } else {
       ## Unstandardized
       return_standat = list(T = nrow(data),
@@ -46,7 +56,8 @@ standat = function(data, xH, P, Q, ahead, standardize_data, distribution){
                             ahead = ahead,
                             distribution = distribution,
                             P = P,
-                            Q = Q)
+                            Q = Q,
+                            meanstructure = meanstructure)
     }
     return(return_standat)
 }
@@ -60,6 +71,7 @@ standat = function(data, xH, P, Q, ahead, standardize_data, distribution){
 ##' @param ahead A number specifying the number of forecasted periods. Defaults to 1.
 ##' @param iterations A positive integer specifying the number of iterations for each chain (including warmup). The default is 1000
 ##' @param chains A positive integer specifying the number of Markov chains. The default is 4.
+##' @param meanstructure Defines model for means. Either 'constant' (default) or 'arma'. Currently arma(1,1) only.
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’. See the documentation in ‘stan’.
 ##' @return An object of S4 class ‘stanfit’ representing the fitted results.
 ##' @author philippe
@@ -73,12 +85,13 @@ bmgarch = function(data,
                    iterations = 1000,
                    chains = 4,
                    standardize_data = TRUE,
-                   distribution = 'Student_t', ...) {
+                   distribution = 'Student_t',
+                   meanstructure = 'constant', ...) {
     num_dist = NA
     if ( distribution == 'Gaussian' ) num_dist = 0 else {
             if ( distribution == 'student_t' | distribution == 'Student_t') num_dist = 1 else warning( '\n\n Specify distribution: Gaussian or Student_t \n\n', immediate. = TRUE) }
-    return_standat = standat(data, xH, P, Q, ahead, standardize_data, distribution = num_dist )
-    stan_data  = return_standat[ c('T', 'xH', 'rts', 'nt', 'ahead', 'distribution', 'P', 'Q')]
+    return_standat = standat(data, xH, P, Q, ahead, standardize_data, distribution = num_dist, meanstructure )
+    stan_data  = return_standat[ c('T', 'xH', 'rts', 'nt', 'ahead', 'distribution', 'P', 'Q', 'meanstructure')]
 
   if(parameterization == 'CCC') model_fit <- rstan::sampling(stanmodels$CCCMGARCH, data = stan_data,
                                                       verbose = TRUE,
@@ -123,7 +136,8 @@ bmgarch = function(data,
                        RTS_last = stan_data$rts[stan_data$T,],
                        RTS_full = stan_data$rts,
                        mgarchQ = stan_data$Q,
-                       mgarchP = stan_data$P)
+                       mgarchP = stan_data$P,
+                       meanstructure = stan_data$meanstructure)
     class(return_fit) <- "bmgarch"
     return(return_fit)
 }

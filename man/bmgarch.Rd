@@ -4,9 +4,10 @@
 \alias{bmgarch}
 \title{Bayesian Multivariate GARCH}
 \usage{
-bmgarch(data, parameterization = "CCC", P = 1, Q = 1, ahead = 1,
-  iterations = 1000, chains = 4, standardize_data = TRUE,
-  distribution = "Normal", ...)
+bmgarch(data, xH = NULL, parameterization = "CCC", P = 1, Q = 1,
+  ahead = 1, iterations = 1000, chains = 4,
+  standardize_data = TRUE, distribution = "Student_t",
+  meanstructure = "constant", ...)
 }
 \arguments{
 \item{data}{A time-series or matrix object containing observations at the same interval.}
@@ -18,6 +19,8 @@ bmgarch(data, parameterization = "CCC", P = 1, Q = 1, ahead = 1,
 \item{iterations}{A positive integer specifying the number of iterations for each chain (including warmup). The default is 1000}
 
 \item{chains}{A positive integer specifying the number of Markov chains. The default is 4.}
+
+\item{meanstructure}{Defines model for means. Either 'constant' (default) or 'arma'. Currently arma(1,1) only.}
 
 \item{...}{Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’. See the documentation in ‘stan’.}
 }
