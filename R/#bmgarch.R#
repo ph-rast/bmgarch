@@ -76,6 +76,7 @@ standat = function(data, xH, P, Q, ahead, standardize_data, distribution, meanst
 ##' @return An object of S4 class ‘stanfit’ representing the fitted results.
 ##' @author philippe
 ##' @export
+
 bmgarch = function(data,
                    xH = NULL,
                    parameterization = 'CCC',
@@ -137,7 +138,6 @@ bmgarch = function(data,
                        RTS_full = stan_data$rts,
                        mgarchQ = stan_data$Q,
                        mgarchP = stan_data$P,
-                       xH = stan_data$xH,
                        meanstructure = stan_data$meanstructure)
     class(return_fit) <- "bmgarch"
     return(return_fit)

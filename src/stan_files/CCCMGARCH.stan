@@ -27,7 +27,8 @@ parameters {
   real< lower = 2 > nu;
 
   // predictor for H 
-  vector[ xH_marker >= 1 ? nt : 0 ] beta; 
+  //  vector[ xH_marker >= 1 ? nt : 0 ] beta;
+    vector[nt] beta; 
 }
 transformed parameters {
   cov_matrix[nt] H[T];
@@ -100,45 +101,8 @@ generated quantities {
   matrix[nt,T] rts_out;
   real log_lik[T];
   corr_matrix[nt] corH[T];
-/* // Params for prediction */
-/*   vector[nt] rts_p[ahead]; */
-/*   vector[nt] mu_p[ahead]; */
-/*   vector[nt] rr_p[ahead]; */
-/*   vector[nt] D_p[ahead]; */
-/*   cov_matrix[nt] H_p[ahead]; */
-/*   vector[2] rev_p = [0,0]'; */
 
-// retrodict
+  // retrodict
 #include /generated/retrodict_H.stan
   
-/* // Forecast */
-/*   mu_p[1,] =  phi0 + phi * rts[T, ] +  theta * (rts[T, ]-mu[T,]); */
-/*   for(d in 1:nt){ */
-/*       rr_p[1, d] = square( rts[T, d] - mu[T, d] ); */
-/*        D_p[1, d] = sqrt( c_h[d] + a_h[d]*rr_p[1, d] +  b_h[d]*D[T,d] ); */
-/*     } */
-/*   H_p[1,] = quad_form_diag(R, D_p[1]); */
-/*   if ( distribution == 0 ) { */
-/*     rts_p[1,] = multi_normal_rng(mu_p[1,], H_p[1,]); */
-/*   } else if ( distribution == 1 ) { */
-/*     rts_p[1,] = multi_student_t_rng(nu, mu_p[1,], H_p[1,]); */
-/*   } */
-/*   // */
-/*   if(ahead >= 2) { */
-/*     for ( p in 2:ahead) { */
-/*       rev_p[2] = rts_p[p-1, 1]; */
-/*       rev_p[1] = rts_p[p-1, 2]; */
-/*       mu_p[p,] =  phi0 + phi * rts_p[p - 1, ] + theta * ( rts_p[p - 1, ] - mu_p[p-1] ); */
-/*       for(d in 1:nt){ */
-/* 	rr_p[p, d] = square( rts_p[p-1, d] - mu_p[p-1, d] ); */
-/* 	D_p[p, d] = sqrt( c_h[d] + a_h[d]*rr_p[p-1, d] +  b_h[d]*D_p[p-1,d] ); */
-/*       } */
-/*       H_p[p,] = quad_form_diag(R, D_p[p]); */
-/*       if ( distribution == 0 ) { */
-/* 	rts_p[p,] = multi_normal_rng(mu_p[p,], H_p[p,]); */
-/*       } else if ( distribution == 1 ) { */
-/* 	rts_p[p,] = multi_student_t_rng(nu, mu_p[p,], H_p[p,]); */
-/*       } */
-/*     } */
-/*   } */
 }

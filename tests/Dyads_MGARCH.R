@@ -1,20 +1,20 @@
-## Project title: 
-##    Created at: 
+## Project title:
+##    Created at:
 ##        Author: Philippe Rast
-##          Data: 
-##       Summary: 
+##          Data:
+##       Summary:
 ## ---------------------------------------------------------------------- ##
 rm(list=ls())
 ############################
 ## Read person level data ##
 ############################
-
 ddip.names <-  scan(file = '~/UZH/Projekte/Archiv/LSM_Ferrer/WORK/-DATASETS/SOURCE/ddip_visits_Names.dat', nlines = 4, what = "character")
 ddip.l23 <-  read.table(file = '~/UZH/Projekte/Archiv/LSM_Ferrer/WORK/-DATASETS/SOURCE/ddip_visits.dat', na.strings = '.',
                         col.names = ddip.names)
 
 head(ddip.l23)
 ddip.l23$id_individual
+
 
 ######################
 ## Data Wrangling   
@@ -122,7 +122,7 @@ ddip.lag$pa_rel_std <- scale(ddip.lag$pa_rel)
 
 
 ## Select one dyad
-i = 10
+i <- 23
 partner <- unique(ddip.lag[ddip.lag$ID_DYAD==sel[i], "ID_INDIV"])
 partner
 ## Extract Time series per invididul in dyad
@@ -134,25 +134,76 @@ pred <- ddip.lag[ddip.lag$ID_INDIV==partner[2],'na_rel']
 ## na1 <- ddip.lag[ddip.lag$ID_INDIV==partner[1], 'na_rel']
 ## na2 <- ddip.lag[ddip.lag$ID_INDIV==partner[2], 'na_rel']
 
-#plot(r1, type = 'l', ylim = c(-3, 3), main = i)
-#lines(r2, col = 'red')
+plot(r1, type = 'l', ylim = c(-3, 3), main = i)
+lines(r2, col = 'red')
 
-#dev.off()
+dev.off()
 
 r <- cbind(r1, r2)
 #r2 <- cbind(( (r - mean(c(r,pred))) / sd(r)), ( (pred - mean(c(r,pred))) / sd(r)))
 sigma1 <- var(r)
 
-#r = data.frame(r)
-#r$t = 1:nrow(r)
 r
 #foreign::write.dta( as.data.frame(  r  ), file = '~/Downloads/dyad10.dta')
 
 ## Fit Model
-bekk_fit = bmgarch(data = r[,1:2], xH = pred,  parameterization = "CCC", iterations = 500, P = 1, Q = 1,
-                   meanstructure = 'constant')
+bekk_fit <- bmgarch(data = r[, 1:2], xH = NULL,
+                   parameterization = "CCC", P = 1, Q = 1,
+                   iterations = 500,
+                   meanstructure = "constant")
 
 summary(bekk_fit)
+plot(bekk_fit, type = "cvar")
+dev.off()
+
+standat <-  list(T = bekk_fit$TS_length,  nt = bekk_fit$nt,
+                 rts =  cbind(bekk_fit$RTS_full),
+                 xH = bekk_fit$xH,
+                 Q =  bekk_fit$mgarchQ,
+                 P =  bekk_fit$mgarchP,
+                 ahead =  3, 
+                 meanstructure =  bekk_fit$meanstructure,
+                 distribution =  bekk_fit$num_dist)
+str(standat)
+
+frcst <- rstan::stan_model(file = "../src/stan_files/forecast_gq.stan")
+
+
+## str(bekk_fit$model_fit)
+bekk_fit$model_fit@model_pars
+
+colnames(as.matrix(bekk_fit$model_fit ))
+
+rstan::summary(bekk_fit$model_fit, pars = c('phi0'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
+
+## nonest <-  matrix(0,  ncol = 8,  nrow = 1000)
+## colnames(nonest) <-  c("phi[1,1]", "phi[1,2]","phi[2,1]","phi[2,2]",
+##                        "theta[1,1]", "theta[1,2]","theta[2,1]","theta[2,2]")
+## ## same for beta
+## nonbeta <- matrix(0,  ncol = 2,  nrow = 1000 )
+## colnames(nonbeta ) <-  paste0(paste0("beta[",  1:2 ), "]")
+
+## mcdraws <- cbind(as.matrix(bekk_fit$model_fit), nonest, nonbeta)
+## mcdraws[1:3, ]
+
+## out <- rstan::gqs(frcst, draws = mcdraws, data =  standat)
+
+
+out <- rstan::gqs(frcst, draws = as.matrix(bekk_fit$model_fit), data =  standat)
+out
+
+dim(out)
+
+str(out)
+
+## return names and obtain position of rts_p's
+pred_rtsp <- grep('rts_p', out@sim$fnames_oi)
+pred_rtsp
+
+out@sim$samples[[1]][pred_rtsp[1]]
+
+
+
 rstan::summary(bekk_fit$model_fit, pars = c('beta'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
 
 bekk_fit = bmgarch(data = r[,1:2], xH = NULL, parameterization = "BEKK", iterations = 500, P = 1, Q = 1,
@@ -166,8 +217,78 @@ summary(bekk_fit)
 
 plot(bekk_fit, type = 'ccor')
 
-pst <- rstan::summary(bekk_fit$model_fit, pars = c('Cnst', 'A', 'B', 'corC',  'phi0', 'phi', 'theta', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
+pst <- out <- rstan::gqs(frcst, draws = as.matrix(bekk_fit$model_fit), data =  standat)
+
 pst
+
+## Not run:
+library(rstan )
+
+m <- stan_model(model_code ='
+data {
+  int<lower = 0, upper = 1> flag;
+}
+parameters {
+  real y;
+  vector[flag ? 1 : 0] phi;
+}
+transformed parameters {
+  real mu;
+  if ( flag == 1 ) {
+    mu = 0.0 + phi[1];
+  } else if ( flag == 0 ) {
+    mu = 0.0;
+  }  
+}
+model {
+  phi ~ normal(10, 0.1);
+  y ~ normal(mu, 1);
+}')
+
+f <- sampling(m, iter = 300, data =  list( flag =  1 ))
+
+f
+
+mc <-'
+data {
+  int<lower = 0, upper = 1> flag;
+}
+parameters {
+  real y;
+//  vector[flag ? 1 : 0] phi;
+  real mu;
+}
+generated quantities {
+//  real mu_p;
+  real y_rep;
+//  if ( flag == 1 ) {
+//    mu_p = 0.0 + phi[1];
+//  } else if ( flag == 0 ) {
+//    mu_p = 0.0;
+//  }
+  y_rep = normal_rng(0, 1);
+}'
+
+mc <-'
+data {
+  int<lower = 0, upper = 1> flag;
+}
+parameters {
+  real y;
+//  vector[flag ? 1 : 0] phi;
+  real mu;
+}
+generated quantities {
+  real y_rep;
+  y_rep = normal_rng(y, 1);
+}'
+
+m2 <- stan_model(model_code = mc)
+
+f2 <- rstan::gqs(m2, draws = as.matrix(f), data =  list( flag =  0))
+f2
+
+
 
 
 ###########################################
@@ -175,8 +296,8 @@ pst
 library(tcltk)
 
 length(sel)
-results_bekk <- array(NA, dim = c(length(sel),27))
-resultsCI_bekk <- array(NA, dim = c(length(sel),54))
+results_bekk <- array(NA, dim = c(length(sel),19))
+resultsCI_bekk <- array(NA, dim = c(length(sel),38))
 
 ## loop through sel participants
 total <- length(sel)
@@ -184,24 +305,24 @@ total <- length(sel)
 pb <- txtProgressBar(min = 0, max = total, style = 3)
 
 for(i in 1:length(sel)){
-  
-# for(i in redo){
+    
+#for(i in redo){
     partner <- unique(ddip.lag[ddip.lag$ID_DYAD==sel[i], "ID_INDIV"])
     ## Extract Time series per invididul in dyad
     r1 <- ddip.lag[ddip.lag$ID_INDIV==partner[1],'pa_rel_std']
     r2 <- ddip.lag[ddip.lag$ID_INDIV==partner[2],'pa_rel_std']
     r <-  cbind(r1, r2)
-    fit1 = bmgarch(data = r, parameterization = "BEKK", iterations = 1500, standardize_data = FALSE)
+    fit1 = bmgarch(data = r, parameterization = "BEKK", iterations = 500, standardize_data = FALSE)
 
-    pst <- rstan::summary(fit1$model_fit, pars = c('Cnst', 'A', 'B', 'corC',  'phi0', 'phi', 'theta', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
+    pst <- rstan::summary(fit1$model_fit, probs = c(.05, .95), pars = c('Cnst', 'A', 'B', 'corC',  'phi0', 'phi', 'theta', 'lp__'))$summary[,c('mean', '5%', '95%', 'Rhat')]
   
     ## Overwrite parameter if Rhat < 1.1
-    results_bekk[i, ] <- pst[,1]*ifelse(pst[,'Rhat']>3.1, NA, 1)
+    results_bekk[i, ] <- pst[,1]*ifelse(pst[,'Rhat']>1.1, NA, 1)
     colnames(results_bekk) <- rownames(pst)
     ## Record lower and upper CI
     resultsCI_bekk[i,] <-  c(t(pst[,2:3]))
-    low <- paste0(rownames(pst), '2.5%')
-    hi <- paste0(rownames(pst), '97.5%')
+    low <- paste0(rownames(pst), '5%')
+    hi <- paste0(rownames(pst), '95%')
     colnames(resultsCI_bekk)  <-   c(t(cbind(low, hi)))    
     ## Progress Bar
     setTxtProgressBar(pb, i)
@@ -227,11 +348,13 @@ load(file = 'results_dyad_bekk.RDat')
 load(file = 'resultsCI_dyad_bekk.RDat')
     
 ## Create filter for results with posterior mass outside of zero
-nonzero <- ifelse(sign(resultsCI_bekk[, seq(1, 54, by = 2)]) + sign(resultsCI_bekk[, seq(2, 54, by = 2)]) == 0, NA, 1)
+    nonzero <- ifelse(sign(resultsCI_bekk[, seq(1, ncol(resultsCI_bekk), by = 2)]) +
+                      sign(resultsCI_bekk[, seq(2, ncol(resultsCI_bekk), by = 2)]) == 0, NA, 1)
 
 ## Return nonzero results:
 round(results_bekk * nonzero, 2)
 
+sel[22]
 
 
 results_dcc_d <- array(NA, dim = c(length(sel),20))

@@ -140,44 +140,11 @@ generated quantities {
   real log_lik[T];
   corr_matrix[nt] corC;
   corr_matrix[nt] corH[T];
-/* // Params for prediction */
-/*   vector[nt] rts_p[ahead]; */
-/*   vector[nt] mu_p[ahead]; */
-/*   matrix[nt,nt] rr_p[ahead]; */
-/*   cov_matrix[nt] H_p[ahead]; */
-/*   cholesky_factor_cov[nt] L_H_p[ahead]; */
-/*   vector[2] rev_p = [0,0]'; */
-//
+
 //Const = multiply_lower_tri_self_transpose(Cnst);
   corC = cov2cor(Cnst);
 
   // retrodict
 #include /generated/retrodict_H.stan
 
-  /* // Forecast */
-  /*  mu_p[1,] =  phi0 + phi * rts[T, ] +  theta * (rts[T, ]-mu[T,]); */
-  /*  rr_p[1,] = ( rts[T,] - mu[T,] )*transpose( rts[T,] - mu[T,] ); */
-  /*   H_p[1,] = Cnst + transpose(A)*rr_p[1,]*A + transpose(B)*H[T,]*B ;     */
-  /* L_H_p[1,] = cholesky_decompose(H_p[1,]); */
-  /* if ( distribution == 0 ) { */
-  /*   rts_p[1,] = multi_normal_cholesky_rng(mu_p[1,], L_H_p[1,]); */
-  /* } else if ( distribution == 1 ) { */
-  /*   rts_p[1,] = multi_student_t_rng(nu, mu_p[1,], L_H_p[1,]*L_H_p[1,]'); */
-  /* } */
-  /* // */
-  /*   if(ahead >= 2) { */
-  /*     for ( p in 2:ahead) { */
-  /*       rev_p[2] = rts_p[p-1, 1]; */
-  /*       rev_p[1] = rts_p[p-1, 2]; */
-  /* 	mu_p[p,] =  phi0 + phi * rts_p[p - 1, ] +  theta * ( rts_p[p - 1, ] - mu_p[p-1] ); */
-  /*       rr_p[p,] = ( rts_p[p - 1,] - mu_p[p - 1,] )*transpose( rts_p[p - 1,] - mu_p[p - 1,] ); */
-  /*        H_p[p,] = Cnst + transpose(A)*rr_p[p,]*A + transpose(B)*H_p[p-1,]*B ;   */
-  /*      L_H_p[p,] = cholesky_decompose(H_p[p,]); */
-  /*      if ( distribution == 0 ) { */
-  /* 	rts_p[p,] = multi_normal_cholesky_rng(mu_p[p,], L_H_p[p,]); */
-  /*     } else if ( distribution == 1 ) { */
-  /* 	rts_p[p,] = multi_student_t_rng(nu, mu_p[p,], L_H_p[p,]*L_H_p[p,]'); */
-  /*     } */
-  /*    } */
-  /* } */
 }

@@ -81,12 +81,13 @@ head(fitsub)
 
 # library(tcltk)
 
-sel = unique(fitsub[fitsub$totday >= 85, "record_id"])
+sel = unique(fitsub[fitsub$totday >= 90, "record_id"])
+sel = sel[!sel %in% redo]
 
 length(sel)
 
-results <- array(NA, dim = c(length(sel),27))
-resultsCI <- array(NA, dim = c(length(sel),54))
+results <- array(NA, dim = c(length(sel),22))
+resultsCI <- array(NA, dim = c(length(sel),44))
 ahead = 1
 
 names(fitsub)
@@ -97,21 +98,21 @@ total <- length(sel)
 pb <- txtProgressBar(min = 0, max = total, style = 3)
 for(i in 1:length(sel)){
 
-for(i in redo){
+#for(i in redo){
 
     ## Extract Time series per invididul   
-    i = 4#13
-    i = 10
-    r <- fitsub[fitsub$record_id==sel[i],c('Max_TemperatureF', 'NAf')]
+    #i = 4#13
+    #i = 10
+    r <- fitsub[fitsub$record_id==sel[i],c('PAf', 'NAf')]
     xH <- fitsub[fitsub$record_id==sel[i],c('we_dummy')] 
     dim( r )
     r
 
-    plot(1:nrow(r), r[,1], type = 'l'); lines(1:nrow(r), r[,2], col = 'red')
-    rug(x = xH*fitsub[fitsub$record_id==sel[i], 'day'])
+    #plot(1:nrow(r), r[,1], type = 'l'); lines(1:nrow(r), r[,2], col = 'red')
+    #rug(x = xH*fitsub[fitsub$record_id==sel[i], 'day'])
 
-xH = cbind( xH, xH )
-    xH
+    xH = cbind( xH, xH )
+    ##xH
     
     # rl = r
     # cbind(rl, r)
@@ -121,20 +122,14 @@ xH = cbind( xH, xH )
     # plot(1:nrow(rl2), rl2[,1], type = 'l')
     # lines(1:nrow(rl2), rl2[,2], col = 'red')
      
-    fit1 = bmgarch(data = r, xH = xH, parameterization = "BEKK", iterations = 500, distribution = 'student_t', Q = 1, P = 1)
-    summary(fit1)
-
-    library(loo)
-    m2 = loo::loo(fit1$model_fit)
-loo::compare(m1, m2)
+    fit1 = bmgarch(data = r, xH = xH, parameterization = "BEKK", iterations = 500,
+                   distribution = 'student_t', Q = 1, P = 1, standardize_data = TRUE)
+    #summary(fit1)
     
-    fit1$mgarchQ
-    fit1$mgarchP
-    
-    round(rstan::summary(fit1$model_fit, pars = c( 'beta', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')], 2)
+    #round(rstan::summary(fit1$model_fit, pars = c( 'beta', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')], 2)
 
-    class(fit1)
-    plot( fit1, type = 'means' )
+    #class(fit1)
+    #plot( fit1, type = 'means' )
     
     # summary(fit1, CrI = c(0.025, .975))
     # bmgarch::plot.bmgarch(fit1, type = 'cvar')
@@ -142,15 +137,15 @@ loo::compare(m1, m2)
     # bmgarch::plot.bmgarch(fit1, type = 'ccor')
     # forecast(fit1, ahead = 3)
     
-    pst <- rstan::summary(fit1$model_fit, pars = c('Cnst', 'A', 'B', 'corC',  'phi0', 'phi', 'theta', 'lp__'))$summary[,c('mean', '2.5%', '97.5%', 'Rhat')]
+    pst <- rstan::summary(fit1$model_fit, pars = c('Cnst', 'A', 'B', 'corC',  'phi0', 'beta[1,1]', 'beta[1,2]', 'beta[2,2]', 'lp__'), probs = c(0.05, 0.95))$summary[,c('mean', '5%', '95%', 'Rhat')]
     dim(pst)
     ## Overwrite parameter if Rhat < 1.1
     results[i, ] <- pst[,1]*ifelse(pst[,'Rhat']>1.1, NA, 1)
     colnames(results) <- rownames(pst)
     ## Record lower and upper CI
     resultsCI[i,] <-  c(t(pst[,2:3]))
-    low <- paste0(rownames(pst), '2.5%')
-    hi <- paste0(rownames(pst), '97.5%')
+    low <- paste0(rownames(pst), '5%')
+    hi <- paste0(rownames(pst), '95%')
     colnames(resultsCI)  <-   c(t(cbind(low, hi)))    
     ## Progress Bar
     setTxtProgressBar(pb, i)
@@ -161,7 +156,7 @@ close(pb)
 ## focus on b2 for now?
 
 results
-resultsCI
+resultsCI[35,]
 
 redo <- which(is.na(rowSums(results)))
 length(redo)
@@ -176,7 +171,7 @@ load('../results_fitbit_bekk.RDat')
 #load(file = 'results_dyad.RDat')
 
 ## Create filter for results with posterior mass outside of zero
-nonzero <- ifelse(sign(resultsCI[, seq(1, 54, by = 2)]) + sign(resultsCI[, seq(2, 54, by = 2)]) == 0, NA, 1)
+nonzero <- ifelse(sign(resultsCI[, seq(1, 44, by = 2)]) + sign(resultsCI[, seq(2, 44, by = 2)]) == 0, NA, 1)
 nonzero
 
 results[ !is.na( rowSums(results) ), ]

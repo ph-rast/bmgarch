@@ -125,60 +125,8 @@ generated quantities {
   matrix[nt,T] rts_out;
   real log_lik[T];
   corr_matrix[nt] corH[T];
-/* // Params for prediction */
-/*   vector[nt] rts_p[ahead]; */
-/*   vector[nt] mu_p[ahead]; */
-/*   vector[nt] rr_p[ahead]; */
-/*   vector[nt] D_p[ahead]; */
-/*   cov_matrix[nt] H_p[ahead]; */
-/*   cholesky_factor_cov[nt] L_H_p[ahead]; */
-/*   vector[2] rev_p = [0,0]'; */
-/*   cov_matrix[nt] Qr_p[ahead]; */
-/*   vector[nt] Qr_sdi_p[ahead]; */
-/*   corr_matrix[nt] R_p[ahead]; */
-/*   vector[nt] u_p[ahead-1]; */
 
   // retrodict
 #include /generated/retrodict_H.stan
 
-  /* // Forecast */
-  /* mu_p[1,] =  phi0 + phi * rts[T, ] +  theta * (rts[T, ]-mu[T,]); */
-  /* for(d in 1:nt){ */
-  /*     rr_p[1, d] = square( rts[T, d] - mu[T, d] ); */
-  /*      D_p[1, d] = sqrt( c_h[d] + a_h[d]*rr_p[1, d] +  b_h[d]*D[T,d] ); */
-  /*   } */
-  /* //  u_p[1,] = diag_matrix(D_p[1,]) \ (rts[t,]- mu[t,]); */
-  /* Qr_p[1,] = (1 - a_q - b_q) * S + a_q * (u[T,] * u[T,]') + b_q * Qr[T,]; */
-  /* Qr_sdi_p[1,] = 1 ./ sqrt(diagonal(Qr_p[1,])); */
-  /* R_p[1,] = quad_form_diag(Qr_p[1,], Qr_sdi_p[1,]); */
-  /* H_p[1,] = quad_form_diag(R_p[1], D_p[1]); // diag(D)*R*diag(D) */
-  /* L_H_p[1,] = cholesky_decompose(H_p[1,]); */
-  /* if ( distribution == 0 ) { */
-  /*   rts_p[1,] = multi_normal_cholesky_rng(mu_p[1,], L_H_p[1,]); */
-  /* } else if ( distribution == 1 ) { */
-  /*   rts_p[1,] = multi_student_t_rng(nu, mu_p[1,], L_H_p[1,]*L_H_p[1,]'); */
-  /* } */
-  /* // */
-  /* if(ahead >= 2) { */
-  /*   for ( p in 2:ahead) { */
-  /*     rev_p[2] = rts_p[p-1, 1]; */
-  /*     rev_p[1] = rts_p[p-1, 2]; */
-  /*     mu_p[p,] =  phi0 + phi * rts_p[p - 1, ] +  theta * ( rts_p[p - 1, ] - mu_p[p-1] ); */
-  /*     for(d in 1:nt){ */
-  /* 	rr_p[p, d] = square( rts_p[p-1, d] - mu_p[p-1, d] ); */
-  /* 	D_p[p, d] = sqrt( c_h[d] + a_h[d]*rr_p[p-1, d] +  b_h[d]*D_p[p-1,d] ); */
-  /*     } */
-  /*     u_p[p-1,] = diag_matrix(D_p[p-1,]) \ (rts_p[p-1,]- mu_p[p-1,]); */
-  /*     Qr_p[p,] = (1 - a_q - b_q) * S + a_q * (u_p[p-1,] * u_p[p-1,]') + b_q * Qr_p[p-1,]; */
-  /*     Qr_sdi_p[p,] = 1 ./ sqrt(diagonal(Qr_p[p,])); */
-  /*     R_p[p,] = quad_form_diag(Qr_p[p,], Qr_sdi_p[p,]); */
-  /*     H_p[p,] = quad_form_diag(R_p[p], D_p[p]);  */
-  /*     L_H_p[p,] = cholesky_decompose(H_p[p,]); */
-  /*     if ( distribution == 0 ) { */
-  /* 	rts_p[p,] = multi_normal_cholesky_rng(mu_p[p,], L_H_p[p,]); */
-  /*     } else if ( distribution == 1 ) { */
-  /* 	rts_p[p,] = multi_student_t_rng(nu, mu_p[p,], L_H_p[p,]*L_H_p[p,]'); */
-  /*     } */
-  /*   } */
-  /* } */
 }
