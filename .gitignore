@@ -7,5 +7,3 @@
 *.hpp
 *.dll
 .Rproj.user/
-tests/local/
-todo.txt
