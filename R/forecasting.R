@@ -6,7 +6,7 @@
 ##' @importFrom ggplot2 geom_point
 ##' @importFrom ggplot2 geom_errorbar
 ##' @export
-forecast <- function(object, ahead){
+forecast_old <- function(object, ahead){
 
     ## Global objects used in forecasts: Location object (mu) is the same for all parameterizations
     

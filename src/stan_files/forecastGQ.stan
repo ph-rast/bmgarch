@@ -44,11 +44,9 @@ parameters {
   /* real<lower = 0> ma_d[nt]; */
   /* real<lower = 0> ar_d[nt]; */
   // END: CCC Block
-  real y;
 }
 
 model {
-  y ~ normal(0,1);
 }
 
 generated quantities {

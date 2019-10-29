@@ -153,10 +153,17 @@ bekk_fit <- bmgarch(data = r[, 1:2], xH = NULL,
                    meanstructure = "constant")
 
 summary(bekk_fit)
-plot(bekk_fit, type = "cvar")
-dev.off()
 
-standat <-  list(T = bekk_fit$TS_length,  nt = bekk_fit$nt,
+plot(bekk_fit, type = "cvar")
+
+aussi <-  forecast(bekk_fit , ahead =  3)
+aussi
+
+
+str(aussi )
+
+
+standata <-  list(T = bekk_fit$TS_length,  nt = bekk_fit$nt,
                  rts =  cbind(bekk_fit$RTS_full),
                  xH = bekk_fit$xH,
                  Q =  bekk_fit$mgarchQ,
@@ -164,10 +171,12 @@ standat <-  list(T = bekk_fit$TS_length,  nt = bekk_fit$nt,
                  ahead =  3, 
                  meanstructure =  bekk_fit$meanstructure,
                  distribution =  bekk_fit$num_dist)
-str(standat)
 
-frcst <- rstan::stan_model(file = "../src/stan_files/forecast_gq.stan")
+out <- rstan::gqs(aussi, draws = as.matrix(bekk_fit$model_fit), data =  standata)
 
+frcst <- rstan::stan_model(file = "../src/stan_files/forecastGQ.stan")
+frcst
+str(frcst )
 
 ## str(bekk_fit$model_fit)
 bekk_fit$model_fit@model_pars
@@ -189,7 +198,7 @@ rstan::summary(bekk_fit$model_fit, pars = c('phi0'))$summary[,c('mean', '2.5%', 
 ## out <- rstan::gqs(frcst, draws = mcdraws, data =  standat)
 
 
-out <- rstan::gqs(frcst, draws = as.matrix(bekk_fit$model_fit), data =  standat)
+out <- rstan::gqs(frcst, draws = as.matrix(bekk_fit$model_fit), data =  standata)
 out
 
 dim(out)
