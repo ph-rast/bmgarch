@@ -43,7 +43,6 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     P = object$mgarchP
     Q = object$mgarchQ
 
-    
     ## depending on parameteriztion, different parameters will be returned:
     if(object$param == 'CCC') {
         model_summary = rstan::summary(object$model_fit,
@@ -52,8 +51,12 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         
         garch_h_index  = grep("_h", rownames(model_summary) )
         cond_corr_index = grep("R", rownames(model_summary) )
-        arma_index = grep("^phi|^theta", rownames(model_summary) )
-
+        if( object$meanstructure == 0 ) {
+            arma_index = grep("phi0", rownames(model_summary))
+        } else {
+            arma_index = grep("^phi|^theta", rownames(model_summary) )
+        }
+          
         ##############################
         ## GARCH parameters of CCC  ##
         ##############################
@@ -110,7 +113,11 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         garch_h_index  = grep("_h", rownames(model_summary) )
         garch_q_index  = grep("_q", rownames(model_summary) )
         S_index = grep("S", rownames(model_summary) )
-        arma_index = grep("^phi|^theta", rownames(model_summary) )
+        if( object$meanstructure == 0 ) {
+            arma_index = grep("phi0", rownames(model_summary))
+        } else {
+            arma_index = grep("^phi|^theta", rownames(model_summary) )
+        }
 
         ## ###########################
         ## GARCH parameters of DCC  ##
@@ -182,7 +189,11 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         garch_R_index  = grep("corC", rownames(model_summary) )                            
         garch_A_index  = grep("A", rownames(model_summary) )
         garch_B_index  = grep("B", rownames(model_summary) )                        
-        arma_index = grep("^phi|^theta", rownames(model_summary) )
+        if( object$meanstructure == 0 ) {
+            arma_index = grep("phi0", rownames(model_summary))
+        } else {
+            arma_index = grep("^phi|^theta", rownames(model_summary) )
+        }
 
         #######################
         ## Garch parameters  ##
@@ -240,15 +251,15 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
         #######
         cat(paste0(paste0("MGARCH(", P, ",", Q, ')')), "estimates for B:", "\n\n")
 
-        b = list()
-        B_out = model_summary[garch_B_index,]
+        b <- list()
+        B_out <- model_summary[garch_B_index,]
         ##if ( nt == 2 ) {
         if (P > 1) {
             for( p in 1:P ){
-                b[[p]] = paste( paste0( paste0("B_", p, "_"), full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+                b[[p]] <- paste( paste0( paste0("B_", p, "_"), full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
             }
-            rownames( B_out ) = unlist( b )
-        } else rownames( B_out ) = paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+            rownames( B_out ) <- unlist( b )
+        } else rownames( B_out ) <- paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
         print(round( B_out, digits = digits) )
         cat("\n\n")
         
@@ -262,9 +273,9 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     }
    }
 
-    nu = rstan::summary(object$model_fit, pars = c('nu'))$summary[,'mean']
-    Lnu = round( rstan::summary(object$model_fit, pars = c('nu'))$summary[,'2.5%'], 2)
-    Unu = round( rstan::summary(object$model_fit, pars = c('nu'))$summary[,'97.5%'], 2)
+    nu <- rstan::summary(object$model_fit, pars = c('nu'))$summary[,'mean']
+    Lnu <- round( rstan::summary(object$model_fit, pars = c('nu'))$summary[,'2.5%'], 2)
+    Unu <- round( rstan::summary(object$model_fit, pars = c('nu'))$summary[,'97.5%'], 2)
     
     if( object$num_dist == 1) {
         cat("Df constant student_t: nu =", round( nu, digits = 2), "\n")
