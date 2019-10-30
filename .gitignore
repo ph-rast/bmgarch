@@ -7,3 +7,6 @@
 *.hpp
 *.dll
 .Rproj.user/
+
+## Do not ignore this:
+!inst/include/meta_header.hpp
