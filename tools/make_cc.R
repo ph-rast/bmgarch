@@ -36,7 +36,7 @@ make_cc <- function(file) {
                     methods = c("call_sampler", 
                                 "param_names", "param_names_oi", "param_fnames_oi", 
                                 "param_dims",  "param_dims_oi", "update_param_oi", "param_oi_tidx", 
-                                "grad_log_prob", "log_prob", 
+                                "grad_log_prob", "log_prob", "standalone_gqs",
                                 "unconstrain_pars", "constrain_pars", "num_pars_unconstrained", 
                                 "unconstrained_param_names", "constrained_param_names"), 
                     file = file.path("stan_files", paste0(f, ".cc")), 

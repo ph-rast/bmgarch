@@ -1,13 +1,6 @@
 data {
-  int<lower=2> T;
-  int<lower=1> nt;    // number of time series
-  vector[nt] rts[T];  // multivariate time-series
-  vector[nt] xH[T];  // time-varying predictor for conditional H
-  int<lower=0> ahead; // how many ahead predictions
-  int<lower=1> Q; // MA component in MGARCH(P,Q), matrix A
-  int<lower=1> P; // AR component in MGARCH(P,Q), matrix B  
-  int<lower=0, upper=1> meanstructure; // Select model for location
-  real<lower=1, upper=1> distribution;
+#include /data/data.stan  
+  real<lower=0, upper=1> parameterization; // select parameterization, CCC=0, DCC=1, BEKK=2
 }
 
 transformed data {
@@ -20,9 +13,12 @@ parameters {
 #include /parameters/arma.stan
   // predictor for H 
   vector[nt] beta;
+  // DF constant nu for student t
+  real< lower = 2 > nu;
+
   
-//  BEGIN: CCC Block
-//  GARCH h parameters on variance metric
+  //  CCC specifics
+  //  GARCH h parameters on variance metric
   vector<lower=0>[nt] c_h;
   vector<lower=0, upper = 1 >[nt] a_h[Q];
   vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
@@ -33,20 +29,10 @@ parameters {
   // D1 init
   vector<lower = 0>[nt] D1_init;
 
-  // DF constant nu for student t
-  real< lower = 2 > nu;
-
   cov_matrix[nt] H[T];
   vector[nt] rr[T-1];
   vector[nt] mu[T]; 
-  vector[nt] D[T]; 
-  /* real<lower = 0> vd[nt]; */
-  /* real<lower = 0> ma_d[nt]; */
-  /* real<lower = 0> ar_d[nt]; */
-  // END: CCC Block
-}
-
-model {
+  vector[nt] D[T];
 }
 
 generated quantities {

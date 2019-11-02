@@ -6,7 +6,6 @@ transformed data {
 #include /transformed_data/xh_marker.stan  
 }
 
-
 parameters {
   // ARMA parameters
 #include /parameters/arma.stan
@@ -14,7 +13,6 @@ parameters {
   vector[nt] beta;
   // DF constant nu for student t
   real< lower = 2 > nu;
-
   
   //  CCC specifics
   //  GARCH h parameters on variance metric
@@ -57,13 +55,13 @@ generated quantities {
   D_p[ 1:(ahead + max(Q,P)), ] = D[ 1:(ahead + max(Q,P)), ];
   H_p[1:(ahead + max(Q,P)), ] = H[1:(ahead + max(Q,P)), ];
 
-  /* // Obtain needed elements from mu and fill into mu_p */
-  /* mu_p[ 1:max(Q, P), ] = mu[  (T-(max(Q,P)-1) ):T, ]; */
-  /* rts_p[1:max(Q, P), ] = rts[ (T-(max(Q,P)-1) ):T, ]; */
-  /* // rr is of length T-1 */
-  /* rr_p[ 1:max(Q, P), ] = rr[ (T-1-(max(Q,P)-1) ):(T-1), ]; */
-  /* D_p[ 1:max(Q, P), ] = D[ (T - (max(Q,P)-1) ):T, ]; */
-  /* H_p[1:max(Q, P), ] = H[(T - (max(Q,P)-1) ):T, ]; */
+  // Obtain needed elements from mu and fill into mu_p
+  mu_p[ 1:max(Q, P), ] = mu[  (T-(max(Q,P)-1) ):T, ];
+  rts_p[1:max(Q, P), ] = rts[ (T-(max(Q,P)-1) ):T, ];
+  // rr is of length T-1
+  rr_p[ 1:max(Q, P), ] = rr[ (T-1-(max(Q,P)-1) ):(T-1), ];
+  D_p[ 1:max(Q, P), ] = D[ (T - (max(Q,P)-1) ):T, ];
+  H_p[1:max(Q, P), ] = H[(T - (max(Q,P)-1) ):T, ];
 
   // Forecast
 

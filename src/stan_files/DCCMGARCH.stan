@@ -2,12 +2,15 @@
 functions { 
 #include /functions/cov2cor.stan
 }
+
 data {
 #include /data/data.stan
 }
+
 transformed data {
 #include /transformed_data/xh_marker.stan
 }
+
 parameters {
   // ARMA parameters
 #include /parameters/arma.stan
@@ -17,9 +20,9 @@ parameters {
   vector<lower=0 >[nt] a_h[Q];
   vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
   // GARCH q parameters 
-  real<lower=0, upper = 1 > a_q; // do the mudulus thing here
+  real<lower=0, upper = 1 > a_q; // 
   real<lower=0, upper = (1 - a_q) > b_q; //
-  corr_matrix[nt] S;  // DCC keeps this constant as it is obtained from step 1. This will probably not work here (i.e. will be overwritten T times)
+  corr_matrix[nt] S;  // DCC keeps this constant 
   // Qr1 init
   cov_matrix[nt] Qr1_init;
   // D1 init
@@ -30,8 +33,11 @@ parameters {
   real< lower = 2 > nu; // nu for student_t
 
   // predictor for diag variance in D
-  vector[ xH_marker >= 1 ? nt : 0 ] beta;  
+  //  vector[ xH_marker >= 1 ? nt : 0 ] beta;
+  // beta needs to be estimated as gqs() does not understand ? operator (yet)
+  vector[nt] beta;  
 }
+
 transformed parameters {
   cholesky_factor_cov[nt] L_H[T];
   cov_matrix[nt] H[T];
