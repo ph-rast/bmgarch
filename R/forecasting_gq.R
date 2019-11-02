@@ -6,7 +6,7 @@
 ##' @importFrom ggplot2 geom_point
 ##' @importFrom ggplot2 geom_errorbar
 ##' @export
-forecast <- function(object, ahead =  1, seed = NA){
+forecast <- function(object, ahead =  1, seed = NA) {
 
     ## model_cppname <- "forecastGQ.stan"
     ## stanfit <- rstan::stanc("./src/stan_files/forecastGQ.stan",
@@ -35,7 +35,12 @@ forecast <- function(object, ahead =  1, seed = NA){
         ## ################
         ## DCC Forecast ##
         ## ################
-         print(0)
+             frcst_DCC <- rstan::gqs(stanmodels$forecastDCC,
+                                 draws =  as.matrix(object$model_fit),
+                                 data = standat,
+                                 seed =  seed)
+            
+            return(frcst_DCC)
 
         ## ##########
         ## END DCC ##
@@ -50,12 +55,12 @@ forecast <- function(object, ahead =  1, seed = NA){
             ## mod_forecast <- rstan::stan_model("./src/stan_files/forecastGQ.stan")
             
             
-             frcst <- rstan::gqs(stanmodels$forecastGQ,
+             frcst_CCC <- rstan::gqs(stanmodels$forecastCCC,
                                  draws =  as.matrix(object$model_fit),
                                  data = standat,
                                  seed =  seed)
             
-            return(frcst)            
+            return(frcst_CCC)            
             ## CCC specific parameters
         
         ## ##########
@@ -67,7 +72,7 @@ forecast <- function(object, ahead =  1, seed = NA){
             ## ###################
             ## BEKK Forecast ##
             ## ###################
-            print( 0 )
+            return( NULL )
             ## BEKK Specific parameters
             ## ###########
             ## END BEKK ##
