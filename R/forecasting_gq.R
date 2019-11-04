@@ -51,10 +51,6 @@ forecast <- function(object, ahead =  1, seed = NA) {
             ## ###############
             ## CCC Forecast ##
             ## ###############
-
-            ## mod_forecast <- rstan::stan_model("./src/stan_files/forecastGQ.stan")
-            
-            
              frcst_CCC <- rstan::gqs(stanmodels$forecastCCC,
                                  draws =  as.matrix(object$model_fit),
                                  data = standat,
@@ -72,7 +68,13 @@ forecast <- function(object, ahead =  1, seed = NA) {
             ## ###################
             ## BEKK Forecast ##
             ## ###################
-            return( NULL )
+             frcst_BEKK <- rstan::gqs(stanmodels$forecastBEKK,
+                                 draws =  as.matrix(object$model_fit),
+                                 data = standat,
+                                 seed =  seed)
+            
+            return(frcst_BEKK)
+
             ## BEKK Specific parameters
             ## ###########
             ## END BEKK ##
