@@ -148,7 +148,7 @@ r
 
 ## Fit Model
 fit <- bmgarch(data = r[, 1:2], xH = NULL,
-               parameterization = "DCC", P = 1, Q = 1,
+               parameterization = "DCC", P = 3, Q = 1,
                iterations = 300,
                meanstructure = "constant")
 
@@ -158,7 +158,7 @@ colnames(as.matrix(fit$model_fit))
 
 plot(fit, type = "cvar")
 
-aussi <-  forecast(fit , ahead =  2)
+aussi <-  forecast(fit , ahead =  3)
 aussi
 
 seed <-  NA
