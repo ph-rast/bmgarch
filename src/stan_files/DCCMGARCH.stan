@@ -14,6 +14,8 @@ transformed data {
 parameters {
   // ARMA parameters
 #include /parameters/arma.stan
+  // predictor for H
+#include /parameters/predH.stan
 
   // GARCH h parameters on variance metric
   vector<lower=0>[nt] c_h; 
@@ -32,10 +34,6 @@ parameters {
 
   real< lower = 2 > nu; // nu for student_t
 
-  // predictor for diag variance in D
-  //  vector[ xH_marker >= 1 ? nt : 0 ] beta;
-  // beta needs to be estimated as gqs() does not understand ? operator (yet)
-  vector[nt] beta;  
 }
 
 transformed parameters {

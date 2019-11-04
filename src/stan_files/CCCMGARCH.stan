@@ -11,6 +11,8 @@ transformed data {
 parameters {
  // ARMA parameters
 #include /parameters/arma.stan
+  // predictor for H
+#include /parameters/predH.stan
 
   // GARCH h parameters on variance metric
   vector<lower=0>[nt] c_h; 
@@ -26,9 +28,6 @@ parameters {
   // DF constant nu for student t
   real< lower = 2 > nu;
 
-  // predictor for H 
-  //  vector[ xH_marker >= 1 ? nt : 0 ] beta;
-    vector[nt] beta; 
 }
 transformed parameters {
   cov_matrix[nt] H[T];

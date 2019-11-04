@@ -10,7 +10,7 @@ parameters {
   // ARMA parameters
 #include /parameters/arma.stan
   // predictor for H 
-  vector[nt] beta;
+#include /parameters/predH.stan
   // DF constant nu for student t
   real< lower = 2 > nu;
   
