@@ -11,7 +11,10 @@ transformed data {
 parameters { 
   // ARMA parameters
 #include /parameters/arma.stan
-
+  // predictor for H
+  //cov_matrix[ xH_marker >= 1 ? nt : 0 ] beta;
+  cov_matrix[nt] beta;
+  
   //  cholesky_factor_cov[nt] Cnst; // Const is symmetric, A, B, are not
   cov_matrix[nt] Cnst; // Const is symmetric, A, B, are not  
 
@@ -34,8 +37,6 @@ parameters {
   cov_matrix[nt] H1_init;
   real< lower = 2 > nu; // nu for student_t
 
-  // predictor for H
-  cov_matrix[ xH_marker >= 1 ? nt : 0 ] beta;
 }
 transformed parameters {
   cholesky_factor_cov[nt] L_H[T];
@@ -85,7 +86,11 @@ transformed parameters {
     
     // Meanstructure model:
 #include /model_components/mu.stan
-    
+
+    // reset A_part and B_part to zero for each iteration t
+    A_part = diag_matrix( rep_vector(0.0, nt));
+    B_part = diag_matrix( rep_vector(0.0, nt));
+        
     for (q in 1:min( t-1, Q) ) {
       rr[t-q,] = ( rts[t-q,] - mu[t-q,] )*( rts[t-q,] - mu[t-q,] )';
       A_part = A_part + A[q]' * rr[t-q,] * A[q];
