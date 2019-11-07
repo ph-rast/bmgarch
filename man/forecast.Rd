@@ -4,12 +4,17 @@
 \alias{forecast}
 \title{Forecasting mean and variance}
 \usage{
-forecast(object, ahead = 1, seed = NA)
+forecast(object, ahead = 1, type = "means", CrI = c(0.05, 0.95),
+  seed = NA)
 }
 \arguments{
 \item{object}{Fitted bmgarch object}
 
 \item{ahead}{Periods to be forecasted ahead}
+
+\item{type}{Plot conditional means (default) or (co)-variances. Takes arguments "means", "variances", "covariances"}
+
+\item{CrI}{Lower and upper boundary of credibility interval. Default is "c( 0.5, .95)"}
 }
 \value{
 Forecasted mean and variance
