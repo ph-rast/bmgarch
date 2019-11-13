@@ -28,7 +28,7 @@ parameters {
   // Qr1 init
   cov_matrix[nt] Qr1_init;
   // D1 init
-  vector[nt] D1_init;
+  vector<lower = 0>[nt] D1_init;
   // u1 init
   vector[nt] u1_init;
 
