@@ -1,9 +1,10 @@
 data {
-#include /data/data.stan  
+#include /data/data.stan
+  vector[nt] xH_p[ahead];  // time-varying predictor for conditional H
 }
 
 transformed data {
-#include /transformed_data/xh_marker.stan  
+#include /transformed_data/xh_marker.stan
 }
 
 parameters {
@@ -88,7 +89,7 @@ generated quantities {
     	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d];
       }
       if ( xH_marker >= 1) {
-      	vd[d] = c_h[d] + beta[d] * xH[t, d] + ma_d[d] + ar_d[d];
+      	vd[d] = c_h[d] + beta[d] * xH_p[t-1, d] + ma_d[d] + ar_d[d];
       } else if ( xH_marker == 0) {
       	vd[d] = c_h[d]  + ma_d[d] + ar_d[d];
       }

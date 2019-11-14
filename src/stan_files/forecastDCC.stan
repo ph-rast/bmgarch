@@ -1,5 +1,6 @@
 data {
 #include /data/data.stan  
+  vector[nt] xH_p[ahead];  // time-varying predictor for conditional H 
 }
 
 transformed data {
@@ -103,7 +104,7 @@ generated quantities {
 
       // Predictor on diag (given in xH)
       if ( xH_marker >= 1) {
-	vd_p[d] = c_h[d] + beta[d] * xH[t, d] + ma_d_p[d] + ar_d_p[d];
+	vd_p[d] = c_h[d] + beta[d] * xH_p[t-1, d] + ma_d_p[d] + ar_d_p[d];
       } else if ( xH_marker == 0) {
       	vd_p[d] = c_h[d]  + ma_d_p[d] + ar_d_p[d];
       }
