@@ -12,7 +12,7 @@ transformed data {
 }
 
 parameters {
-  // ARMA parameters
+  // ARMA parameters 
 #include /parameters/arma.stan
   // predictor for H
 #include /parameters/predH.stan
@@ -103,7 +103,7 @@ model {
   // Prior for initial state
   Qr1_init ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
   to_vector(D1_init) ~ lognormal(0, 1);
-  to_vector(u1_init) ~ lognormal(0, 1);
+  to_vector(u1_init) ~ normal(0, 1);
   // Prior on nu for student_t
   if ( distribution == 1 )
     nu ~ normal( nt, 50 );

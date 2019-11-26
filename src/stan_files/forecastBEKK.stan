@@ -1,5 +1,5 @@
 data {
-#include /data/data.stan  
+#include /data/gq_data.stan  
 }
 
 transformed data {

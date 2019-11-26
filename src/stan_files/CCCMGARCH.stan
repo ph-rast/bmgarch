@@ -9,7 +9,7 @@ transformed data {
 #include /transformed_data/xh_marker.stan  
 }
 parameters {
- // ARMA parameters
+ // ARMA parameters 
 #include /parameters/arma.stan
   // predictor for H
 #include /parameters/predH.stan

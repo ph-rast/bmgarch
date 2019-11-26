@@ -1,5 +1,5 @@
 data {
-#include /data/data.stan  
+#include /data/gq_data.stan  
   vector[nt] xH_p[ahead];  // time-varying predictor for conditional H 
 }
 
