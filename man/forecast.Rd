@@ -4,8 +4,15 @@
 \alias{forecast}
 \title{Forecasting mean and variance}
 \usage{
-forecast(object, ahead = 1, type = "means", CrI = c(0.05, 0.95),
-  seed = NA)
+forecast(
+  object,
+  ahead = 1,
+  type = "means",
+  xH_p = NULL,
+  CrI = c(0.05, 0.95),
+  seed = NA,
+  plot = TRUE
+)
 }
 \arguments{
 \item{object}{Fitted bmgarch object}
@@ -14,7 +21,11 @@ forecast(object, ahead = 1, type = "means", CrI = c(0.05, 0.95),
 
 \item{type}{Plot conditional means (default) or (co)-variances. Takes arguments "means", "variances", "covariances"}
 
+\item{xH_p}{Predictor for H}
+
 \item{CrI}{Lower and upper boundary of credibility interval. Default is "c( 0.5, .95)"}
+
+\item{plot}{Should forecast be plotted. Logical argument, defaults to TRUE}
 }
 \value{
 Forecasted mean and variance

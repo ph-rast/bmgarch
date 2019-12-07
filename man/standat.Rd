@@ -4,13 +4,10 @@
 \alias{standat}
 \title{Standardize input data to facilitate computation}
 \usage{
-standat(data, xH, P, Q, ahead, standardize_data, distribution,
-  meanstructure)
+standat(data, xH, P, Q, standardize_data, distribution, meanstructure)
 }
 \arguments{
 \item{data}{Time-series data}
-
-\item{ahead}{Number of periods forecasting ahead}
 }
 \value{
 bmgarch object

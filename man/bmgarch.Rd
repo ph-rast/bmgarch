@@ -4,21 +4,34 @@
 \alias{bmgarch}
 \title{Bayesian Multivariate GARCH}
 \usage{
-bmgarch(data, xH = NULL, parameterization = "CCC", P = 1, Q = 1,
-  ahead = 1, iterations = 1000, chains = 4,
-  standardize_data = TRUE, distribution = "Student_t",
-  meanstructure = "constant", ...)
+bmgarch(
+  data,
+  xH = NULL,
+  parameterization = "CCC",
+  P = 1,
+  Q = 1,
+  iterations = 1000,
+  chains = 4,
+  standardize_data = TRUE,
+  distribution = "Student_t",
+  meanstructure = "constant",
+  ...
+)
 }
 \arguments{
 \item{data}{A time-series or matrix object containing observations at the same interval.}
 
 \item{parameterization}{A character string specifying the type of of parameterization, must be one of "CCC" (default), "DCC", or "BEKK".}
 
-\item{ahead}{A number specifying the number of forecasted periods. Defaults to 1.}
+\item{P}{dimension of AR component in MGARCH(P,Q)}
+
+\item{Q}{dimension of MA component in MGARCH(P,Q)}
 
 \item{iterations}{A positive integer specifying the number of iterations for each chain (including warmup). The default is 1000}
 
 \item{chains}{A positive integer specifying the number of Markov chains. The default is 4.}
+
+\item{distribution}{Distribution of innovation: "Student_t" (default) or "Normal"}
 
 \item{meanstructure}{Defines model for means. Either 'constant' (default) or 'arma'. Currently arma(1,1) only.}
 
@@ -31,8 +44,8 @@ An object of S4 class ‘stanfit’ representing the fitted results.
 Draw samples from a specified multivariate GARCH model, given multivariate time-series.
 }
 \details{
-Three paramerization are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlatoin (DCC), and the BEKK.
+Three paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlatoin (DCC), and  BEKK.
 }
 \author{
-philippe
+Philippe Rast
 }

@@ -46,7 +46,7 @@
 ##' @title Internal function to be used
 ##' @param x 
 ##' @keywords internal
-.qtile = function(x){
-  cis = quantile(x, c(.025, .975) )
+.qtile <- function(x, CrI = c(.025, .975) ) {
+  cis <- quantile(x, CrI )
   return(cis)
 }

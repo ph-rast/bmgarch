@@ -4,7 +4,7 @@
 \alias{plot.bmgarch}
 \title{Plot}
 \usage{
-\method{plot}{bmgarch}(object, type = "means")
+\method{plot}{bmgarch}(object, type = "means", askNewPage = TRUE)
 }
 \arguments{
 \item{object}{stan object}
@@ -18,5 +18,5 @@ Plot
 Plot
 }
 \author{
-philippe
+Philippe Rast <rast.ph@gmail.com>
 }
