@@ -4,7 +4,7 @@
 ##' @return Summary object
 ##' @author philippe
 ##' @export
-summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
+summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
     cat( "Model:", paste0(object$param, "-MGARCH\n"))
     if( object$param == 'CCC') {
         cat("Basic specification: H_t = D_t R D_t", "\n")
@@ -30,22 +30,22 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     round((max(object$elapsed_time[,1]) + max(object$elapsed_time[,2]))/60, 2) , "\n\n")
 
     ## Shared objects
-    nt = object$nt
-    short_names = substr(object$TS_names, 1, 2)
+    nt <- object$nt
+    short_names <- substr(object$TS_names, 1, 2)
     ## extract and printonly off-diagonal elements
-    cormat_index = matrix(1:(nt*nt), nrow = nt)
-    corr_only = cormat_index[lower.tri(cormat_index)]
-    diag_only = diag(cormat_index)
+    cormat_index <- matrix(1:(nt*nt), nrow = nt)
+    corr_only <- cormat_index[lower.tri(cormat_index)]
+    diag_only <- diag(cormat_index)
     ## obtain all combinations of TS varnames for A and B in BEKK
-    full_varnames = expand.grid( short_names, short_names)
+    full_varnames <- expand.grid( short_names, short_names)
     ## obtain off-diagonal TS varnames
-    od_varnames = full_varnames[corr_only, ]
-    P = object$mgarchP
-    Q = object$mgarchQ
+    od_varnames <- full_varnames[corr_only, ]
+    P <- object$mgarchP
+    Q <- object$mgarchQ
 
     ## depending on parameteriztion, different parameters will be returned:
     if(object$param == 'CCC') {
-        model_summary = rstan::summary(object$model_fit,
+        model_summary <- rstan::summary(object$model_fit,
                                        pars = c('c_h', 'a_h', 'b_h', 'R', 'phi0', 'phi', 'theta', 'lp__'),
                                        probs = CrI)$summary[, -2 ] # drop se_mean with [,-2]
         
@@ -273,9 +273,20 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ){
     }
    }
 
+    ## ######################
+    ## Beta: Predictor on H
+    ## #####################
+    if( sum(object$xH) != 0) {
+        cat("Exogenous predictor (beta):", "\n\n")
+        beta <- rstan::summary(object$model_fit, pars = c('beta'), probs = CrI)$summary[, -2]
+        print(round(beta, digits = digits ) )
+        cat("\n\n" )
+    }
+        
     nu <- rstan::summary(object$model_fit, pars = c('nu'))$summary[,'mean']
-    Lnu <- round( rstan::summary(object$model_fit, pars = c('nu'))$summary[,'2.5%'], 2)
-    Unu <- round( rstan::summary(object$model_fit, pars = c('nu'))$summary[,'97.5%'], 2)
+    Lnu <- round( rstan::summary(object$model_fit, pars = c('nu'), probs = CrI)$summary[,4], 2)
+    Unu <- round( rstan::summary(object$model_fit, pars = c('nu'), probs = CrI)$summary[,5], 2)
+
     
     if( object$num_dist == 1) {
         cat("Df constant student_t: nu =", round( nu, digits = 2), "\n")

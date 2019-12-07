@@ -64,7 +64,7 @@ generated quantities {
   D_p[  1:(ahead + max(Q,P)), ] = D[  1:(ahead + max(Q,P)), ];
   u_p[  1:(ahead + max(Q,P)), ] = u[  1:(ahead + max(Q,P)), ];
   Qr_p[ 1:(ahead + max(Q,P)), ] = Qr[ 1:(ahead + max(Q,P)), ];
-  Qr_sdi_p[ 1:(ahead + max(Q,P)), ] =Qr_sdi[ 1:(ahead + max(Q,P)), ];
+  Qr_sdi_p[ 1:(ahead + max(Q,P)), ] = Qr_sdi[ 1:(ahead + max(Q,P)), ];
   
   R_p[ 1:(ahead + max(Q,P)), ] = R[ 1:(ahead + max(Q,P)), ];
 
@@ -77,6 +77,7 @@ generated quantities {
   D_p[  1:max(Q, P), ] =  D[ (T - (max(Q,P)-1) ):T, ];
   u_p[  1:max(Q, P), ] =  u[ (T - (max(Q,P)-1) ):T, ];
   Qr_p[ 1:max(Q, P), ] = Qr[ (T - (max(Q,P)-1) ):T, ];
+  Qr_sdi_p[ 1:max(Q, P), ] = Qr_sdi[ (T - (max(Q,P)-1) ):T, ];
   R_p[  1:max(Q, P), ] =  R[ (T - (max(Q,P)-1) ):T, ];
   
   // Forecast
@@ -115,7 +116,9 @@ generated quantities {
     Qr_p[t,] = (1 - a_q - b_q) * S + a_q * (u_p[t-1,] * u_p[t-1,]') + b_q * Qr_p[t-1,];
     Qr_sdi_p[t,] = 1 ./ sqrt(diagonal(Qr_p[t,]));
     R_p[t,] = quad_form_diag(Qr_p[t,], Qr_sdi_p[t,]);
-    H_p[t,] = quad_form_diag(R_p[t,],     D_p[t,]);
+    
+    //    H_p[t,] = quad_form_diag(R_p[t,],     D_p[t,]);
+    H_p[t,] = diag_matrix(D_p[t,]) * R_p[t,] * diag_matrix(D_p[t,]);
        
   
     if ( distribution == 0 ) {

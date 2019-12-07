@@ -1,12 +1,11 @@
 #' Standardize input data to facilitate computation
 #' 
 #' @param data Time-series data
-#' @param ahead Number of periods forecasting ahead
 #'
 #' @return bmgarch object 
 #' @export
 #' @keywords internal
-standat = function(data, xH, P, Q, ahead, standardize_data, distribution, meanstructure){
+standat = function(data, xH, P, Q, standardize_data, distribution, meanstructure){
 
     if(dim(data)[1] < dim(data)[2]) data = t(data)
     if ( is.null( colnames( data ) ) ) colnames( data ) = paste0('t', 1:ncol( data ) )
@@ -40,7 +39,6 @@ standat = function(data, xH, P, Q, ahead, standardize_data, distribution, meanst
                           rts = stdx,
                           xH = xH,
                           nt = ncol(stdx),
-                          ahead = ahead,
                           centered_data = centered_data,
                           scaled_data = scaled_data,
                           distribution = distribution,
@@ -53,7 +51,6 @@ standat = function(data, xH, P, Q, ahead, standardize_data, distribution, meanst
                             rts = data,
                             xH = xH,
                             nt = ncol(data),
-                            ahead = ahead,
                             distribution = distribution,
                             P = P,
                             Q = Q,
@@ -64,24 +61,27 @@ standat = function(data, xH, P, Q, ahead, standardize_data, distribution, meanst
 
 ##' Draw samples from a specified multivariate GARCH model, given multivariate time-series.
 ##'
-##' Three paramerization are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlatoin (DCC), and the BEKK.
+##' Three paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK.
 ##' @title Bayesian Multivariate GARCH
 ##' @param data A time-series or matrix object containing observations at the same interval.
+##' @param xH 
 ##' @param parameterization A character string specifying the type of of parameterization, must be one of "CCC" (default), "DCC", or "BEKK".
-##' @param ahead A number specifying the number of forecasted periods. Defaults to 1.
+##' @param P dimension of AR component in MGARCH(P,Q)
+##' @param Q dimension of MA component in MGARCH(P,Q)
 ##' @param iterations A positive integer specifying the number of iterations for each chain (including warmup). The default is 1000
 ##' @param chains A positive integer specifying the number of Markov chains. The default is 4.
+##' @param standardize_data 
+##' @param distribution Distribution of innovation: "Student_t" (default) or "Normal" 
 ##' @param meanstructure Defines model for means. Either 'constant' (default) or 'arma'. Currently arma(1,1) only.
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’. See the documentation in ‘stan’.
 ##' @return An object of S4 class ‘stanfit’ representing the fitted results.
-##' @author philippe
+##' @author Philippe Rast
 ##' @export
 bmgarch = function(data,
                    xH = NULL,
                    parameterization = 'CCC',
                    P = 1,
                    Q = 1,
-                   ahead = 1,
                    iterations = 1000,
                    chains = 4,
                    standardize_data = TRUE,
@@ -90,8 +90,8 @@ bmgarch = function(data,
     num_dist = NA
     if ( distribution == 'Gaussian' ) num_dist = 0 else {
             if ( distribution == 'student_t' | distribution == 'Student_t') num_dist = 1 else warning( '\n\n Specify distribution: Gaussian or Student_t \n\n', immediate. = TRUE) }
-    return_standat = standat(data, xH, P, Q, ahead, standardize_data, distribution = num_dist, meanstructure )
-    stan_data  = return_standat[ c('T', 'xH', 'rts', 'nt', 'ahead', 'distribution', 'P', 'Q', 'meanstructure')]
+    return_standat = standat(data, xH, P, Q,  standardize_data, distribution = num_dist, meanstructure )
+    stan_data  = return_standat[ c('T', 'xH', 'rts', 'nt', 'distribution', 'P', 'Q', 'meanstructure')]
 
   if(parameterization == 'CCC') model_fit <- rstan::sampling(stanmodels$CCCMGARCH, data = stan_data,
                                                       verbose = TRUE,
@@ -129,7 +129,6 @@ bmgarch = function(data,
                        chains = chains,
                        elapsed_time = rstan::get_elapsed_time(model_fit),
                        date = date(),
-                       ahead = ahead,
                        nt = stan_data$nt,
                        TS_length = stan_data$T,
                        TS_names = colnames(stan_data$rts),
