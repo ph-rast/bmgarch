@@ -348,7 +348,7 @@ forecast <- function(object,
         ## Plots
         if( plot ) {
             ## Use conditional variance plot of bmgarch::plot
-            retro <- bmgarch::plot.bmgarch(object, type = 'ccor', askNewPage = FALSE, CrI = CrI)
+            retro <- plot(object, type = 'ccor', askNewPage = FALSE, CrI = CrI)
 
             ## FOR LOOP HERE with number of correlations (corrs)
             for(i in 1:corrs ) {

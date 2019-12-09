@@ -1,0 +1,4 @@
+/tests/local
+*.hpp
+*.cpp
+R/zzz.R
