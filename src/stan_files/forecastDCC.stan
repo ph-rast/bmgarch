@@ -69,7 +69,7 @@ generated quantities {
   R_p[ 1:(ahead + max(Q,P)), ] = R[ 1:(ahead + max(Q,P)), ];
 
   // Obtain needed elements from mu and fill into mu_p
-  rts_p[1:max(Q, P), ] = rts[ (T-(max(Q,P)-1) ):T, ];
+  rts_p[1:max(Q, P), ] = rts[(T-(max(Q,P)-1) ):T, ];
   H_p[  1:max(Q, P), ] =  H[ (T-(max(Q,P)-1) ):T, ];
   mu_p[ 1:max(Q, P), ] = mu[ (T-(max(Q,P)-1) ):T, ];
   // rr is of length T-1
@@ -112,8 +112,8 @@ generated quantities {
 
       D_p[t, d] = sqrt( vd_p[d] );
     }
-    u_p[t,] = diag_matrix(D_p[t,]) \ (rts_p[t,]- mu_p[t,]);
-    Qr_p[t,] = (1 - a_q - b_q) * S + a_q * (u_p[t-1,] * u_p[t-1,]') + b_q * Qr_p[t-1,];
+    u_p[t - 1,] = diag_matrix(D_p[t - 1,]) \ (rts_p[t - 1,]- mu_p[t - 1,]);
+    Qr_p[t, ] = (1 - a_q - b_q) * S + a_q * (u_p[t-1,] * u_p[t-1,]') + b_q * Qr_p[t-1,];
     Qr_sdi_p[t,] = 1 ./ sqrt(diagonal(Qr_p[t,]));
     R_p[t,] = quad_form_diag(Qr_p[t,], Qr_sdi_p[t,]);
     
