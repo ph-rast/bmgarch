@@ -7,11 +7,12 @@
 forecast(
   object,
   ahead = 1,
-  type = "means",
+  type = "var",
   xH_p = NULL,
-  CrI = c(0.05, 0.95),
+  CrI = c(0.025, 0.975),
   seed = NA,
-  plot = TRUE
+  plot = TRUE,
+  last_t = 100
 )
 }
 \arguments{
@@ -19,16 +20,22 @@ forecast(
 
 \item{ahead}{Periods to be forecasted ahead}
 
-\item{type}{Plot conditional means (default) or (co)-variances. Takes arguments "means", "variances", "covariances"}
+\item{type}{Plot conditional means, variances (default) or correlations. Takes arguments "mean", "var", "cor"}
 
 \item{xH_p}{Predictor for H}
 
-\item{CrI}{Lower and upper boundary of credibility interval. Default is "c( 0.5, .95)"}
+\item{CrI}{Lower and upper bound of credible interval. Default is "c( 0.025, .975)".
+Possible values are .025, .05, .10, .50, .90, .95, and .975}
 
 \item{plot}{Should forecast be plotted. Logical argument, defaults to TRUE}
+
+\item{last_t}{For plotting: Only show last t observations in plot}
 }
 \value{
-Forecasted mean and variance
+Forecasted conditional means, variances and correlations. Forecasts are shown in plots (unless plot = FALSE).
+Conditional variance and correlation forecasts are appended to the corresponding plots with the estimates over the given period.
+Mean forecasts are appended to the observed values if no meanstructure is estimated (default), otherwise they will be appended
+to the esimated means.
 }
 \description{
 Forecasting mean and variance

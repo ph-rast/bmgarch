@@ -113,6 +113,7 @@ forecast <- function(object,
                                          probs =  CrI[1] )$summary[, 4]
         rts_pred_Ucri <-  rstan::summary(forecasted, pars =  "rts_p",
                                          probs =  CrI[2] )$summary[, 4]
+        
         ## Dummy code periods: observed vs forecast
         rts_period <- rep( seq_len( length( rts_pred_mn )/nt ), each = nt )
         rts_frcst <- ifelse( rts_period < max(rts_period) - (ahead -1 ), 0, 1)
@@ -150,6 +151,8 @@ forecast <- function(object,
         ## Plots:
         if( plot ) {
             if ( object$meanstructure != 0 ) {
+                rts_data <- object$RTS_full
+                
                 ## Use conditional means plot of bmgarch::plot
                 retro <- bmgarch::plot.bmgarch(object, type = 'means', askNewPage = FALSE, CrI = CrI )
                 

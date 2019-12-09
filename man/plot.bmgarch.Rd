@@ -4,12 +4,14 @@
 \alias{plot.bmgarch}
 \title{Plot}
 \usage{
-\method{plot}{bmgarch}(object, type = "means", askNewPage = TRUE)
+\method{plot}{bmgarch}(object, type = "means", askNewPage = TRUE, CrI = c(0.025, 0.975))
 }
 \arguments{
 \item{object}{stan object}
 
 \item{type}{Plot past expected means ("means"), or past conditional volatilyt ("cvar"), or past conditinoal correlation ("ccor")}
+
+\item{CrI}{Lower and upper bound of credible interval. Default is "c( 0.025, .975)".}
 }
 \value{
 Plot

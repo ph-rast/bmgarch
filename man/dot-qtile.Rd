@@ -4,7 +4,7 @@
 \alias{.qtile}
 \title{Internal function to be used}
 \usage{
-.qtile(x)
+.qtile(x, CrI = c(0.025, 0.975))
 }
 \arguments{
 \item{x}{}

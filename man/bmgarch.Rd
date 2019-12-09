@@ -21,6 +21,8 @@ bmgarch(
 \arguments{
 \item{data}{A time-series or matrix object containing observations at the same interval.}
 
+\item{xH}{}
+
 \item{parameterization}{A character string specifying the type of of parameterization, must be one of "CCC" (default), "DCC", or "BEKK".}
 
 \item{P}{dimension of AR component in MGARCH(P,Q)}
@@ -30,6 +32,8 @@ bmgarch(
 \item{iterations}{A positive integer specifying the number of iterations for each chain (including warmup). The default is 1000}
 
 \item{chains}{A positive integer specifying the number of Markov chains. The default is 4.}
+
+\item{standardize_data}{}
 
 \item{distribution}{Distribution of innovation: "Student_t" (default) or "Normal"}
 
@@ -44,7 +48,7 @@ An object of S4 class ‘stanfit’ representing the fitted results.
 Draw samples from a specified multivariate GARCH model, given multivariate time-series.
 }
 \details{
-Three paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlatoin (DCC), and  BEKK.
+Three paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK.
 }
 \author{
 Philippe Rast
