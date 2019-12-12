@@ -1,3 +1,7 @@
+functions { 
+#include /functions/cov2cor.stan
+}
+
 data {
 #include /data/gq_data.stan  
 }
@@ -25,12 +29,14 @@ parameters {
   vector[nt] mu[T];
   matrix[nt, nt] A[Q];
   matrix[nt, nt] B[P];
+  corr_matrix[nt] corH[T];
 }
 
 generated quantities {
   // Define matrix for rts prediction
   vector[nt] rts_p[ahead + max(Q,P)];
   cov_matrix[nt] H_p[ahead + max(Q,P)];
+  corr_matrix[nt] R_p[ahead + max(Q,P)];
 
   matrix[nt,nt] rr_p[ahead + max(Q,P)];
   vector[nt] mu_p[ahead + max(Q,P)];
@@ -45,12 +51,15 @@ generated quantities {
   mu_p[ 1:(ahead + max(Q,P)), ] = mu[ 1:(ahead + max(Q,P)), ];
   rr_p[ 1:(ahead + max(Q,P)), ] = rr[ 1:(ahead + max(Q,P)), ];
   
+   R_p[ 1:(ahead + max(Q,P)), ] = corH[ 1:(ahead + max(Q,P)), ];
+  
   // Obtain needed elements from mu and fill into mu_p
   rts_p[1:max(Q, P), ] = rts[ (T-(max(Q,P)-1) ):T, ];
   H_p[  1:max(Q, P), ] =  H[ (T-(max(Q,P)-1) ):T, ];
   mu_p[ 1:max(Q, P), ] = mu[ (T-(max(Q,P)-1) ):T, ];
   // rr is of length T-1
   rr_p[ 1:max(Q, P), ] = rr[ (T-1-(max(Q,P)-1) ):(T-1), ];
+  R_p[  1:max(Q, P), ] =  corH[ (T - (max(Q,P)-1) ):T, ];
   
   // Forecast
   for (t in (max(Q, P) + 1 ):( max(Q, P) + ahead ) ){
@@ -76,7 +85,8 @@ generated quantities {
       H_p[t,] = Cnst + A_part_p +  B_part_p;
     } else if( xH_marker >= 1) {
       H_p[t,] = Cnst + beta * xH_m[t]  + A_part_p +  B_part_p;
-    } 
+    }
+    R_p[t, ] = cov2cor(H_p[t,]);
     
     if ( distribution == 0 ) {
       rts_p[t,] = multi_normal_rng( mu_p[t,], H_p[t,]);

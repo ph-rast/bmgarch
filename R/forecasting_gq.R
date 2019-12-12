@@ -150,9 +150,7 @@ forecast <- function(object,
         
         ## Plots:
         if( plot ) {
-            if ( object$meanstructure != 0 ) {
-                rts_data <- object$RTS_full
-                
+            if ( object$meanstructure != 0 ) {                
                 ## Use conditional means plot of bmgarch::plot
                 retro <- bmgarch::plot.bmgarch(object, type = 'means', askNewPage = FALSE, CrI = CrI )
                 
@@ -160,7 +158,7 @@ forecast <- function(object,
                     df <- array( NA, dim = c(standat$T, 3) )
                     df <- data.frame( rbind(df, forecasted_rts[[i]]) )
                     df$period <- seq_len( dim(df )[1] )
-                    names(df )[1] <- names(rts_data )[i]
+                    names(df )[1] <- object$TS_names[i]
                     
                     plt[[i]] <- retro$retro_plot[[i]] +
                         geom_line(data = df, aes_string( x = "period", y = names(df)[1] ) ) +                
@@ -186,7 +184,7 @@ forecast <- function(object,
                                          rep("Forecasted",  ahead)) )
                     
                     df$period <- seq_len( dim(df )[1] )
-                    names(df )[1] <- names(rts_data )[i]
+                    names(df )[1] <- object$TS_names[i]
                     
                     plt[[i]] <- ggplot(data = df, aes_string(x = "period",
                                                              y = names(df)[1],

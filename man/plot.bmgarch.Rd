@@ -14,7 +14,7 @@
 \item{CrI}{Lower and upper bound of credible interval. Default is "c( 0.025, .975)".}
 }
 \value{
-Plot
+plot.bmgarch
 }
 \description{
 Plot
