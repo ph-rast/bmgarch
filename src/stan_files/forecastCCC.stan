@@ -86,7 +86,7 @@ generated quantities {
     	ma_d[d] = ma_d[d] + a_h[q, d]*rr_p[t-q, d] ;
       }
       for (p in 1:min( t-1, P) ) {
-    	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d];
+    	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d]^2;
       }
       if ( xH_marker >= 1) {
       	vd[d] = c_h[d] + beta[d] * xH_p[t-1, d] + ma_d[d] + ar_d[d];

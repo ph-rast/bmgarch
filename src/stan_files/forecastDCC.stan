@@ -100,7 +100,7 @@ generated quantities {
       }
       // GARCH AR component
       for (p in 1:min( t-1, P) ) {
-      	ar_d_p[d] = ar_d_p[d] + b_h[p, d] * D_p[t-p, d];
+      	ar_d_p[d] = ar_d_p[d] + b_h[p, d] * D_p[t-p, d]^2;
       }
 
       // Predictor on diag (given in xH)

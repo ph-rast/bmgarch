@@ -76,7 +76,7 @@ transformed parameters {
       }
       // GARCH AR component
       for (p in 1:min( t-1, P) ) {
-	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d];
+	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d]^2;
       }
 
       // Predictor on diag (given in xH)
