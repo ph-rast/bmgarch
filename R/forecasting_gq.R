@@ -339,8 +339,8 @@ forecast <- function(object,
         forecasted_R <- list()
         corrs <- (nt^2 - nt)/2
         for(i in 1:corrs  ) {
-            forecasted_R[[i]] <- forecasted_data_R[seq(1, ahead * nt , by = nt)+(i-1), ]
-            label_pos <- row_col[seq(1, ahead * nt , by = nt)+(i-1), ][1, ]
+            forecasted_R[[i]] <- forecasted_data_R[seq(1, ahead * corrs , by = corrs)+(i-1), ]
+            label_pos <- row_col[seq(1, ahead * corrs , by = corrs)+(i-1), ][1, ]
             colnames(forecasted_R[[i]])[1] <- paste( paste(abbreviate( colnames(standat$rts)[label_pos[1]]),
                                                            abbreviate( colnames(standat$rts)[label_pos[2]]), sep =  "_"),
                                                     colnames(forecasted_R[[i]])[1], sep = "_")
