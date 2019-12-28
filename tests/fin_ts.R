@@ -34,7 +34,7 @@ GOOG$mday <- ifelse( GOOG$wday == 1, 1, 0)
 
 upper <- max(dim(cbind(FB$FB.Open,  TWTR$TWTR.Open,  GOOG$GOOG.Open)))
 upper
-lower <- upper-116
+lower <- upper-300
 leaveout <- 0
 r2 <- cbind(FB$FB.Open, TWTR$TWTR.Open, GOOG$GOOG.Open)[lower:(upper-leaveout),] ## remove the last leaveout days
 dim(r2)
@@ -87,22 +87,72 @@ dim(tweet ) == dim(rts )
 ################
 ## Forecasting
 
-rlag <- diff(r2, lag = 1,  log = TRUE )[-1, ]
+rlag <- scale( diff(r2, lag = 1,  log = TRUE )[-1, ]  )
 
 rlag[1:5, ]
 colnames(rlag ) <- colnames(r2 )
 
 library(bmgarch)
 
-fit <- bmgarch(rlag,
-               iterations = 250,
+tweet
+dim(rlag)
+
+range(rlag[,1:2])
+
+head(r2 )
+tail(r2)
+
+sr2 <- scale(r2 )
+sr2
+
+y <- r2[, 1:2]
+
+ys1 <-  ( y[,1] - as.numeric(y[1,1]) ) / sd(y[, 1] )
+ys2 <-  ( y[,2] - as.numeric(y[1,2]) ) / sd(y[, 2] )
+
+ys <- cbind(ys1, ys2 )
+ys
+
+fit <- bmgarch(sr2[,1:2],
+               iterations = 800,
+               P = 1, Q = 1,
+               meanstructure = "arma",
+               standardize_data = FALSE,
+               parameterization = 'CCC',
+               xH = NULL,
+               adapt_delta=0.80)
+system("notify-send 'Done sampling' " )
+summary(fit )
+
+fit5 <- bmgarch(rlag[,1:2]*5,
+               iterations = 6000,
                P = 1, Q = 1,
                meanstructure = "constant",
-               standardize_data = TRUE,
-               parameterization = 'CCC', xH = NULL)
+	       standardize_data = FALSE,
+               parameterization = 'BEKK',
+	       xH = NULL,
+               adapt_delta=0.99)
+system("notify-send 'Done sampling' " )
+summary(fit5 )
 
-summary(fit)
+rstan::traceplot(fit$model_fit,  pars =  c('phi0' ) ,  inc_warmup =  T)
 
-forecast( fit, ahead =  50, type = "mean", CrI =  c(.025, .975))
+forecast( fit, ahead =  25, type = "mean", CrI =  c(.025, .975), last_t = 50)
+fit$RTS_full
+fit$TS_names
 
-plot(fit, type =  'cvar' )
+plot(fit, type =  'ccor' )
+
+library(astsa )
+astsa::sarima(r2[,1] , p = 1,  q = 1, d = 1)
+
+stata <- read.csv(file =  '~/Downloads/statadata.csv' )
+
+
+
+stata_fit <- bmgarch(stata[1700:2000,1:2]*10,  parameterization = 'DCC',  standardize_data = FALSE )
+summary(stata_fit )
+plot(stata_fit,  type =  'ccor' )
+forecast(stata_fit, type = "var", ahead =  25)
+forecast(stata_fit, type = "cor", ahead =  25)
+forecast(stata_fit, type = "mean", ahead =  25)
