@@ -3,5 +3,5 @@ vector[nt] phi0;
 // estimate phi and theta anyways
 //matrix[meanstructure ? nt : 0, meanstructure ? nt : 0 ] phi;
 //matrix[meanstructure ? nt : 0, meanstructure ? nt : 0 ] theta;
-matrix[nt,nt] phi;
-matrix[nt,nt] theta;
+matrix<lower = -1, upper = 1>[nt,nt] phi;
+matrix<lower = -1, upper = 1>[nt,nt] theta;

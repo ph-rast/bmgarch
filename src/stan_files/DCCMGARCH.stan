@@ -112,7 +112,7 @@ model {
   to_vector(phi0) ~ normal(0, 1);
   //  to_vector(a_h) ~ normal(0, .5);
   //to_vector(b_h) ~ normal(0, .5);
-  S ~ lkj_corr(nt);
+  S ~ lkj_corr( 1 );
 
   // likelihood
   if ( distribution == 0 ) {
