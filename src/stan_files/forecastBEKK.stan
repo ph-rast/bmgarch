@@ -3,7 +3,8 @@ functions {
 }
 
 data {
-#include /data/gq_data.stan  
+#include /data/gq_data.stan
+  vector[nt] xH_p[ahead];  // time-varying predictor for conditional H 
 }
 
 transformed data {
@@ -16,7 +17,12 @@ parameters {
 #include /parameters/arma.stan
   // predictor for H
   //cov_matrix[ xH_marker >= 1 ? nt : 0 ] beta;
-  cov_matrix[nt] beta;
+  //  cov_matrix[nt] beta;
+  row_vector[nt] beta0;
+  vector[nt] beta1;
+  
+  // in case Cnst is predicted, separate into C_sd*C_R*C_sd
+  corr_matrix[nt] C_R;
   
   // DF constant nu for student t
   real< lower = 2 > nu;
@@ -41,6 +47,8 @@ generated quantities {
   matrix[nt,nt] rr_p[ahead + max(Q,P)];
   vector[nt] mu_p[ahead + max(Q,P)];
 
+  matrix[nt+1, nt] beta = append_row( beta0, diag_matrix(beta1) );
+  
   // Placeholders
   matrix[nt, nt] A_part_p;
   matrix[nt, nt] B_part_p;
@@ -82,9 +90,10 @@ generated quantities {
       B_part_p = B_part_p + B[p]' * H_p[t-p,] * B[p];
     }
     if( xH_marker == 0 ) {
-      H_p[t,] = Cnst + A_part_p +  B_part_p;
+      H_p[t,] = quad_form_diag(C_R, exp( beta0 ) ) + A_part_p +  B_part_p;
     } else if( xH_marker >= 1) {
-      H_p[t,] = Cnst + beta * xH_m[t]  + A_part_p +  B_part_p;
+      H_p[t,] = quad_form_diag(C_R,exp( append_col( 1.0, xH_p[t]' ) * beta )) +
+	A_part_p +  B_part_p;
     }
     R_p[t, ] = cov2cor(H_p[t,]);
     

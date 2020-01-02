@@ -105,9 +105,9 @@ generated quantities {
 
       // Predictor on diag (given in xH)
       if ( xH_marker >= 1) {
-	vd_p[d] = c_h[d] + beta[d] * xH_p[t-1, d] + ma_d_p[d] + ar_d_p[d];
+	vd_p[d] = exp( c_h[d] + beta[d] * xH_p[t-1, d] ) + ma_d_p[d] + ar_d_p[d];
       } else if ( xH_marker == 0) {
-      	vd_p[d] = c_h[d]  + ma_d_p[d] + ar_d_p[d];
+      	vd_p[d] = exp( c_h[d] )  + ma_d_p[d] + ar_d_p[d];
       }
 
       D_p[t, d] = sqrt( vd_p[d] );

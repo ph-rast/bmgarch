@@ -63,9 +63,9 @@ transformed parameters {
 	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d]^2;
       }
       if ( xH_marker >= 1) {
-      vd[d] = c_h[d] + beta[d] * xH[t, d] + ma_d[d] + ar_d[d];
+	vd[d] = exp( c_h[d] + beta[d] * xH[t, d] ) + ma_d[d] + ar_d[d];
       } else if ( xH_marker == 0) {
-      	vd[d] = c_h[d]  + ma_d[d] + ar_d[d];
+      	vd[d] = exp( c_h[d] )  + ma_d[d] + ar_d[d];
       }
       D[t, d] = sqrt( vd[d] );
     }
@@ -75,7 +75,8 @@ transformed parameters {
 
 model {
   // priors
-  to_vector(beta) ~ normal(0, 3);
+  to_vector(beta) ~ normal(0, 1);
+  to_vector(c_h) ~ normal(-2, 4);
   if ( distribution == 1 )
     nu ~ normal( nt, 50 );
   to_vector(D1_init) ~ lognormal(0, 1);

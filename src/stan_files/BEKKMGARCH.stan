@@ -13,11 +13,13 @@ parameters {
 #include /parameters/arma.stan
   // predictor for H
   //cov_matrix[ xH_marker >= 1 ? nt : 0 ] beta;
-  cov_matrix[nt] beta;
+  row_vector[nt] beta0;
+  vector[nt] beta1;
   
-  //  cholesky_factor_cov[nt] Cnst; // Const is symmetric, A, B, are not
-  cov_matrix[nt] Cnst; // Const is symmetric, A, B, are not  
+  // in case Cnst is predicted, separate into C_sd*C_R*C_sd
+  corr_matrix[nt] C_R;
 
+  
   // construct A, so that one element (a11) can be constrained to be non-negative
   real<lower = 0, upper = 1> Ap11[Q];
   row_vector[nt-2] Ap1k[Q];
@@ -54,6 +56,12 @@ transformed parameters {
   matrix[nt, nt] A_part = diag_matrix( rep_vector(0.0, nt));
   matrix[nt, nt] B_part = diag_matrix( rep_vector(0.0, nt));
 
+  matrix[nt+1, nt] beta = append_row( beta0, diag_matrix(beta1) );
+    row_vector[nt] C_sd;
+//  cholesky_factor_cov[nt] Cnst; // Const is symmetric, A, B, are not
+  cov_matrix[nt] Cnst; // Const is symmetric, A, B, are not  
+  
+  
   // Define matrix constraints
   for ( q in 1:Q )
     Ap[q] = append_row(append_col(Ap11[q], Ap1k[q]), Ap_sub[q]);
@@ -99,9 +107,13 @@ transformed parameters {
       B_part = B_part + B[p]' * H[t-p,] * B[p];
     }
     if( xH_marker == 0 ) {
+      C_sd = exp( beta0 ); 
+      Cnst =  quad_form_diag(C_R, C_sd );
       H[t,] = Cnst + A_part +  B_part;
     } else if( xH_marker >= 1) {
-      H[t,] = Cnst + beta * xH_m[t]  + A_part +  B_part;
+      C_sd = exp( append_col( 1.0, xH[t]' ) * beta ); 
+      Cnst =  quad_form_diag(C_R, C_sd );
+      H[t,] = Cnst  + A_part +  B_part;
     }
     L_H[t,] = cholesky_decompose(H[t,]);
   }
@@ -116,8 +128,11 @@ model {
   to_vector(theta) ~ normal(0, 1);
   to_vector(phi) ~ normal(0, 1);
   to_vector(phi0) ~ normal(0, 1);
-  Cnst ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
- 
+  //  Cnst ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
+  to_vector(beta0) ~ normal(-2, 4);
+  to_vector(beta1) ~ normal(0, 1);
+  C_R ~ lkj_corr( 1 );
+  
   for( k in 1:nt){ 
      for( q in 1:Q ) {
        target += uniform_lpdf(Av[q,k] | -Ca[q,k], Ca[q,k]) + log( 2*Ca[q,k] ) + log_inv_logit( A_log[q,k] ) + log1m_inv_logit( A_log[q,k] );
@@ -145,9 +160,11 @@ generated quantities {
   real log_lik[T];
   corr_matrix[nt] corC;
   corr_matrix[nt] corH[T];
+  row_vector[nt] C_var;
 
 //Const = multiply_lower_tri_self_transpose(Cnst);
   corC = cov2cor(Cnst);
+  C_var = exp( beta0 ) .* exp( beta0 );
 
   // retrodict
 #include /generated/retrodict_H.stan

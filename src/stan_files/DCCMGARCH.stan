@@ -18,7 +18,7 @@ parameters {
 #include /parameters/predH.stan
 
   // GARCH h parameters on variance metric
-  vector<lower=0>[nt] c_h; 
+  vector<lower=0>[nt] c_h; // variance on log metric 
   vector<lower=0 >[nt] a_h[Q];
   vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
   // GARCH q parameters 
@@ -81,9 +81,9 @@ transformed parameters {
 
       // Predictor on diag (given in xH)
       if ( xH_marker >= 1) {
-      vd[d] = c_h[d] + beta[d] * xH[t, d] + ma_d[d] + ar_d[d];
+	vd[d] = exp( c_h[d] + beta[d] * xH[t, d] ) + ma_d[d] + ar_d[d];
       } else if ( xH_marker == 0) {
-      	vd[d] = c_h[d]  + ma_d[d] + ar_d[d];
+      	vd[d] = exp( c_h[d] )  + ma_d[d] + ar_d[d];
       }
 
       D[t, d] = sqrt( vd[d] );
@@ -99,7 +99,8 @@ transformed parameters {
 }
 model {
   // priors
-  to_vector(beta) ~ normal(0, 3);
+  to_vector(beta) ~ normal(0, 1);
+  to_vector(c_h) ~ normal(-2, 4);
   // Prior for initial state
   Qr1_init ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
   to_vector(D1_init) ~ lognormal(0, 1);

@@ -31,7 +31,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
 
     ## Shared objects
     nt <- object$nt
-    short_names <- substr(object$TS_names, 1, 2)
+    short_names <- abbreviate(object$TS_names, minlength = 2)
     ## extract and printonly off-diagonal elements
     cormat_index <- matrix(1:(nt*nt), nrow = nt)
     corr_only <- cormat_index[lower.tri(cormat_index)]
@@ -181,18 +181,19 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
     ## BEKK ##
     ##########
     if(object$param == 'BEKK') {
-        model_summary = rstan::summary(object$model_fit,
-                                    pars = c('Cnst', 'A', 'B', 'corC', 'phi0', 'phi', 'theta', 'lp__'),
-                                    probs = CrI)$summary[, -2 ] 
+        model_summary <- rstan::summary(object$model_fit,
+                                        pars = c('beta0', 'C_var', 'A', 'B', 'C_R', 'phi0', 'phi', 'theta', 'lp__'),
+                                        probs = CrI)$summary[, -2 ] 
 
-        garch_C_index  = grep("Cnst", rownames(model_summary) )
-        garch_R_index  = grep("corC", rownames(model_summary) )                            
-        garch_A_index  = grep("A", rownames(model_summary) )
-        garch_B_index  = grep("B", rownames(model_summary) )                        
+        garch_C_index <- grep("beta0", rownames(model_summary) )
+        garch_Cv_index <- grep("C_var", rownames(model_summary) )
+        garch_R_index <- grep("C_R", rownames(model_summary) )                            
+        garch_A_index <- grep("A", rownames(model_summary) )
+        garch_B_index <- grep("B", rownames(model_summary) )                        
         if( object$meanstructure == 0 ) {
-            arma_index = grep("phi0", rownames(model_summary))
+            arma_index <- grep("phi0", rownames(model_summary))
         } else {
-            arma_index = grep("^phi|^theta", rownames(model_summary) )
+            arma_index <- grep("^phi|^theta", rownames(model_summary) )
         }
 
         #######################
@@ -202,20 +203,22 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
         cat("---\n\n")
 
         cat("Constant correlation, R (diag[C]*R*diag[C]):", "\n\n")
-        R_out = model_summary[garch_R_index[corr_only],]
+        R_out <- model_summary[garch_R_index[corr_only],]
         if ( nt == 2 ) {
-            tmp = matrix( R_out, nrow = 1 )
-            rownames(tmp) = paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
-            colnames(tmp) = names(R_out)
+            tmp <- matrix( R_out, nrow = 1 )
+            rownames(tmp) <- paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ),
+                                  substr(od_varnames[ ,2], 1, 2) , sep = '-')
+            colnames(tmp) <- names(R_out)
             R_out = tmp } else {
-                               rownames(R_out) =
-                                   paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
+                               rownames(R_out) <- 
+                                   paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ),
+                                         substr(od_varnames[ ,2], 1, 2) , sep = '-')
                            }
         print(round( R_out, digits = digits) )
         cat("\n\n")
 
         cat("Constant variances (diag[C]):", "\n\n")
-        C_out = model_summary[garch_C_index[diag_only],]
+        C_out = model_summary[garch_Cv_index,]
         if ( nt == 2 ) {
             tmp = matrix( C_out, nrow = 2 )
             rownames(tmp) = paste0("var_", short_names )
@@ -277,8 +280,9 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
     ## Beta: Predictor on H
     ## #####################
     if( sum(object$xH) != 0) {
-        cat("Exogenous predictor (beta):", "\n\n")
-        beta <- rstan::summary(object$model_fit, pars = c('beta'), probs = CrI)$summary[, -2]
+        cat("Exogenous predictor (beta1 on log scale: C = sRs with s = exp( x*beta ):", "\n\n")
+        beta <- rstan::summary(object$model_fit, pars = c('beta1'), probs = CrI)$summary[, -2]
+        rownames(beta) <- paste0( "beta1_", short_names )
         print(round(beta, digits = digits ) )
         cat("\n\n" )
     }

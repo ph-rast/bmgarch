@@ -144,7 +144,8 @@ forecast <- function(object,
 
         for(i in 1:nt ) {
             forecasted_rts[[i]] <- forecasted_data_rts[seq(1, ahead * nt , by = nt)+(i-1), ]            
-            colnames(forecasted_rts[[i]])[1] <- paste(colnames(standat$rts)[i], colnames(forecasted_rts[[i]])[1], sep = "_")
+            names(forecasted_rts[[i]])[1] <- paste(colnames(standat$rts)[i],
+                                                      names(forecasted_rts[[i]])[1], sep = "_")
         }
 
         
@@ -164,7 +165,8 @@ forecast <- function(object,
                         geom_line(data = df, aes_string( x = "period", y = names(df)[1] ) ) +                
                         geom_errorbar(data = df,  aes_string(x = "period", ymin = names(df)[2], ymax = names(df)[3]),
                                       inherit.aes = FALSE , alpha =  .3)+
-                        geom_point(data = df, mapping = aes_string(x = "period", y = names(df)[1] ), inherit.aes = FALSE)+
+                        geom_point(data = df, mapping = aes_string(x = "period", y = names(df)[1] ),
+                                   inherit.aes = FALSE)+
                         coord_cartesian( xlim = c(dim(df )[1]-last_t,  dim(df )[1]) )
                     
                     plot(plt[[i]])
@@ -251,12 +253,12 @@ forecast <- function(object,
                                          paste0('CrI_', CrI[1]),
                                          paste0('CrI_', CrI[2]))
 
-        
         forecasted_H <- list()
         
         for(i in 1:nt ) {
             forecasted_H[[i]] <- forecasted_data_H[seq(1, ahead * nt , by = nt)+(i-1), ]            
-            colnames(forecasted_H[[i]])[1] <- paste(colnames(standat$rts)[i], colnames(forecasted_H[[i]])[1], sep = "_")
+            names(forecasted_H[[i]])[1] <- paste(colnames(standat$rts)[i],
+                                                    names(forecasted_H[[i]])[1], sep = "_")
         }
         
         ## Plots
@@ -335,15 +337,16 @@ forecast <- function(object,
                                          paste0('CrI_', CrI[1]),
                                          paste0('CrI_', CrI[2]))
 
-        
         forecasted_R <- list()
         corrs <- (nt^2 - nt)/2
         for(i in 1:corrs  ) {
             forecasted_R[[i]] <- forecasted_data_R[seq(1, ahead * corrs , by = corrs)+(i-1), ]
-            label_pos <- row_col[seq(1, ahead * corrs , by = corrs)+(i-1), ][1, ]
-            colnames(forecasted_R[[i]])[1] <- paste( paste(abbreviate( colnames(standat$rts)[label_pos[1]]),
-                                                           abbreviate( colnames(standat$rts)[label_pos[2]]), sep =  "_"),
-                                                    colnames(forecasted_R[[i]])[1], sep = "_")
+            if(corrs == 1 ) label_pos <-  1 else {
+            label_pos <- row_col[seq(1, ahead * corrs , by = corrs)+(i-1), ][1, ]}
+            names(forecasted_R[[i]])[1] <- paste( paste(abbreviate( colnames(standat$rts)[label_pos[1]]),
+                                                        abbreviate( colnames(standat$rts)[label_pos[2]]),
+                                                           sep =  "_"),
+                                                    names(forecasted_R[[i]])[1], sep = "_")
         }
         
         ## Plots
