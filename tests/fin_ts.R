@@ -113,12 +113,13 @@ ys2 <-  ( y[,2] - as.numeric(y[1,2]) ) / sd(y[, 2] )
 ys <- cbind(ys1, ys2 )
 ys
 
+
 fit <- bmgarch(sr2[,1:2],
                iterations = 800,
                P = 1, Q = 1,
                meanstructure = "arma",
                standardize_data = FALSE,
-               parameterization = 'CCC',
+               parameterization = 'DCC',
                xH = NULL,
                adapt_delta=0.80)
 system("notify-send 'Done sampling' " )
