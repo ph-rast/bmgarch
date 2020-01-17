@@ -67,12 +67,13 @@ fit.constant <- bmgarch(rlag[,1:2],
                         adapt_delta = .80)
 system("notify-send 'Done sampling' " )
 summary(fit.constant)
+mcmc_parcoord(as.array(fit.constant$model_fit, pars = c("A","B","Cnst")), np = nuts_params(fit.constant$model_fit))
 
 ############
 # Sim data #
 ############
 
-set.seed(123)
+set.seed(13)
 N <-  100
 C <-  matrix( c(2,  0.5,  0.5,  2 ) ,  ncol = 2)
 A <-  matrix( c(.4,  0.1,  -0.3,  .2 ) ,  ncol = 2)
