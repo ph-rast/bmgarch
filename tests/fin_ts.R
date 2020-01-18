@@ -46,11 +46,11 @@ colnames(rlag ) <- colnames(r2 )
 sr2 <- scale(r2 )
 sr2
 
-fit <- bmgarch(sr2[,1:2],
+fit <- bmgarch(r2,
                iterations = 800,
                P = 1, Q = 1,
                meanstructure = "arma",
-               standardize_data = FALSE,
+               standardize_data = TRUE,
                parameterization = 'BEKK',
                xH = NULL,
                adapt_delta=0.80)
@@ -72,35 +72,93 @@ mcmc_parcoord(as.array(fit.constant$model_fit, pars = c("A","B","Cnst")), np = n
 ############
 # Sim data #
 ############
+sim.bekk <- function(N,C,A,B, phi = NULL, theta = NULL) {
+    if(ncol(C) != nrow(C)){
+        stop("C must be symmetric, square, PD.")
+    }
+    if(ncol(A) != nrow(A)){
+        stop("A must be square.")
+    }
+    if(ncol(B) != nrow(B)){
+        stop("B must be square.")
+    }
+    nt <- ncol(C)
+
+    y <- array(0, dim = c(N, nt))
+    y[1,] <- rnorm(nt, 0, sqrt(diag(C)))
+
+    H <- array(0, dim = c(nt, nt, N))
+    H[,,1] <- C
+
+    for(i in 2:N) {
+        H[,,i] <- C + t(A) %*% (t(y[i - 1,, drop = FALSE]) %*% y[i - 1,,drop = FALSE]) %*% A + t(B) %*% H[,,i-1] %*% B
+        y[i,] <- MASS::mvrnorm(1, rep(0, nt), H[,,i])
+    }
+
+    if (!is.null(phi) & !is.null(theta)) {
+        ## Assume phi0 (intercept) is zero.
+        if (ncol(phi) != nrow(phi)) {
+            stop("phi must be square [nt, nt].")
+        }
+        if (ncol(theta) != nrow(theta)) {
+            stop("theta must be square [nt, nt].")
+        }
+        if (ncol(phi) != nt) {
+            stop("phi must be square [nt, nt].")
+        }
+        if (ncol(theta) != nt) {
+            stop("theta must be square [nt, nt].")
+        }
+        mu <- array(0, dim = c(N, nt))
+        mu[1,] <- 0
+        for(i in 2:N) {
+            mu[i,] <- 10 + y[i - 1, , drop = FALSE] %*% phi + (y[i - 1, ,drop = FALSE] - mu[i - 1,,drop = FALSE])%*%theta
+            y[i,] <- y[i,,drop = FALSE] + mu[i,,drop = FALSE]
+        }
+        ## y <- mu + y
+    }
+
+    return(y)
+}
 
 set.seed(13)
+# nt = 2
 N <-  100
 C <-  matrix( c(2,  0.5,  0.5,  2 ) ,  ncol = 2)
 A <-  matrix( c(.4,  0.1,  -0.3,  .2 ) ,  ncol = 2)
 B <-  matrix( c(.2,  0.1,  0.3,  .3 ) ,  ncol = 2)
-y <- array(c(.5, -.5 ),  dim = c(N,  2) )
-H <- array(C, dim = c(2, 2, N ) )
-for( i in 2:N ) {
-    H[,,i] <- C + t(A) %*% (y[i-1,] %*% t(y[i-1,])) %*% A + t(B) %*% H[,,i-1] %*% B
-    y[i, ] <- MASS::mvrnorm(1,  c(0, 0 ),  H[,,i] )
-}
-y
 
-fit.constant <- bmgarch(y,
-                        iterations = 1000,
-                        P = 1, Q = 1,
-                        meanstructure = "constant",
-                        standardize_data = FALSE,
-                        parameterization = "BEKK",
-                        distribution = "Gaussian",
-                        xH = NULL,
-                        adapt_delta = .95)
+# nt = 3
+set.seed(13)
+N <- 100
+nt <- 3
+C_sd <- diag(rep(2, 3))
+C <- C_sd %*% rethinking::rlkjcorr(1,3, 5) %*% C_sd
+A <- matrix(runif(nt^2, -.5, .5), ncol=nt)
+B <- matrix(runif(nt^2, -.5, .5), ncol=nt)
+
+# ARMA(1,1)
+phi <- matrix(runif(nt^2, -.5, .5), ncol = nt)
+theta <- matrix(runif(nt^2, -.5, .5), ncol = nt)
+phi <- matrix(0, ncol = nt, nrow = nt)
+theta <- matrix(0, ncol = nt, nrow = nt)
+diag(phi) <- rep(.8, nt)
+diag(theta) <- rep(.5, nt)
+
+y <- sim.bekk(N, C, A, B, phi, theta)
+
+fit <- bmgarch(y,
+                iterations = 1000,
+                P = 1, Q = 1,
+                meanstructure = "arma",
+                standardize_data = FALSE,
+                parameterization = "BEKK",
+                distribution = "Gaussian",
+                xH = NULL,
+                adapt_delta = .95)
 system("notify-send 'Done sampling' " )
-summary(fit.constant)
-A
-B
-C
-## summary(fit.constant$model_fit, pars = c("A","B","Cnst"))$summary[,c("mean","2.5%","97.5%","Rhat")]
+summary(fit)
 
-mcmc_trace(as.array(fit.constant$model_fit, pars = c("A","B","Cnst")))
-mcmc_dens_overlay(as.array(fit.constant$model_fit, pars = c("A","B","Cnst")))
+mcmc_trace(as.array(fit$model_fit, pars = c("A","B","Cnst")))
+mcmc_dens_overlay(as.array(fit$model_fit, pars = c("A","B","Cnst")))
+mcmc_parcoord(as.array(fit$model_fit, pars = c("A","B","Cnst","beta0","beta1","phi","theta")), np = nuts_params(fit$model_fit))
