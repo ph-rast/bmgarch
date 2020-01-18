@@ -4,19 +4,9 @@
 \alias{bmgarch}
 \title{Bayesian Multivariate GARCH}
 \usage{
-bmgarch(
-  data,
-  xH = NULL,
-  parameterization = "CCC",
-  P = 1,
-  Q = 1,
-  iterations = 1000,
-  chains = 4,
-  standardize_data = TRUE,
-  distribution = "Student_t",
-  meanstructure = "constant",
-  ...
-)
+bmgarch(data, xH = NULL, parameterization = "CCC", P = 1, Q = 1,
+  iterations = 1000, chains = 4, standardize_data = TRUE,
+  distribution = "Student_t", meanstructure = "constant", ...)
 }
 \arguments{
 \item{data}{A time-series or matrix object containing observations at the same interval.}

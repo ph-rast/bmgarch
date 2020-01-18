@@ -4,16 +4,8 @@
 \alias{forecast}
 \title{Forecasting mean and variance}
 \usage{
-forecast(
-  object,
-  ahead = 1,
-  type = "var",
-  xH_p = NULL,
-  CrI = c(0.025, 0.975),
-  seed = NA,
-  plot = TRUE,
-  last_t = 100
-)
+forecast(object, ahead = 1, type = "var", xH_p = NULL,
+  CrI = c(0.025, 0.975), seed = NA, plot = TRUE, last_t = 100)
 }
 \arguments{
 \item{object}{Fitted bmgarch object}
