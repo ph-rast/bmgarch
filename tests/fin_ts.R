@@ -3,19 +3,15 @@
 ## #####################
 library(quantmod)
 library(plyr)
-#symbols <- c("GOOG","MMM")
-#symbols
+library(bmgarch)
+library(bayesplot)
 
-#getQuote("AAPL")
-#getQuote("FB",what=yahooQF(c("Bid","Ask")))
-#standardQuote()
-
+##########
+# Stocks #
+##########
 
 getSymbols("TWTR")
 TWTR$TWTR.Open[1:10]
-## tail( TWTR )
-
-## class( TWTR )
 
 TWTR$wday <- .indexwday( TWTR )
 TWTR$mday <- ifelse( TWTR$wday == 1, 1, 0)
@@ -33,127 +29,136 @@ GOOG$mday <- ifelse( GOOG$wday == 1, 1, 0)
 
 
 upper <- max(dim(cbind(FB$FB.Open,  TWTR$TWTR.Open,  GOOG$GOOG.Open)))
-upper
 lower <- upper-300
 leaveout <- 0
 r2 <- cbind(FB$FB.Open, TWTR$TWTR.Open, GOOG$GOOG.Open)[lower:(upper-leaveout),] ## remove the last leaveout days
-dim(r2)
-head(r2 )
 
-## Monday
-mday <- cbind(tail( FB$mday, n = nrow(r2) ),
-  tail( TWTR$mday, n = nrow(r2)),
-  tail( GOOG$mday, n = nrow(r2)))
-
-
-head(mday)
-
-## Tweets from
-## http://trumptwitterarchive.com/archive
-goog <- read.csv( file = "./goog.csv" )
-twtr <- read.csv( file = "./twtr.csv" )
-fb <- read.csv( file = "./fb.csv" )
-
-fb_tweet <- as.POSIXlt( as.character(twtr$created_at), format = "%m-%d-%Y %H:%M:%S")
-twtr_tweet <- as.POSIXlt( as.character(twtr$created_at), format = "%m-%d-%Y %H:%M:%S")
-goog_tweet <- as.POSIXlt( as.character(goog$created_at), format = "%m-%d-%Y %H:%M:%S")
-
-mday[, 1:3] <- 0
-head(mday)
-
-mday[as.Date(fb_tweet), 'mday'] <- 1
-mday[as.Date(twtr_tweet), 'mday.1'] <- 1
-mday[as.Date(goog_tweet), 'mday.2'] <- 1
-
-colnames(mday) <- c("fb",  "twtr",  "goog" )
-
-head(mday )
-head(r2 )
-## ## write out for stata
-## r2$t <- 1:nrow(r2)
-## foreign::write.dta( as.data.frame(  r2  ), file = '~/Downloads/test.dta')
-
-dim(mday )
-
-nrow(mday )
-## remove last day of mday and first row of rts, so that tweet dummy is at the
-## day when stock opens. 
-tweet <-  mday[-nrow(mday ), ]
-rts <- r2[-1,]
-
-dim(tweet ) == dim(rts )
 ################
 ## BEKK       ##
 ################
 ## Forecasting
 
-rlag <- scale( diff(r2, lag = 1,  log = TRUE )[-1, ]  )
-
-rlag[1:5, ]
+# If not using arma.
+rlag <- scale( diff(r2, lag = 1,  log = FALSE )[-1, ]  )
 colnames(rlag ) <- colnames(r2 )
 
-library(bmgarch)
-
-tweet
-dim(rlag)
-
-range(rlag[,1:2])
-
-head(r2 )
-tail(r2)
-
+# If using arma
 sr2 <- scale(r2 )
 sr2
 
-y <- r2[, 1:2]
-
-ys1 <-  ( y[,1] - as.numeric(y[1,1]) ) / sd(y[, 1] )
-ys2 <-  ( y[,2] - as.numeric(y[1,2]) ) / sd(y[, 2] )
-
-ys <- cbind(ys1, ys2 )
-ys
-
-
-fit <- bmgarch(sr2[,1:2],
+fit <- bmgarch(r2,
                iterations = 800,
                P = 1, Q = 1,
                meanstructure = "arma",
-               standardize_data = FALSE,
-               parameterization = 'DCC',
+               standardize_data = TRUE,
+               parameterization = 'BEKK',
                xH = NULL,
                adapt_delta=0.80)
 system("notify-send 'Done sampling' " )
 summary(fit )
 
-fit5 <- bmgarch(rlag[,1:2]*5,
-               iterations = 6000,
-               P = 1, Q = 1,
-               meanstructure = "constant",
-	       standardize_data = FALSE,
-               parameterization = 'BEKK',
-	       xH = NULL,
-               adapt_delta=0.99)
+fit.constant <- bmgarch(rlag[,1:2],
+                        iterations = 800,
+                        P = 1, Q = 1,
+                        meanstructure = "constant",
+                        standardize_data = FALSE,
+                        parameterization = "BEKK",
+                        xH = NULL,
+                        adapt_delta = .80)
 system("notify-send 'Done sampling' " )
-summary(fit5 )
+summary(fit.constant)
+mcmc_parcoord(as.array(fit.constant$model_fit, pars = c("A","B","Cnst")), np = nuts_params(fit.constant$model_fit))
 
-rstan::traceplot(fit$model_fit,  pars =  c('phi0' ) ,  inc_warmup =  T)
+############
+# Sim data #
+############
+sim.bekk <- function(N,C,A,B, phi = NULL, theta = NULL) {
+    if(ncol(C) != nrow(C)){
+        stop("C must be symmetric, square, PD.")
+    }
+    if(ncol(A) != nrow(A)){
+        stop("A must be square.")
+    }
+    if(ncol(B) != nrow(B)){
+        stop("B must be square.")
+    }
+    nt <- ncol(C)
 
-forecast( fit, ahead =  25, type = "mean", CrI =  c(.025, .975), last_t = 50)
-fit$RTS_full
-fit$TS_names
+    y <- array(0, dim = c(N, nt))
+    y[1,] <- rnorm(nt, 0, sqrt(diag(C)))
 
-plot(fit, type =  'ccor' )
+    H <- array(0, dim = c(nt, nt, N))
+    H[,,1] <- C
 
-library(astsa )
-astsa::sarima(r2[,1] , p = 1,  q = 1, d = 1)
+    for(i in 2:N) {
+        H[,,i] <- C + t(A) %*% (t(y[i - 1,, drop = FALSE]) %*% y[i - 1,,drop = FALSE]) %*% A + t(B) %*% H[,,i-1] %*% B
+        y[i,] <- MASS::mvrnorm(1, rep(0, nt), H[,,i])
+    }
 
-stata <- read.csv(file =  '~/Downloads/statadata.csv' )
+    if (!is.null(phi) & !is.null(theta)) {
+        ## Assume phi0 (intercept) is zero.
+        if (ncol(phi) != nrow(phi)) {
+            stop("phi must be square [nt, nt].")
+        }
+        if (ncol(theta) != nrow(theta)) {
+            stop("theta must be square [nt, nt].")
+        }
+        if (ncol(phi) != nt) {
+            stop("phi must be square [nt, nt].")
+        }
+        if (ncol(theta) != nt) {
+            stop("theta must be square [nt, nt].")
+        }
+        mu <- array(0, dim = c(N, nt))
+        mu[1,] <- 0
+        for(i in 2:N) {
+            mu[i,] <- 10 + y[i - 1, , drop = FALSE] %*% phi + (y[i - 1, ,drop = FALSE] - mu[i - 1,,drop = FALSE])%*%theta
+            y[i,] <- y[i,,drop = FALSE] + mu[i,,drop = FALSE]
+        }
+        ## y <- mu + y
+    }
 
+    return(y)
+}
 
+set.seed(13)
+# nt = 2
+N <-  100
+C <-  matrix( c(2,  0.5,  0.5,  2 ) ,  ncol = 2)
+A <-  matrix( c(.4,  0.1,  -0.3,  .2 ) ,  ncol = 2)
+B <-  matrix( c(.2,  0.1,  0.3,  .3 ) ,  ncol = 2)
 
-stata_fit <- bmgarch(stata[1700:2000,1:2]*10,  parameterization = 'DCC',  standardize_data = FALSE )
-summary(stata_fit )
-plot(stata_fit,  type =  'ccor' )
-forecast(stata_fit, type = "var", ahead =  25)
-forecast(stata_fit, type = "cor", ahead =  25)
-forecast(stata_fit, type = "mean", ahead =  25)
+# nt = 3
+set.seed(13)
+N <- 100
+nt <- 3
+C_sd <- diag(rep(2, 3))
+C <- C_sd %*% rethinking::rlkjcorr(1,3, 5) %*% C_sd
+A <- matrix(runif(nt^2, -.5, .5), ncol=nt)
+B <- matrix(runif(nt^2, -.5, .5), ncol=nt)
+
+# ARMA(1,1)
+phi <- matrix(runif(nt^2, -.5, .5), ncol = nt)
+theta <- matrix(runif(nt^2, -.5, .5), ncol = nt)
+phi <- matrix(0, ncol = nt, nrow = nt)
+theta <- matrix(0, ncol = nt, nrow = nt)
+diag(phi) <- rep(.8, nt)
+diag(theta) <- rep(.5, nt)
+
+y <- sim.bekk(N, C, A, B, phi, theta)
+
+fit <- bmgarch(y,
+                iterations = 1000,
+                P = 1, Q = 1,
+                meanstructure = "arma",
+                standardize_data = FALSE,
+                parameterization = "BEKK",
+                distribution = "Gaussian",
+                xH = NULL,
+                adapt_delta = .95)
+system("notify-send 'Done sampling' " )
+summary(fit)
+
+mcmc_trace(as.array(fit$model_fit, pars = c("A","B","Cnst")))
+mcmc_dens_overlay(as.array(fit$model_fit, pars = c("A","B","Cnst")))
+mcmc_parcoord(as.array(fit$model_fit, pars = c("A","B","Cnst","beta0","beta1","phi","theta")), np = nuts_params(fit$model_fit))
