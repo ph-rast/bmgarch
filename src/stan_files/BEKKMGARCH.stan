@@ -14,6 +14,7 @@ transformed data {
 parameters { 
   // ARMA parameters 
 #include /parameters/arma.stan
+
   // predictor for H
   //cov_matrix[ xH_marker >= 1 ? nt : 0 ] beta;
   row_vector[nt] beta0;
@@ -90,7 +91,6 @@ model {
   to_vector(phi) ~ normal(0, 1);
   to_vector(phi0) ~ normal(0, 1);
 
-  //  Cnst ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
   to_vector(beta0) ~ std_normal();
   to_vector(beta1) ~ std_normal();
   C_R ~ lkj_corr( 1 );
@@ -103,19 +103,19 @@ model {
   }
     
   
-  // for( k in 1:nt){ 
-     // for( q in 1:Q ) {
-       //A_diag[q,k] ~ normal(0, 1);
-       //target += log( A_diag[q,k] ) + log1m( A_diag[q,k] );       
+  //for( k in 1:nt){ 
+  //   for( q in 1:Q ) {
+  //A_raw[q,k,k] ~ uniform(0, 1);
+	//target += log( A_[q,k,k] ) + log1m( A_diag[q,k] );       
        // target += uniform_lpdf(A_diag[q,k] | 0, 1 ) +  log( A_diag[q,k] ) + log1m( A_diag[q,k] );
      /*   target += uniform_lpdf(Av[q,k] | -Ca[q,k], Ca[q,k]) + log( 2*Ca[q,k] ) + log_inv_logit( A_log[q,k] ) + log1m_inv_logit( A_log[q,k] ); */
-     // }
+  //  }
      // for ( p in 1:P ) {
        //B[p,k,k] ~ uniform(0, 1);
        //target += log( B[p,k,k] ) + log1m( B[p,k,k] );
        // target += uniform_lpdf(B_diag[p,k] | 0, 1 ) +  log( B_diag[p,k] ) + log1m( B_diag[p,k] );
        //target += uniform_lpdf(Bv[p,k] | -Cb[p,k], Cb[p,k]) + log( 2*Cb[p,k] ) + log_inv_logit( B_log[p,k] ) + log1m_inv_logit( B_log[p,k] );
-     // }
+  // }
   // }
   // likelihood
   if ( distribution == 0 ) {
