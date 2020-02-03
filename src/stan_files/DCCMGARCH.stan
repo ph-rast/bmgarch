@@ -18,7 +18,7 @@ parameters {
 #include /parameters/predH.stan
 
   // GARCH h parameters on variance metric
-  vector<lower=0>[nt] c_h; // variance on log metric 
+  vector[nt] c_h; // variance on log metric 
   vector<lower=0 >[nt] a_h[Q];
   vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
   // GARCH q parameters 
@@ -96,18 +96,18 @@ transformed parameters {
 }
 model {
   // priors
-  to_vector(beta) ~ normal(0, 1);
-  to_vector(c_h) ~ normal(0, 1);
+  to_vector(beta) ~ std_normal();
+  to_vector(c_h) ~ std_normal();
   // Prior for initial state
   Qr1_init ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
   to_vector(D1_init) ~ lognormal(0, 1);
-  to_vector(u1_init) ~ normal(0, 1);
+  to_vector(u1_init) ~ std_normal();
   // Prior on nu for student_t
   //if ( distribution == 1 )
   nu ~ normal( nt, 50 );
-  to_vector(theta) ~ normal(0, 1);
-  to_vector(phi) ~ normal(0, 1);
-  to_vector(phi0) ~ normal(0, 1);
+  to_vector(theta) ~ std_normal();
+  to_vector(phi) ~ std_normal();
+  to_vector(phi0) ~ std_normal();
   //  to_vector(a_h) ~ normal(0, .5);
   //to_vector(b_h) ~ normal(0, .5);
   S ~ lkj_corr( 1 );
@@ -127,7 +127,8 @@ generated quantities {
   matrix[nt,T] rts_out;
   real log_lik[T];
   corr_matrix[nt] corH[T];
-
+  // for the no-predictor case
+  vector<lower=0>[nt] c_h_var = exp(c_h);
   // retrodict
 #include /generated/retrodict_H.stan
 

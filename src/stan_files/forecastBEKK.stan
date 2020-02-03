@@ -15,6 +15,7 @@ transformed data {
 parameters {
   // ARMA parameters
 #include /parameters/arma.stan
+
   // predictor for H
   //cov_matrix[ xH_marker >= 1 ? nt : 0 ] beta;
   //  cov_matrix[nt] beta;
