@@ -106,11 +106,11 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
     ## DCC ##
     #########
     if(object$param == 'DCC') {
-        model_summary = rstan::summary(object$model_fit,
-                                       pars = c('a_q', 'b_q', 'c_h', 'a_h', 'b_h', 'S', 'phi0', 'phi', 'theta', 'lp__'),
+        model_summary <- rstan::summary(object$model_fit,
+                                       pars = c('a_q', 'b_q', 'c_h_var', 'a_h', 'b_h', 'S', 'phi0', 'phi', 'theta','beta', 'lp__'),
                                        probs = CrI)$summary[, -2]
             
-        garch_h_index  = grep("_h", rownames(model_summary) )
+        garch_h_index <- grep("_h", rownames(model_summary) )
         garch_q_index  = grep("_q", rownames(model_summary) )
         S_index = grep("S", rownames(model_summary) )
         if( object$meanstructure == 0 ) {
@@ -124,17 +124,17 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
         ## ###########################
         cat(paste0(paste0("GARCH(", P, ",", Q, ')')), "estimates for conditional variance on D:", "\n\n") 
 
-        rn = rownames(model_summary[garch_h_index,])
+        rn <- rownames(model_summary[garch_h_index,])
         for ( i in 1:nt ) {
-            replace = grep(paste0( as.character(i), "\\]"), rn) 
-        rn[replace] = gsub(paste0( as.character(i), "\\]" ), paste0(short_names[i]), rn)[replace]
+            replace <- grep(paste0( as.character(i), "\\]"), rn) 
+        rn[replace] <- gsub(paste0( as.character(i), "\\]" ), paste0(short_names[i]), rn)[replace]
         }
-        rn = gsub("\\[", "_", rn)
+        rn <- gsub("\\[", "_", rn)
 
         ## Save into new object to change rownames
-        garch_h_out = model_summary[garch_h_index,]
+        garch_h_out <- model_summary[garch_h_index,]
         ## Assign new rownames
-        rownames(garch_h_out) = rn
+        rownames(garch_h_out) <- rn
         ## print garch parameters
         print(round( garch_h_out, digits = digits) )
         cat("\n\n")
@@ -158,13 +158,13 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
         cat("\n\n")
 
         cat("Unconditional correlation 'S' in Q:", "\n\n")
-        S_out = model_summary[S_index[corr_only],]
+        S_out <- model_summary[S_index[corr_only],]
         if ( nt == 2 ) {
-            tmp = matrix( S_out, nrow = 1 )
-            rownames(tmp) = paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
-            colnames(tmp) = names(S_out)
-            S_out = tmp } else {
-                               rownames(S_out) =
+            tmp <- matrix( S_out, nrow = 1 )
+            rownames(tmp) <- paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
+            colnames(tmp) <- names(S_out)
+            S_out <- tmp } else {
+                               rownames(S_out) <- 
                                    paste( paste0("S_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
                            }
         print(round( S_out, digits = digits) )
@@ -280,11 +280,21 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
     ## Beta: Predictor on H
     ## #####################
     if( sum(object$xH) != 0) {
+        if(object$param == 'BEKK') {
         cat("Exogenous predictor (beta1 on log scale: C = sRs with s = exp( x*beta ):", "\n\n")
         beta <- rstan::summary(object$model_fit, pars = c('beta1'), probs = CrI)$summary[, -2]
         rownames(beta) <- paste0( "beta1_", short_names )
         print(round(beta, digits = digits ) )
         cat("\n\n" )
+        } else {
+            cat("Exogenous predictor (beta1 on log scale: c = exp( beta_0 + beta_1*x ):", "\n\n")
+            beta0 <- rstan::summary(object$model_fit, pars = c('c_h'), probs = CrI)$summary[, -2]
+            rownames(beta0) <- paste0( "beta0_", short_names )
+            beta <- rstan::summary(object$model_fit, pars = c('beta'), probs = CrI)$summary[, -2]
+            rownames(beta) <- paste0( "beta_", short_names )
+            print(round(rbind(beta0,beta), digits = digits ) )
+            cat("\n\n" )
+        }
     }
         
     nu <- rstan::summary(object$model_fit, pars = c('nu'))$summary[,'mean']
