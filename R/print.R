@@ -15,7 +15,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
             cat("               diag(D_t) = sqrt(h_ii,t) = c_h + a_h*y^2_[t-1] + b_h*h_[ii,t-1]", "\n")
             cat("               R_t = Q^[-1]_t Q_t Q^[-1]_t = ( 1 - a_q - b_q)S + a_q(u_[t-1]u'_[t-1]) + b_q(Q_[t-1])", "\n")
         } else {
-            if( object$param == 'BEKK' ) {
+            if( object$param == 'BEKK' | object$param == 'pdBEKK') {
                 cat("Basic specification: H_t = C + A'[y_(t-1)*y'_(t-1)]A + B'H_(t-1)B", "\n")
             }
         }
@@ -177,10 +177,10 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
         print(round( model_summary[arma_index,], digits = digits) )
         cat("\n\n") } else {
 
-    ##########              
-    ## BEKK ##
-    ##########
-    if(object$param == 'BEKK') {
+    #####################              
+    ## BEKK and pdBEKK ##
+    #####################
+    if(object$param == 'BEKK' | object$param == 'pdBEKK') {
         model_summary <- rstan::summary(object$model_fit,
                                         pars = c('beta0', 'C_var', 'A', 'B', 'C_R', 'phi0', 'phi', 'theta', 'lp__'),
                                         probs = CrI)$summary[, -2 ] 
@@ -280,7 +280,7 @@ summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
     ## Beta: Predictor on H
     ## #####################
     if( sum(object$xH) != 0) {
-        if(object$param == 'BEKK') {
+        if(object$param == 'BEKK' | object$param == 'pdBEKK') {
         cat("Exogenous predictor (beta1 on log scale: C = sRs with s = exp( x*beta ):", "\n\n")
         beta <- rstan::summary(object$model_fit, pars = c('beta1'), probs = CrI)$summary[, -2]
         rownames(beta) <- paste0( "beta1_", short_names )

@@ -105,14 +105,22 @@ bmgarch = function(data,
                                                       control = list(adapt_delta = .99),
                                                       init_r = 1,
                                                       chains = chains) else {
-  if( parameterization == 'BEKK' ) model_fit <- rstan::sampling(stanmodels$BEKKMGARCH, 
+  if( parameterization == 'BEKK' ) model_fit <- rstan::sampling(stanmodels$BEKKMGARCH,
                                                       data = stan_data,
                                                       verbose = TRUE,
                                                       iter = iterations,
                                                       control = list(adapt_delta = .99),
                                                       init_r = 1,
                                                       chains = chains) else {
-  warning( 'Not a valid model specification. Select CCC, DCC, or BEKK.' )}
+if( parameterization == 'pdBEKK' ) model_fit <- rstan::sampling(stanmodels$pdBEKKMGARCH,
+                                                      data = stan_data,
+                                                      verbose = TRUE,
+                                                      iter = iterations,
+                                                      control = list(adapt_delta = .99),
+                                                      init_r = 1,
+                                                      chains = chains) else {                                                                           
+  warning( 'Not a valid model specification. Select CCC, DCC, BEKK, or pdBEKK.' )}
+                                                                       }
                                                                        }
                                                                        }
     ## Model fit is based on standardized values.

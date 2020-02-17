@@ -68,7 +68,7 @@ forecast <- function(object,
             ## ###########
             
         } else {
-            if( object$param == 'BEKK' ) {
+            if( object$param == 'BEKK' | object$param == 'pdBEKK' ) {
                 ## ###################
                 ## BEKK Forecast ##
                 ## ###################
