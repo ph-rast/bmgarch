@@ -8,7 +8,16 @@ data {
 }
 
 transformed data {
+  // Obtain mean and sd over TS for prior in arma process phi0                                                                                                                                                 
+  vector[nt] rts_m;
+  vector[nt] rts_sd;
+ 
 #include /transformed_data/xh_marker.stan
+ 
+  for ( i in 1:nt ){
+    rts_m[i] = mean(rts[,i]);
+    rts_sd[i] = sd(rts[,i]);
+  }
 }
 
 parameters {
@@ -107,7 +116,7 @@ model {
   nu ~ normal( nt, 50 );
   to_vector(theta) ~ std_normal();
   to_vector(phi) ~ std_normal();
-  to_vector(phi0) ~ std_normal();
+  phi0 ~ multi_normal(rts_m, diag_matrix( rts_sd ) );
   //  to_vector(a_h) ~ normal(0, .5);
   //to_vector(b_h) ~ normal(0, .5);
   S ~ lkj_corr( 1 );

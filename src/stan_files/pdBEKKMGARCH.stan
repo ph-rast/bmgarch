@@ -11,7 +11,8 @@ transformed data {
   // Obtain mean and sd ove TS for prior in arma process phi0
   vector[nt] rts_m;
   vector[nt] rts_sd;
-
+  // off diagonal elements
+  int<lower = 1> od = ( nt*nt - nt ) / 2;
 #include /transformed_data/xh_marker.stan
 
   for ( i in 1:nt ){
@@ -36,10 +37,10 @@ parameters {
   vector<lower = 0, upper = 1>[nt] A_diag[Q];
   vector<lower = 0, upper = 1>[nt] B_diag[P];
 
-  vector[ ((nt*nt)-nt)/2 ] A_lower[Q];
-  vector[ ((nt*nt)-nt)/2 ] B_lower[P];
-  vector[ ((nt*nt)-nt)/2 ] A_upper[Q];
-  vector[ ((nt*nt)-nt)/2 ] B_upper[P];
+  vector[ od ] A_lower[Q];
+  vector[ od ] B_lower[P];
+  vector[ od ] A_upper[Q];
+  vector[ od ] B_upper[P];
 
     // H1 init
   cov_matrix[nt] H1_init; 

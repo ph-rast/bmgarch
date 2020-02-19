@@ -8,7 +8,8 @@ data {
 }
 
 transformed data {
-  // Obtain mean and sd ove TS for prior in arma process phi0
+
+  // Obtain mean and sd over TS for prior in arma process phi0
   vector[nt] rts_m;
   vector[nt] rts_sd;
 
