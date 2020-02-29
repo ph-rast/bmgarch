@@ -1,4 +1,4 @@
-// DCC-Parameterization
+OA// DCC-Parameterization
 functions { 
 #include /functions/cov2cor.stan
 }
@@ -28,8 +28,8 @@ parameters {
 
   // GARCH h parameters on variance metric
   vector[nt] c_h; // variance on log metric 
-  vector< upper = 1 >[nt] a_h[Q];
-  vector< upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
+  vector<lower = 0,  upper = 1 >[nt] a_h[Q];
+  vector<lower = 0,  upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
   // GARCH q parameters 
   real<lower=0, upper = 1 > a_q; // 
   real<lower=0, upper = (1 - a_q) > b_q; //
