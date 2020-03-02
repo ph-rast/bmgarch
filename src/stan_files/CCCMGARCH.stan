@@ -71,9 +71,9 @@ transformed parameters {
       for (p in 1:min( t-1, P) ) {
 	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d]^2;
       }
-      if ( xH_marker >= 1) {
-	vd[d] = exp( c_h[d] + beta[d] * xH[t, d] ) + ma_d[d] + ar_d[d];
-      } else if ( xH_marker == 0) {
+      if ( xC_marker >= 1) {
+	vd[d] = exp( c_h[d] + beta[d] * xC[t, d] ) + ma_d[d] + ar_d[d];
+      } else if ( xC_marker == 0) {
       	vd[d] = exp( c_h[d] )  + ma_d[d] + ar_d[d];
       }
       D[t, d] = sqrt( vd[d] );

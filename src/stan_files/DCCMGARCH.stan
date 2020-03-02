@@ -1,4 +1,4 @@
-OA// DCC-Parameterization
+// DCC-Parameterization
 functions { 
 #include /functions/cov2cor.stan
 }
@@ -86,10 +86,10 @@ transformed parameters {
 	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d]^2;
       }
 
-      // Predictor on diag (given in xH)
-      if ( xH_marker >= 1) {
-	vd[d] = exp( c_h[d] + beta[d] * xH[t, d] ) + ma_d[d] + ar_d[d];
-      } else if ( xH_marker == 0) {
+      // Predictor on diag (given in xC)
+      if ( xC_marker >= 1) {
+	vd[d] = exp( c_h[d] + beta[d] * xC[t, d] ) + ma_d[d] + ar_d[d];
+      } else if ( xC_marker == 0) {
       	vd[d] = exp( c_h[d] )  + ma_d[d] + ar_d[d];
       }
 

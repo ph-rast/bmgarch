@@ -26,7 +26,7 @@ parameters {
 #include /parameters/arma.stan
 
   // predictor for H
-  //cov_matrix[ xH_marker >= 1 ? nt : 0 ] beta;
+  //cov_matrix[ xC_marker >= 1 ? nt : 0 ] beta;
   row_vector[nt] beta0;
   vector[nt] beta1;
   
@@ -73,12 +73,12 @@ transformed parameters {
     for (p in 1:min( t-1, P) ) {
       B_part = B_part + B_raw[p]' * H[t-p,] * B_raw[p];
     }
-    if( xH_marker == 0 ) {
+    if( xC_marker == 0 ) {
       C_sd = exp( beta0 ); 
       Cnst =  quad_form_diag(C_R, C_sd );
       H[t,] = Cnst + A_part +  B_part;
-    } else if( xH_marker >= 1) {
-      C_sd = exp( append_col( 1.0, xH[t]' ) * beta ); 
+    } else if( xC_marker >= 1) {
+      C_sd = exp( append_col( 1.0, xC[t]' ) * beta ); 
       Cnst =  quad_form_diag(C_R, C_sd );
       H[t,] = Cnst  + A_part +  B_part;
     }

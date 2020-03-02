@@ -4,7 +4,7 @@ functions {
 
 data {
 #include /data/gq_data.stan
-  vector[nt] xH_p[ahead];  // time-varying predictor for conditional H 
+  vector[nt] xC_p[ahead];  // time-varying predictor for conditional H 
 }
 
 transformed data {
@@ -17,7 +17,7 @@ parameters {
 #include /parameters/arma.stan
 
   // predictor for H
-  //cov_matrix[ xH_marker >= 1 ? nt : 0 ] beta;
+  //cov_matrix[ xC_marker >= 1 ? nt : 0 ] beta;
   //  cov_matrix[nt] beta;
   row_vector[nt] beta0;
   vector[nt] beta1;
@@ -90,10 +90,10 @@ generated quantities {
     for (p in 1:min( t-1, P) ) {
       B_part_p = B_part_p + B[p]' * H_p[t-p,] * B[p];
     }
-    if( xH_marker == 0 ) {
+    if( xC_marker == 0 ) {
       H_p[t,] = quad_form_diag(C_R, exp( beta0 ) ) + A_part_p +  B_part_p;
-    } else if( xH_marker >= 1) {
-      H_p[t,] = quad_form_diag(C_R,exp( append_col( 1.0, xH_p[t]' ) * beta )) +
+    } else if( xC_marker >= 1) {
+      H_p[t,] = quad_form_diag(C_R,exp( append_col( 1.0, xC_p[t]' ) * beta )) +
 	A_part_p +  B_part_p;
     }
     R_p[t, ] = cov2cor(H_p[t,]);

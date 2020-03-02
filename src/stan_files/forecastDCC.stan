@@ -1,6 +1,6 @@
 data {
 #include /data/gq_data.stan  
-  vector[nt] xH_p[ahead];  // time-varying predictor for conditional H 
+  vector[nt] xC_p[ahead];  // time-varying predictor for conditional H 
 }
 
 transformed data {
@@ -103,10 +103,10 @@ generated quantities {
       	ar_d_p[d] = ar_d_p[d] + b_h[p, d] * D_p[t-p, d]^2;
       }
 
-      // Predictor on diag (given in xH)
-      if ( xH_marker >= 1) {
-	vd_p[d] = exp( c_h[d] + beta[d] * xH_p[t-1, d] ) + ma_d_p[d] + ar_d_p[d];
-      } else if ( xH_marker == 0) {
+      // Predictor on diag (given in xC)
+      if ( xC_marker >= 1) {
+	vd_p[d] = exp( c_h[d] + beta[d] * xC_p[t-1, d] ) + ma_d_p[d] + ar_d_p[d];
+      } else if ( xC_marker == 0) {
       	vd_p[d] = exp( c_h[d] )  + ma_d_p[d] + ar_d_p[d];
       }
 

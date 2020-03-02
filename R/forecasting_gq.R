@@ -1,7 +1,7 @@
-##' @title Forecasting mean and variance 
+##' %@title Forecasting mean and variance 
 ##' @param object Fitted bmgarch object
 ##' @param ahead Periods to be forecasted ahead
-##' @param xH_p Predictor for H
+##' @param xC_p Predictor for H
 ##' @param type Plot conditional means, variances (default) or correlations. Takes arguments "mean", "var", "cor"
 ##' @param CrI Lower and upper bound of credible interval. Default is "c( 0.025, .975)".
 ##' Possible values are .025, .05, .10, .50, .90, .95, and .975
@@ -19,26 +19,26 @@
 forecast <- function(object,
                      ahead =  1,
                      type =  "var",
-                     xH_p =  NULL,
+                     xC_p =  NULL,
                      CrI =  c(.025, .975),
                      seed = NA,
                      plot =  TRUE,
                      last_t =  100) {
 
     ## Define a 0 array as the stan models need some non-null matrix
-    if( is.null( xH_p ) ) xH_p <- array( rep(0, object$nt),  dim = c(ahead,  object$nt ) )
+    if( is.null( xC_p ) ) xC_p <- array( rep(0, object$nt),  dim = c(ahead,  object$nt ) )
 
     ## obtain data to be passed to gqs
     standat <-  list(T = object$TS_length,
                      nt = object$nt,
                      rts = cbind(object$RTS_full),
-                     xH = object$xH,
+                     xC = object$xC,
                      Q =  object$mgarchQ,
                      P =  object$mgarchP,
                      ahead =  ahead, 
                      meanstructure =  object$meanstructure,
                      distribution =  object$num_dist,
-                     xH_p =  xH_p)
+                     xC_p =  xC_p)
 
     ## Call forecasting functions
     if( object$param == 'DCC') {

@@ -1,12 +1,12 @@
-// Check whether xH contains a predictor or not.
-matrix[nt, nt] xH_m[T];
-int<lower = 0> xH_marker = 0;
+// Check whether xC contains a predictor or not.
+matrix[nt, nt] xC_m[T];
+int<lower = 0> xC_marker = 0;
 real<lower = 0> cp;
 
 for( t in 1:T ){
-  xH_m[t] = diag_matrix( xH[t] );
-  // add a variable that notes if xH is null or actually a predictor
-  cp = sum( xH_m[t]' * xH_m[t] );
+  xC_m[t] = diag_matrix( xC[t] );
+  // add a variable that notes if xC is null or actually a predictor
+  cp = sum( xC_m[t]' * xC_m[t] );
   if( cp != 0 )
-    xH_marker = xH_marker + 1;
+    xC_marker = xC_marker + 1;
  }
