@@ -1,5 +1,5 @@
-int<lower=1> T; // lengh of time series
-int<lower=1> nt;    // number of time series
+int<lower=2> T; // lengh of time series
+int<lower=2> nt;    // number of time series
 int<lower=1> Q; // MA component in MGARCH(P,Q), matrix A
 int<lower=1> P; // AR component in MGARCH(P,Q), matrix B
 vector[nt] rts[T];  // multivariate time-series
