@@ -2,13 +2,18 @@
 % Please edit documentation in R/forecasting_gq.R
 \name{forecast}
 \alias{forecast}
-\title{Forecasting mean and variance}
+\title{Forecasting mean and variance
+
+Forecasts the (conditional) mean and conditional variance.
+
+\code{forecast} takes a fitted \code{bmgarch} object, and predicts the next \code{ahead} means and variances, with uncertainty.
+Time-varying predictors can be included in \code{xC}.}
 \usage{
 forecast(
   object,
   ahead = 1,
   type = "var",
-  xH_p = NULL,
+  xC_p = NULL,
   CrI = c(0.025, 0.975),
   seed = NA,
   plot = TRUE,
@@ -16,20 +21,20 @@ forecast(
 )
 }
 \arguments{
-\item{object}{Fitted bmgarch object}
+\item{object}{bmgarch object. The fitted model used for forecasting.}
 
-\item{ahead}{Periods to be forecasted ahead}
+\item{ahead}{Integer (Default: 1). Periods to be forecasted ahead.}
 
-\item{type}{Plot conditional means, variances (default) or correlations. Takes arguments "mean", "var", "cor"}
+\item{type}{String (Default: "var"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor").}
 
-\item{xH_p}{Predictor for H}
-
-\item{CrI}{Lower and upper bound of credible interval. Default is "c( 0.025, .975)".
+\item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 Possible values are .025, .05, .10, .50, .90, .95, and .975}
 
-\item{plot}{Should forecast be plotted. Logical argument, defaults to TRUE}
+\item{plot}{Logical (Default: TRUE). Should forecasts be plotted.}
 
-\item{last_t}{For plotting: Only show last t observations in plot}
+\item{last_t}{Integer (Default: 100). For plotting only. Only show \code{last_t} observations in plot.}
+
+\item{xC}{Predictor for H.}
 }
 \value{
 Forecasted conditional means, variances and correlations. Forecasts are shown in plots (unless plot = FALSE).
@@ -39,6 +44,11 @@ to the esimated means.
 }
 \description{
 Forecasting mean and variance
+
+Forecasts the (conditional) mean and conditional variance.
+
+\code{forecast} takes a fitted \code{bmgarch} object, and predicts the next \code{ahead} means and variances, with uncertainty.
+Time-varying predictors can be included in \code{xC}.
 }
 \author{
 philippe

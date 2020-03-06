@@ -1,12 +1,17 @@
-##' %@title Forecasting mean and variance 
-##' @param object Fitted bmgarch object
-##' @param ahead Periods to be forecasted ahead
-##' @param xC_p Predictor for H
-##' @param type Plot conditional means, variances (default) or correlations. Takes arguments "mean", "var", "cor"
-##' @param CrI Lower and upper bound of credible interval. Default is "c( 0.025, .975)".
+##' @title Forecasting mean and variance
+##'
+##' Forecasts the (conditional) mean and conditional variance.
+##'
+##' \code{forecast} takes a fitted \code{bmgarch} object, and predicts the next \code{ahead} means and variances, with uncertainty.
+##' Time-varying predictors can be included in \code{xC}.
+##' @param object bmgarch object. The fitted model used for forecasting.
+##' @param ahead Integer (Default: 1). Periods to be forecasted ahead.
+##' @param xC Predictor for H.
+##' @param type String (Default: "var"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor"). 
+##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' Possible values are .025, .05, .10, .50, .90, .95, and .975
-##' @param plot Should forecast be plotted. Logical argument, defaults to TRUE
-##' @param last_t For plotting: Only show last t observations in plot
+##' @param plot Logical (Default: TRUE). Should forecasts be plotted.
+##' @param last_t Integer (Default: 100). For plotting only. Only show \code{last_t} observations in plot.
 ##' @return Forecasted conditional means, variances and correlations. Forecasts are shown in plots (unless plot = FALSE).
 ##' Conditional variance and correlation forecasts are appended to the corresponding plots with the estimates over the given period.
 ##' Mean forecasts are appended to the observed values if no meanstructure is estimated (default), otherwise they will be appended
@@ -26,7 +31,7 @@ forecast <- function(object,
                      last_t =  100) {
 
     ## Define a 0 array as the stan models need some non-null matrix
-    if( is.null( xC_p ) ) xC_p <- array( rep(0, object$nt),  dim = c(ahead,  object$nt ) )
+    if( is.null( xC_p ) ) xC <- array( rep(0, object$nt),  dim = c(ahead,  object$nt ) )
 
     ## obtain data to be passed to gqs
     standat <-  list(T = object$TS_length,
@@ -38,7 +43,7 @@ forecast <- function(object,
                      ahead =  ahead, 
                      meanstructure =  object$meanstructure,
                      distribution =  object$num_dist,
-                     xC_p =  xC_p)
+                     xC_p =  xC)
 
     ## Call forecasting functions
     if( object$param == 'DCC') {
