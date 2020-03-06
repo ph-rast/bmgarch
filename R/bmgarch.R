@@ -149,3 +149,9 @@ if( parameterization == 'pdBEKK' ) model_fit <- rstan::sampling(stanmodels$pdBEK
     class(return_fit) <- "bmgarch"
     return(return_fit)
 }
+
+
+#' Models supported by bmgarch
+#' @keywords internal
+#' @author Stephen R. Martin
+supported_models <- c("DCC","CCC","BEKK","pdBEKK")
