@@ -67,7 +67,7 @@ standat = function(data, xC, P, Q, standardize_data, distribution, meanstructure
 ##' Three paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK.
 ##' @title Estimate Bayesian Multivariate GARCH
 ##' @param data Time-series or matrix object. A time-series or matrix object containing observations at the same interval.
-##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. 
+##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
 ##' @param parameterization Character (Default: "CCC"). The type of of parameterization. Must be one of "CCC", "DCC", "BEKK", or "pdBEKK".
 ##' @param P Integer. Dimension of GARCH component in MGARCH(P,Q).
 ##' @param Q Integer. Dimension of ARCH component in MGARCH(P,Q).
