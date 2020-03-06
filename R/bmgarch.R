@@ -7,7 +7,10 @@
 #' @keywords internal
 standat = function(data, xC, P, Q, standardize_data, distribution, meanstructure){
 
-    if(dim(data)[1] < dim(data)[2]) data = t(data)
+    if(dim(data)[1] < dim(data)[2]) {
+        data = t(data)
+        warning("data is wider than it is long. Transposing...")
+    }
     if ( is.null( colnames( data ) ) ) colnames( data ) = paste0('t', 1:ncol( data ) )
 
     ## Model for meanstructure
