@@ -35,29 +35,29 @@ standat = function(data, xC, P, Q, standardize_data, distribution, meanstructure
 
     if(standardize_data) {
     ## Standardize time-series
-    stdx <- scale(data)
-    centered_data <- attr(stdx, "scaled:center")
-    scaled_data <- attr(stdx, "scaled:scale")
-    return_standat <- list(T = nrow(stdx),
-                          rts = stdx,
-                          xC = xC,
-                          nt = ncol(stdx),
-                          centered_data = centered_data,
-                          scaled_data = scaled_data,
-                          distribution = distribution,
-                          P = P,
-                          Q = Q,
-                          meanstructure = meanstructure)
-    } else {
-      ## Unstandardized
-      return_standat <- list(T = nrow(data),
-                            rts = data,
+        stdx <- scale(data)
+        centered_data <- attr(stdx, "scaled:center")
+        scaled_data <- attr(stdx, "scaled:scale")
+        return_standat <- list(T = nrow(stdx),
+                            rts = stdx,
                             xC = xC,
-                            nt = ncol(data),
+                            nt = ncol(stdx),
+                            centered_data = centered_data,
+                            scaled_data = scaled_data,
                             distribution = distribution,
                             P = P,
                             Q = Q,
                             meanstructure = meanstructure)
+        } else {
+        ## Unstandardized
+        return_standat <- list(T = nrow(data),
+                                rts = data,
+                                xC = xC,
+                                nt = ncol(data),
+                                distribution = distribution,
+                                P = P,
+                                Q = Q,
+                                meanstructure = meanstructure)
     }
     return(return_standat)
 }
