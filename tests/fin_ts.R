@@ -29,7 +29,7 @@ GOOG$mday <- ifelse( GOOG$wday == 1, 1, 0)
 
 
 upper <- max(dim(cbind(FB$FB.Open,  TWTR$TWTR.Open,  GOOG$GOOG.Open)))
-lower <- upper-300
+lower <- upper-100
 leaveout <- 0
 r2 <- cbind(FB$FB.Open, TWTR$TWTR.Open, GOOG$GOOG.Open)[lower:(upper-leaveout),] ## remove the last leaveout days
 
@@ -45,17 +45,22 @@ colnames(rlag ) <- colnames(r2 )
 # If using arma
 sr2 <- scale(r2 )
 sr2
+r2
 
 fit <- bmgarch(r2,
-               iterations = 800,
+               iterations = 1000,
                P = 1, Q = 1,
                meanstructure = "arma",
                standardize_data = TRUE,
-               parameterization = 'BEKK',
+               parameterization = 'DCC',
                xH = NULL,
-               adapt_delta=0.80)
+               adapt_delta=0.85)
 system("notify-send 'Done sampling' " )
 summary(fit )
+
+plot(fit, type = 'var' )
+
+forecast(fit, ahead = 3 ,  type = "cor")
 
 fit.constant <- bmgarch(rlag[,1:2],
                         iterations = 800,

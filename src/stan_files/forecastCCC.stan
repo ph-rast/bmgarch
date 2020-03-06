@@ -89,9 +89,9 @@ generated quantities {
     	ar_d[d] = ar_d[d] + b_h[p, d]*D_p[t-p, d]^2;
       }
       if ( xC_marker >= 1) {
-      	vd[d] = c_h[d] + beta[d] * xC_p[t-1, d] + ma_d[d] + ar_d[d];
+      	vd[d] = exp( c_h[d] + beta[d] * xC_p[t-1, d] ) + ma_d[d] + ar_d[d];
       } else if ( xC_marker == 0) {
-      	vd[d] = c_h[d]  + ma_d[d] + ar_d[d];
+      	vd[d] = exp( c_h[d] )  + ma_d[d] + ar_d[d];
       }
       D_p[t, d] = sqrt( vd[d] );
     }
