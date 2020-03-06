@@ -3,7 +3,7 @@
 ##' @param type Plot past expected means ("means"), or past conditional volatilyt ("cvar"), or past conditinoal correlation ("ccor")
 ##' @param CrI Lower and upper bound of credible interval. Default is "c( 0.025, .975)".
 ##' @return plot.bmgarch
-##' @author Philippe Rast <rast.ph@gmail.com>
+##' @author Philippe Rast
 ##' @importFrom ggplot2 ggplot
 ##' @importFrom ggplot2 geom_line
 ##' @importFrom ggplot2 geom_ribbon

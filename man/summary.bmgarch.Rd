@@ -18,5 +18,5 @@ Summary object
 Summary for BMGARCH object
 }
 \author{
-philippe
+Philippe Rast
 }

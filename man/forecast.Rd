@@ -51,5 +51,5 @@ Forecasts the (conditional) mean and conditional variance.
 Time-varying predictors can be included in \code{xC}.
 }
 \author{
-philippe
+Philippe Rast
 }

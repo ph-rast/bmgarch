@@ -2,7 +2,7 @@
 ##' @param object 
 ##' @param CrI 
 ##' @return Summary object
-##' @author philippe
+##' @author Philippe Rast
 ##' @export
 summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
     cat( "Model:", paste0(object$param, "-MGARCH\n"))

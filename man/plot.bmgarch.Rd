@@ -20,5 +20,5 @@ plot.bmgarch
 Plot
 }
 \author{
-Philippe Rast <rast.ph@gmail.com>
+Philippe Rast
 }

@@ -16,7 +16,7 @@
 ##' Conditional variance and correlation forecasts are appended to the corresponding plots with the estimates over the given period.
 ##' Mean forecasts are appended to the observed values if no meanstructure is estimated (default), otherwise they will be appended
 ##' to the esimated means. 
-##' @author philippe
+##' @author Philippe Rast
 ##' @importFrom ggplot2 geom_point
 ##' @importFrom ggplot2 geom_errorbar
 ##' @importFrom ggplot2 aes_string

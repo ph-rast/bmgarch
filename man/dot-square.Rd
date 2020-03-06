@@ -16,6 +16,6 @@ Squared value
 Internal function to be used in sweep()
 }
 \author{
-philippe
+Philippe Rast
 }
 \keyword{internal}
