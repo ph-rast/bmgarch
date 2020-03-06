@@ -1,15 +1,14 @@
 Package: bmgarch
 Title: Bayesian Multivariate GARCH
 Version: 0.0.0.9000
-Authors@R: 
-c( person(given = "Philippe",
+Authors@R: c( person(given = "Philippe",
            family = "Rast",
            role = c("aut", "cre"),
            email = "rast.ph@gmail.com",
            comment = c(ORCID = "0000-0003-3630-6629")),
    person(given = "Stephen",
            family = "Martin",
-           role = c("aut", "cre"),
+           role = c("aut"),
            email = "stephenSRMmartin@gmail.com"),
    person(given = "Josue",
            family = "Rodriguez",
@@ -35,6 +34,6 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
 SystemRequirements: GNU make
-RoxygenNote: 7.0.0
+RoxygenNote: 7.0.2
 Suggests: 
     testthat (>= 2.1.0)
