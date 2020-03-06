@@ -6,7 +6,7 @@
 ##' Time-varying predictors can be included in \code{xC}.
 ##' @param object bmgarch object. The fitted model used for forecasting.
 ##' @param ahead Integer (Default: 1). Periods to be forecasted ahead.
-##' @param xC Predictor for H.
+##' @param xC Predictor for constant covariance.
 ##' @param type String (Default: "var"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor"). 
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' Possible values are .025, .05, .10, .50, .90, .95, and .975
@@ -16,7 +16,7 @@
 ##' Conditional variance and correlation forecasts are appended to the corresponding plots with the estimates over the given period.
 ##' Mean forecasts are appended to the observed values if no meanstructure is estimated (default), otherwise they will be appended
 ##' to the esimated means. 
-##' @author Philippe Rast
+##' @author Philippe Rast, Stephen R. Martin
 ##' @importFrom ggplot2 geom_point
 ##' @importFrom ggplot2 geom_errorbar
 ##' @importFrom ggplot2 aes_string
@@ -45,48 +45,22 @@ forecast <- function(object,
                      distribution =  object$num_dist,
                      xC_p =  xC)
 
-    ## Call forecasting functions
-    if( object$param == 'DCC') {
-        ## ################
-        ## DCC Forecast ##
-        ## ################
-        forecasted <- rstan::gqs(stanmodels$forecastDCC,
-                                 draws =  as.matrix(object$model_fit),
-                                 data = standat,
-                                 seed =  seed)
-        ## ##########
-        ## END DCC ##
-        ## ##########
-        
-    } else {
-        if ( object$param == 'CCC') {
-            ## ###############
-            ## CCC Forecast ##
-            ## ###############
-            forecasted <- rstan::gqs(stanmodels$forecastCCC,
-                                     draws =  as.matrix(object$model_fit),
-                                     data = standat,
-                                     seed =  seed)
-            
-            ## ##########
-            ## END CCC ##
-            ## ###########
-            
-        } else {
-            if( object$param == 'BEKK' | object$param == 'pdBEKK' ) {
-                ## ###################
-                ## BEKK Forecast ##
-                ## ###################
-                forecasted <- rstan::gqs(stanmodels$forecastBEKK,
-                                         draws =  as.matrix(object$model_fit),
-                                         data = standat,
-                                         seed =  seed)
-                ## ###########
-                ## END BEKK ##
-                ## ###########
-            }
-        }
+    gqs_model <- switch(object$param,
+                        DCC = stanmodels$forecastDCC,
+                        CCC = stanmodels$forecastCCC,
+                        BEKK = stanmodels$forecastBEKK,
+                        pdBEKK = stanmodels$forecastBEKK,
+                        NULL)
+    if(is.null(gqs_model)) {
+        stop("bmgarch object 'param' does not match a supported model. ",
+             object$param, "is not one in ", paste0(supported_models, collapse = ", "), ".")
     }
+
+    ## Call forecasting functions
+    forecasted <- rstan::gqs(gqs_model,
+                             draws = as.matrix(object$model_fit),
+                             data = standat,
+                             seed = seed)
     
     ## We only need rts_p and H_p and R_p
     ## note that rts_p and H_p include past observations (given by P or Q)

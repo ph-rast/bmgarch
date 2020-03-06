@@ -34,7 +34,7 @@ Possible values are .025, .05, .10, .50, .90, .95, and .975}
 
 \item{last_t}{Integer (Default: 100). For plotting only. Only show \code{last_t} observations in plot.}
 
-\item{xC}{Predictor for H.}
+\item{xC}{Predictor for constant covariance.}
 }
 \value{
 Forecasted conditional means, variances and correlations. Forecasts are shown in plots (unless plot = FALSE).
@@ -51,5 +51,5 @@ Forecasts the (conditional) mean and conditional variance.
 Time-varying predictors can be included in \code{xC}.
 }
 \author{
-Philippe Rast
+Philippe Rast, Stephen R. Martin
 }
