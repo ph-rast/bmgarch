@@ -2,7 +2,7 @@
 % Please edit documentation in R/bmgarch.R
 \name{bmgarch}
 \alias{bmgarch}
-\title{Bayesian Multivariate GARCH}
+\title{Estimate Bayesian Multivariate GARCH}
 \usage{
 bmgarch(
   data,
@@ -19,30 +19,30 @@ bmgarch(
 )
 }
 \arguments{
-\item{data}{A time-series or matrix object containing observations at the same interval.}
+\item{data}{Time-series or matrix object. A time-series or matrix object containing observations at the same interval.}
 
-\item{xC}{Predictor on the constanta variance term C, or c returning log scaled regression weights.}
+\item{xC}{Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms.}
 
-\item{parameterization}{A character string specifying the type of of parameterization, must be one of "CCC" (default), "DCC", "BEKK", or "pdBEKK".}
+\item{parameterization}{Character (Default: "CCC"). The type of of parameterization. Must be one of "CCC", "DCC", "BEKK", or "pdBEKK".}
 
-\item{P}{dimension of GARCH component in MGARCH(P,Q)}
+\item{P}{Integer. Dimension of GARCH component in MGARCH(P,Q).}
 
-\item{Q}{dimension of ARCH component in MGARCH(P,Q)}
+\item{Q}{Integer. Dimension of ARCH component in MGARCH(P,Q).}
 
-\item{iterations}{A positive integer specifying the number of iterations for each chain (including warmup). The default is 2000}
+\item{iterations}{Integer (Default: 2000). Number of iterations for each chain (including warmup).}
 
-\item{chains}{A positive integer specifying the number of Markov chains. The default is 4.}
+\item{chains}{Integer (Default: 4). The number of Markov chains.}
 
-\item{standardize_data}{Whether data should be standardized. Defaults to FALSE}
+\item{standardize_data}{Logical (Default: FALSE). Whether data should be standardized.}
 
-\item{distribution}{Distribution of innovation: "Student_t" (default) or "Gaussian"}
+\item{distribution}{Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"}
 
-\item{meanstructure}{Defines model for means. Either 'constant' (default) or 'arma'. Currently arma(1,1) only.}
+\item{meanstructure}{Character (Default: "constant"). Defines model for means. Either 'constant'  or 'arma'. Currently arma(1,1) only.}
 
-\item{...}{Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in ‘stan’.}
+\item{...}{Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[stan]{stan}}.}
 }
 \value{
-An object of S4 class ‘stanfit’ representing the fitted results.
+\code{bmgarch} object.
 }
 \description{
 Draw samples from a specified multivariate GARCH model, given multivariate time-series.
