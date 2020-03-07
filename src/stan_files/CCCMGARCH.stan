@@ -24,7 +24,7 @@ parameters {
 #include /parameters/predH.stan
 
   // GARCH h parameters on variance metric
-  vector<lower=0>[nt] c_h; 
+  vector[nt] c_h; 
   vector<lower=0, upper = 1 >[nt] a_h[Q];
   vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
 
