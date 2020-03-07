@@ -2,22 +2,23 @@
 % Please edit documentation in R/print.R
 \name{summary.bmgarch}
 \alias{summary.bmgarch}
-\title{Summary method for BMGARCH object}
+\title{Summary method for bmgarch objects.}
 \usage{
 \method{summary}{bmgarch}(object, CrI = c(0.025, 0.975), digits = 2)
 }
 \arguments{
 \item{object}{bmgarch object.}
 
-\item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
-Possible values are .025, .05, .10, .50, .90, .95, and .975}
+\item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
+
+\item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
 }
 \value{
-Summary object
+Named list. model_summary contains summary table for model parameters.
 }
 \description{
-Summary method for BMGARCH object
+Computes posterior summaries for all parameters of interest for bmgarch objects.
 }
 \author{
-Philippe Rast
+Stephen R. Martin
 }
