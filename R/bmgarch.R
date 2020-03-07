@@ -82,24 +82,24 @@ standat = function(data, xC, P, Q, standardize_data, distribution, meanstructure
 ##' @export
 bmgarch <- function(data,
                    xC = NULL,
-                   parameterization = 'CCC',
+                   parameterization = "CCC",
                    P = 1,
                    Q = 1,
                    iterations = 2000,
                    chains = 4,
                    standardize_data = FALSE,
-                   distribution = 'Student_t',
-                   meanstructure = 'constant', ...) {
-    if ( tolower(distribution) == 'gaussian' ) {
+                   distribution = "Student_t",
+                   meanstructure = "constant", ...) {
+    if ( tolower(distribution) == "gaussian" ) {
         num_dist <- 0
-    } else if ( tolower(distribution) == 'student_t' ) {
+    } else if ( tolower(distribution) == "student_t" ) {
         num_dist <- 1
     } else {
-        stop( '\n\n Specify distribution: Gaussian or Student_t \n\n')
+        stop( "\n\n Specify distribution: Gaussian or Student_t \n\n")
     }
 
     return_standat <- standat(data, xC, P, Q,  standardize_data, distribution = num_dist, meanstructure )
-    stan_data <- return_standat[ c('T', 'xC', 'rts', 'nt', 'distribution', 'P', 'Q', 'meanstructure')]
+    stan_data <- return_standat[ c("T", "xC", "rts", "nt", "distribution", "P", "Q", "meanstructure")]
 
     stanmodel <- switch(parameterization,
                         CCC = stanmodels$CCCMGARCH,
