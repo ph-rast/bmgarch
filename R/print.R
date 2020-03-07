@@ -62,12 +62,23 @@ print.summary.bmgarch <- function(x, ...) {
     } else if(x$meta$param %in% c("BEKK", "pdBEKK")) {
         .print.summary.bekk(x)
     }
+    .newline(2)
 
     .print.summary.arma(x)
+    .newline(2)
 
     if(x$meta$xC) {
         .print.summary.beta(x)
+        .newline(2)
     }
+
+    if(x$meta$num_dist == 1) {
+        .print.summary.nu(x)
+        .newline(2)
+    }
+
+    .print.summary.lp(x)
+    .newline()
 }
 
 .print.summary.ccc <- function(bmsum) {
@@ -144,7 +155,6 @@ print.summary.bmgarch <- function(x, ...) {
         rownames(corr_out) <- paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
     }
     print(round(corr_out, digits = digits))
-    .newline(2)
 }
 
 .print.summary.dcc <- function(bmsum) {
@@ -241,8 +251,6 @@ print.summary.bmgarch <- function(x, ...) {
     }
 
     print(round(S_out, digits = digits))
-    .newline(2)
-    
 }
 
 .print.summary.bekk <- function(bmsum) {
@@ -357,7 +365,6 @@ print.summary.bmgarch <- function(x, ...) {
         rownames( B_out ) <- paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')   
     }
     print(round( B_out, digits = digits) )
-    .newline(2)
 }
 
 .print.summary.arma <- function(bmsum) {
@@ -370,7 +377,6 @@ print.summary.bmgarch <- function(x, ...) {
     cat("ARMA(1,1) estimates on the location:")
     .newline(2)
     print(round(bmsum$model_summary[arma_index,], digits = bmsum$meta$digits))
-    .newline(2)
 }
 
 .print.summary.beta <- function(bmsum) {
@@ -413,8 +419,20 @@ print.summary.bmgarch <- function(x, ...) {
         rownames(beta) <- paste0("beta_", short_names)
         betas <- rbind(beta0, beta)
         print(round(betas, digits = digits))
-        .newline(2)
     }
+}
+
+.print.summary.nu <- function(bmsum) {
+    nu <- bmsum$model_summary["nu",]
+    cat("Df constant student_t (nu):")
+    .newline(2)
+    print(round(nu, digits = bmsum$meta$digits))
+}
+
+.print.summary.lp <- function(bmsum) {
+    cat("Log density posterior estimate:")
+    .newline(2)
+    print(round(bmsum$model_summary["lp__",], digits = bmsum$meta$digits))
 }
 
 .newline <- function(n = 1) {
