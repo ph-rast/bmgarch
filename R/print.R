@@ -15,12 +15,13 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
 
     ccc_params <- c("c_h", "a_h", "b_h", "R", "beta", "c_h_var")
     dcc_params <- c("c_h", "a_h", "b_h", "beta", "c_h_var", "a_q", "b_q", "S")
-    bekk_params <- c("C_R", "C_var", "A", "B")
+    bekk_params <- c("C_R", "C_var", "A", "B", "beta1")
     
     # Meta-data needed for printing
     # TODO: Revisit this; some can be removed. Kitchen sink for now.
-    metaNames <- c("param", "distribution", "num_dist", "iter", "chains", "elapsed_time", "date", "nt", "TS_length", "TS_names", "RTS_last", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
+    metaNames <- c("param", "distribution", "num_dist", "iter", "chains", "elapsed_time", "date", "nt", "TS_length", "TS_names", "RTS_last", "RTS_full", "mgarchQ", "mgarchP", "meanstructure")
     meta <- with(object, mget(metaNames))
+    meta$xC <- !all(object$xC == 0)
     out <- list()
     out$meta <- meta
     out$meta$digits <- digits
@@ -63,6 +64,10 @@ print.summary.bmgarch <- function(x, ...) {
     }
 
     .print.summary.arma(x)
+
+    if(x$meta$xC) {
+        .print.summary.beta(x)
+    }
 }
 
 .print.summary.ccc <- function(bmsum) {
@@ -365,6 +370,51 @@ print.summary.bmgarch <- function(x, ...) {
     cat("ARMA(1,1) estimates on the location:")
     .newline(2)
     print(round(bmsum$model_summary[arma_index,], digits = bmsum$meta$digits))
+    .newline(2)
+}
+
+.print.summary.beta <- function(bmsum) {
+
+    ms <- bmsum$model_summary
+    # Settings
+    nt <- bmsum$meta$nt
+    P <- bmsum$meta$mgarchP
+    Q <- bmsum$meta$mgarchQ
+    digits <- bmsum$meta$digits
+    # Shortened TS names, if needed.
+    short_names <- abbreviate(bmsum$meta$TS_names, minlength = 2)
+    # Off-diagonals
+    cormat_index <- matrix(1:(nt*nt), nrow = nt)
+    corr_only <- cormat_index[lower.tri(cormat_index)]
+    diag_only <- diag(cormat_index)
+    ## obtain all combinations of TS varnames for A and B in BEKK
+    full_varnames <- expand.grid( short_names, short_names)
+    ## obtain off-diagonal TS varnames
+    od_varnames <- full_varnames[corr_only, ]
+    
+
+    if(bmsum$meta$param %in% c("BEKK", "pdBEKK")) {
+        cat("Exogenous predictor (beta1 on log scale: C = sRs with s = exp( x*beta ):")
+        .newline(2)
+        beta_index <- grep("beta1", rownames(ms))
+        beta <- ms[beta_index,]
+        rownames(beta) <- paste0("beta1_", short_names)
+        print(round(beta, digits = digits))
+    } else {
+        cat("Exogenous predictor (beta1 on log scale: c = exp( beta_0 + beta_1*x ):")
+        .newline(2)
+
+        beta0_index <- grep("c_h\\[", rownames(ms))
+        beta0 <- ms[beta0_index,]
+        rownames(beta0) <- paste0("beta0_", short_names)
+
+        beta_index <- grep("beta", rownames(ms))
+        beta <- ms[beta_index,]
+        rownames(beta) <- paste0("beta_", short_names)
+        betas <- rbind(beta0, beta)
+        print(round(betas, digits = digits))
+        .newline(2)
+    }
 }
 
 .newline <- function(n = 1) {
