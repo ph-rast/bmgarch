@@ -2,13 +2,13 @@
 % Please edit documentation in R/forecasting_gq.R
 \name{forecast}
 \alias{forecast}
-\title{Forecasting mean and variance}
+\title{%@title Forecasting mean and variance}
 \usage{
 forecast(
   object,
   ahead = 1,
   type = "var",
-  xH_p = NULL,
+  xC_p = NULL,
   CrI = c(0.025, 0.975),
   seed = NA,
   plot = TRUE,
@@ -22,7 +22,7 @@ forecast(
 
 \item{type}{Plot conditional means, variances (default) or correlations. Takes arguments "mean", "var", "cor"}
 
-\item{xH_p}{Predictor for H}
+\item{xC_p}{Predictor for H}
 
 \item{CrI}{Lower and upper bound of credible interval. Default is "c( 0.025, .975)".
 Possible values are .025, .05, .10, .50, .90, .95, and .975}
@@ -38,7 +38,7 @@ Mean forecasts are appended to the observed values if no meanstructure is estima
 to the esimated means.
 }
 \description{
-Forecasting mean and variance
+%@title Forecasting mean and variance
 }
 \author{
 philippe

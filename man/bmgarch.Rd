@@ -6,13 +6,13 @@
 \usage{
 bmgarch(
   data,
-  xH = NULL,
+  xC = NULL,
   parameterization = "CCC",
   P = 1,
   Q = 1,
-  iterations = 1000,
+  iterations = 2000,
   chains = 4,
-  standardize_data = TRUE,
+  standardize_data = FALSE,
   distribution = "Student_t",
   meanstructure = "constant",
   ...
@@ -21,25 +21,25 @@ bmgarch(
 \arguments{
 \item{data}{A time-series or matrix object containing observations at the same interval.}
 
-\item{xH}{}
+\item{xC}{Predictor on the constanta variance term C, or c returning log scaled regression weights.}
 
-\item{parameterization}{A character string specifying the type of of parameterization, must be one of "CCC" (default), "DCC", or "BEKK".}
+\item{parameterization}{A character string specifying the type of of parameterization, must be one of "CCC" (default), "DCC", "BEKK", or "pdBEKK".}
 
-\item{P}{dimension of AR component in MGARCH(P,Q)}
+\item{P}{dimension of GARCH component in MGARCH(P,Q)}
 
-\item{Q}{dimension of MA component in MGARCH(P,Q)}
+\item{Q}{dimension of ARCH component in MGARCH(P,Q)}
 
-\item{iterations}{A positive integer specifying the number of iterations for each chain (including warmup). The default is 1000}
+\item{iterations}{A positive integer specifying the number of iterations for each chain (including warmup). The default is 2000}
 
 \item{chains}{A positive integer specifying the number of Markov chains. The default is 4.}
 
-\item{standardize_data}{}
+\item{standardize_data}{Whether data should be standardized. Defaults to FALSE}
 
-\item{distribution}{Distribution of innovation: "Student_t" (default) or "Normal"}
+\item{distribution}{Distribution of innovation: "Student_t" (default) or "Gaussian"}
 
 \item{meanstructure}{Defines model for means. Either 'constant' (default) or 'arma'. Currently arma(1,1) only.}
 
-\item{...}{Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’. See the documentation in ‘stan’.}
+\item{...}{Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in ‘stan’.}
 }
 \value{
 An object of S4 class ‘stanfit’ representing the fitted results.
