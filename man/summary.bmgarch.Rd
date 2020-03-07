@@ -4,7 +4,7 @@
 \alias{summary.bmgarch}
 \title{Summary method for BMGARCH object}
 \usage{
-\method{summary}{bmgarch}(object, CrI = c(0.05, 0.95), digits = 2)
+\method{summary}{bmgarch}(object, CrI = c(0.025, 0.975), digits = 2)
 }
 \arguments{
 \item{object}{bmgarch object.}

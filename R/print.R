@@ -5,7 +5,7 @@
 ##' @return Summary object
 ##' @author Philippe Rast
 ##' @export
-summary.bmgarch = function(object, CrI = c(0.05, 0.95), digits = 2 ) {
+summary.bmgarch = function(object, CrI = c(0.025, 0.975), digits = 2 ) {
     cat( "Model:", paste0(object$param, "-MGARCH\n"))
     if( object$param == 'CCC') {
         cat("Basic specification: H_t = D_t R D_t", "\n")
