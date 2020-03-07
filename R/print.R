@@ -280,7 +280,7 @@ summary.bmgarch = function(object, CrI = c(0.025, 0.975), digits = 2 ) {
     ## ######################
     ## Beta: Predictor on H
     ## #####################
-    if( sum(object$xC) != 0) {
+    if(all(object$xC == 0)) {
         if(object$param == 'BEKK' | object$param == 'pdBEKK') {
         cat("Exogenous predictor (beta1 on log scale: C = sRs with s = exp( x*beta ):", "\n\n")
         beta <- rstan::summary(object$model_fit, pars = c('beta1'), probs = CrI)$summary[, -2]
