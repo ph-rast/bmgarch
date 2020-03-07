@@ -58,6 +58,8 @@ print.summary.bmgarch <- function(x, ...) {
         .print.summary.ccc(x)
     } else if(x$meta$param == "DCC") {
         .print.summary.dcc(x)
+    } else if(x$meta$param %in% c("BEKK", "pdBEKK")) {
+        .print.summary.bekk(x)
     }
 
     .print.summary.arma(x)
@@ -236,6 +238,121 @@ print.summary.bmgarch <- function(x, ...) {
     print(round(S_out, digits = digits))
     .newline(2)
     
+}
+
+.print.summary.bekk <- function(bmsum) {
+    # Meta-data
+    cat("Model:", paste0(bmsum$meta$param, "-MGARCH\n"))
+    cat("Basic Specification: ")
+    cat("H_t = D_t R D_t")
+    .newline()
+    cat("H_t = C + A'[y_(t-1)*y'_(t-1)]A + B'H_(t-1)B")
+    .newline()
+
+    # Sampling configuration
+    .print.config(bmsum)
+
+    # Get indices for params
+    ms <- bmsum$model_summary
+    ms <- ms[!grepl("c_h$", rownames(ms)),] # Remove c_h; will print c_h_var
+    garch_h_index <- grep("_h", rownames(ms))
+    garch_q_index  <- grep("_q", rownames(ms) )
+    cond_corr_index <- grep("R", rownames(ms))
+    S_index = grep("S", rownames(ms))
+
+    # Settings
+    nt <- bmsum$meta$nt
+    P <- bmsum$meta$mgarchP
+    Q <- bmsum$meta$mgarchQ
+    digits <- bmsum$meta$digits
+
+    # Shortened TS names, if needed.
+    short_names <- abbreviate(bmsum$meta$TS_names, minlength = 2)
+    # Off-diagonals
+    cormat_index <- matrix(1:(nt*nt), nrow = nt)
+    corr_only <- cormat_index[lower.tri(cormat_index)]
+    diag_only <- diag(cormat_index)
+    ## obtain all combinations of TS varnames for A and B in BEKK
+    full_varnames <- expand.grid( short_names, short_names)
+    ## obtain off-diagonal TS varnames
+    od_varnames <- full_varnames[corr_only, ]
+
+    garch_C_index <- grep("beta0", rownames(ms))
+    garch_Cv_index <- grep("C_var", rownames(ms))
+    garch_R_index <- grep("C_R", rownames(ms))
+    garch_A_index <- grep("A", rownames(ms))
+    garch_B_index <- grep("B", rownames(ms)) 
+
+    ########
+    # BEKK #
+    ########
+    .sep()
+    cat("Constant correlation, R (diag[C]*R*diag[C]):")
+    .newline(2)
+    R_out <- ms[garch_R_index[corr_only],]
+    if(nt == 2) {
+        tmp <- matrix( R_out, nrow = 1 )
+        rownames(tmp) <- paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
+        colnames(tmp) <- names(R_out)
+        R_out = tmp 
+    } else {
+        rownames(R_out) <- paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
+    }
+
+    print(round(R_out, digits = digits))
+    .newline(2)
+
+    cat("Constant variances (diag[C]):")
+    .newline(2)
+    C_out <- ms[garch_Cv_index,]
+    if ( nt == 2 ) {
+        tmp <- matrix( C_out, nrow = 2 )
+        rownames(tmp) <- paste0("var_", short_names )
+        colnames(tmp) <- colnames(C_out)
+        C_out <- tmp
+    } else {
+        rownames(C_out) = paste0("var_", short_names )
+    }
+    print(round( C_out, digits = digits) )
+    .newline(2)
+
+    #####
+    # A #
+    #####
+    cat(paste0(paste0("MGARCH(", P, ",", Q, ')')), "estimates for A:")
+    .newline(2)
+
+    a <- list()
+    A_out <- ms[garch_A_index,]
+    if (Q > 1) {
+        for( q in 1:Q ){
+            a[[q]] = paste( paste0( paste0("A_", q, "_"), full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+        }
+        rownames(A_out) = unlist( a )
+    } else  {
+        rownames(A_out) = paste( paste0("A_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')   
+    }
+    print(round( A_out, digits = digits) )
+    .newline(2)
+
+    #####
+    # B #
+    #####
+    cat(paste0(paste0("MGARCH(", P, ",", Q, ')')), "estimates for B:")
+    .newline(2)
+
+    b <- list()
+    B_out <- ms[garch_B_index,]
+    if (P > 1) {
+        for( p in 1:P ){
+            b[[p]] <- paste( paste0( paste0("B_", p, "_"), full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')
+        }
+        rownames( B_out ) <- unlist( b )
+    } else {
+        rownames( B_out ) <- paste( paste0("B_", full_varnames[ ,1] ), full_varnames[ ,2] , sep = '-')   
+    }
+    print(round( B_out, digits = digits) )
+    .newline(2)
 }
 
 .print.summary.arma <- function(bmsum) {
