@@ -14,10 +14,10 @@ standat = function(data, xC, P, Q, standardize_data, distribution, meanstructure
     if ( is.null( colnames( data ) ) ) colnames( data ) = paste0('t', 1:ncol( data ) )
 
     ## Model for meanstructure
-    if( meanstructure == 'constant') {
+    if( meanstructure == "constant") {
         meanstructure <- 0
     } else {
-        if ( meanstructure == 'arma') {
+        if ( meanstructure == "arma") {
             meanstructure <- 1
         }
     }
@@ -30,7 +30,7 @@ standat = function(data, xC, P, Q, standardize_data, distribution, meanstructure
         warning("xC is assumed constant across TS's")
         xC <- matrix( xC, nrow = nrow( data ), ncol = ncol( data)) ## Risky, better to throw an error
     } else { ## xC is not a vector  - check if it is of right dimension
-        if( dim( xC )[2] != dim( data )[2] ) warning('xC is not of right dimension - adapt xC dimension to match number of TS')
+        if( dim( xC )[2] != dim( data )[2] ) warning("xC is not of right dimension - adapt xC dimension to match number of TS")
         }
 
     if(standardize_data) {
@@ -153,4 +153,4 @@ bmgarch <- function(data,
 #' Models supported by bmgarch
 #' @keywords internal
 #' @author Stephen R. Martin
-supported_models <- c("DCC","CCC","BEKK","pdBEKK")
+supported_models <- c("DCC", "CCC", "BEKK", "pdBEKK")
