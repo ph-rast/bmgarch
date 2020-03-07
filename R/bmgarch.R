@@ -28,7 +28,7 @@ standat = function(data, xC, P, Q, standardize_data, distribution, meanstructure
         xC = matrix(0, nrow = nrow(data), ncol = ncol(data))
     }
     ## Match dimension of predictor to TS. If only one vector is given, it's assumed that it is the same for all TS's
-    if ( is.null(ncol(xC)) | ncol(xC) == 1 ) {
+    if ( is.null(ncol(xC)) ) {
         warning("xC is assumed constant across TS's")
         xC <- matrix(xC, nrow = nrow(data), ncol = ncol(data)) ## Risky, better to throw an error
     } else if ( dim( xC )[2] != dim( data )[2] ) { ## xC is not a vector  - check if it is of right dimension
