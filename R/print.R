@@ -56,6 +56,8 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
 print.summary.bmgarch <- function(x, ...) {
     if(x$meta$param == "CCC") {
         .print.summary.ccc(x)
+    } else if(x$meta$param == "DCC") {
+        .print.summary.dcc(x)
     }
 
     .print.summary.arma(x)
@@ -86,9 +88,6 @@ print.summary.bmgarch <- function(x, ...) {
     Q <- bmsum$meta$mgarchQ
     digits <- bmsum$meta$digits
 
-    cat(paste0("GARCH(", P, ",", Q, ")"), " estimates for conditional variance:")
-    .newline(2)
-
     # Shortened TS names, if needed.
     short_names <- abbreviate(bmsum$meta$TS_names, minlength = 2)
     # Off-diagonals
@@ -99,6 +98,10 @@ print.summary.bmgarch <- function(x, ...) {
     full_varnames <- expand.grid( short_names, short_names)
     ## obtain off-diagonal TS varnames
     od_varnames <- full_varnames[corr_only, ]
+
+    cat(paste0("GARCH(", P, ",", Q, ")"), " estimates for conditional variance:")
+    .newline(2)
+
 
     #########
     # GARCH #
@@ -135,6 +138,104 @@ print.summary.bmgarch <- function(x, ...) {
     }
     print(round(corr_out, digits = digits))
     .newline(2)
+}
+
+.print.summary.dcc <- function(bmsum) {
+    # Meta-data
+    cat("Model:", paste0(bmsum$meta$param, "-MGARCH\n"))
+    cat("Basic Specification: ")
+    cat("H_t = D_t R D_t")
+    .newline()
+    .tab()
+    cat("diag(D_t) = sqrt(h_ii,t) = c_h + a_h*y^2_[t-1] + b_h*h_[ii,t-1]")
+    .newline()
+    .tab()
+    cat("R_t = Q^[-1]_t Q_t Q^[-1]_t = ( 1 - a_q - b_q)S + a_q(u_[t-1]u'_[t-1]) + b_q(Q_[t-1])")
+    .newline()
+
+    # Sampling configuration
+    .print.config(bmsum)
+
+    # Get indices for params
+    ms <- bmsum$model_summary
+    ms <- ms[!grepl("c_h$", rownames(ms)),] # Remove c_h; will print c_h_var
+    garch_h_index <- grep("_h", rownames(ms))
+    garch_q_index  <- grep("_q", rownames(ms) )
+    cond_corr_index <- grep("R", rownames(ms))
+    S_index = grep("S", rownames(ms))
+
+    # Settings
+    nt <- bmsum$meta$nt
+    P <- bmsum$meta$mgarchP
+    Q <- bmsum$meta$mgarchQ
+    digits <- bmsum$meta$digits
+
+    # Shortened TS names, if needed.
+    short_names <- abbreviate(bmsum$meta$TS_names, minlength = 2)
+    # Off-diagonals
+    cormat_index <- matrix(1:(nt*nt), nrow = nt)
+    corr_only <- cormat_index[lower.tri(cormat_index)]
+    diag_only <- diag(cormat_index)
+    ## obtain all combinations of TS varnames for A and B in BEKK
+    full_varnames <- expand.grid( short_names, short_names)
+    ## obtain off-diagonal TS varnames
+    od_varnames <- full_varnames[corr_only, ]
+
+    #########
+    # GARCH #
+    #########
+    cat(paste0("GARCH(", P, ",", Q, ")"), " estimates for conditional variance on D:")
+    .newline(2)
+
+    rn <- rownames(ms[garch_h_index,])
+    for ( i in 1:nt ) {
+        replace <- grep(paste0( as.character(i), "\\]"), rn) 
+        rn[replace] <- gsub(paste0( as.character(i), "\\]" ), paste0(short_names[i]), rn)[replace]
+    }
+    rn <- gsub("\\[", "_", rn)
+
+    ## Save into new object to change rownames
+    garch_h_out <- ms[garch_h_index,]
+    ## Assign new rownames
+    rownames(garch_h_out) <- rn
+    ## print garch parameters
+    print(round( garch_h_out, digits = digits) )
+    .newline(2)
+
+    #####
+    # Q #
+    #####
+    cat("GARCH(1,1) estimates for conditional variance on Q:")
+    .newline(2)
+    rn = rownames(ms[garch_q_index,])
+    for ( i in 1:nt ) {
+        replace = grep(paste("\\[", "\\]", sep=as.character(i)), rn)
+        rn[replace] = gsub(paste("\\[", "\\]", sep=as.character(i)), paste0("_", short_names[i]), rn)[replace]
+    }
+
+    ## Save into new object to change rownames
+    garch_q_out = ms[garch_q_index,]
+    ## Assign new rownames
+    rownames(garch_q_out) = rn
+    ## print garch parameters
+    print(round( garch_q_out, digits = digits) )
+    .newline(2)
+
+    cat("Unconditional correlation 'S' in Q:")
+    .newline(2)
+    S_out <- ms[S_index[corr_only],]
+    if (nt == 2) {
+        tmp <- matrix( S_out, nrow = 1 )
+        rownames(tmp) <- paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
+        colnames(tmp) <- names(S_out)
+        S_out <- tmp 
+    } else {
+        rownames(S_out) <- paste( paste0("S_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
+    }
+
+    print(round(S_out, digits = digits))
+    .newline(2)
+    
 }
 
 .print.summary.arma <- function(bmsum) {
