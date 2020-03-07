@@ -96,36 +96,27 @@ bmgarch <- function(data,
     return_standat <- standat(data, xC, P, Q,  standardize_data, distribution = num_dist, meanstructure )
     stan_data <- return_standat[ c('T', 'xC', 'rts', 'nt', 'distribution', 'P', 'Q', 'meanstructure')]
 
-  if(parameterization == 'CCC') model_fit <- rstan::sampling(stanmodels$CCCMGARCH, data = stan_data,
-                                                      verbose = TRUE,
-                                                      iter = iterations,
-                                                      control = list(adapt_delta = .99),
-                                                      init_r = 1,
-                                                      chains = chains) else {
-  if( parameterization == 'DCC' ) model_fit <- rstan::sampling(stanmodels$DCCMGARCH, data = stan_data,
-                                                      verbose = TRUE,
-                                                      iter = iterations,
-                                                      control = list(adapt_delta = .99),
-                                                      init_r = 1,
-                                                      chains = chains) else {
-  if( parameterization == 'BEKK' ) model_fit <- rstan::sampling(stanmodels$BEKKMGARCH,
-                                                      data = stan_data,
-                                                      verbose = TRUE,
-                                                      iter = iterations,
-                                                      control = list(adapt_delta = .99),
-                                                      init_r = 1,
-                                                      chains = chains) else {
-if( parameterization == 'pdBEKK' ) model_fit <- rstan::sampling(stanmodels$pdBEKKMGARCH,
-                                                      data = stan_data,
-                                                      verbose = TRUE,
-                                                      iter = iterations,
-                                                      control = list(adapt_delta = .99),
-                                                      init_r = 1,
-                                                      chains = chains) else {                                                                           
-  warning( 'Not a valid model specification. Select CCC, DCC, BEKK, or pdBEKK.' )}
-                                                                       }
-                                                                       }
-                                                                       }
+    stanmodel <- switch(parameterization,
+                        CCC = stanmodels$CCCMGARCH,
+                        DCC = stanmodels$DCCMGARCH,
+                        BEKK = stanmodels$BEKKMGARCH,
+                        pdBEKK = stanmodels$pdBEKKMGARCH,
+                        NULL)
+    if(is.null(stanmodel)) {
+        stop("Not a valid model specification. ",
+             parameterization,
+             "must be one of: ",
+             paste0(supported_models, collapse = ", "),
+             ".")
+    }
+
+    model_fit <- rstan::sampling(stanmodel,
+                                 data = stan_data,
+                                 verbose = TRUE,
+                                 iter = iterations,
+                                 control = list(adapt_delta = .99),
+                                 chains = chains)
+
     ## Model fit is based on standardized values.
     mns <- return_standat$centered_data
     sds <- return_standat$scaled_data
