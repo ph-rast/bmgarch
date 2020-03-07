@@ -4,17 +4,19 @@
 \alias{plot.bmgarch}
 \title{Plot}
 \usage{
-\method{plot}{bmgarch}(object, type = "means", askNewPage = TRUE, CrI = c(0.025, 0.975))
+\method{plot}{bmgarch}(x, type = "means", askNewPage = TRUE, CrI = c(0.025, 0.975))
 }
 \arguments{
-\item{object}{stan object}
+\item{x}{bmgarch object.}
 
-\item{type}{Plot past expected means ("means"), or past conditional volatilyt ("cvar"), or past conditinoal correlation ("ccor")}
+\item{type}{String (Default: "var"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor").}
 
-\item{CrI}{Lower and upper bound of credible interval. Default is "c( 0.025, .975)".}
+\item{askNewPage}{Logical (Default: True). Whether to ask for new plotting page.}
+
+\item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
 }
 \value{
-plot.bmgarch
+plot.bmgarch (Invisibly). List of plots.
 }
 \description{
 Plot

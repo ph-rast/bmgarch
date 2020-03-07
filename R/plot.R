@@ -1,8 +1,9 @@
 ##' @title Plot 
-##' @param object stan object
-##' @param type Plot past expected means ("means"), or past conditional volatilyt ("cvar"), or past conditinoal correlation ("ccor")
-##' @param CrI Lower and upper bound of credible interval. Default is "c( 0.025, .975)".
-##' @return plot.bmgarch
+##' @param x bmgarch object.
+##' @param type String (Default: "var"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor"). 
+##' @param askNewPage Logical (Default: True). Whether to ask for new plotting page.
+##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
+##' @return plot.bmgarch (Invisibly). List of plots.
 ##' @author Philippe Rast
 ##' @importFrom ggplot2 ggplot
 ##' @importFrom ggplot2 geom_line
@@ -11,7 +12,7 @@
 ##' @importFrom ggplot2 labs
 ##' @importFrom ggplot2 coord_cartesian
 ##' @export
-plot.bmgarch <- function(object, type = "means", askNewPage =  TRUE, CrI = c(.025, .975)) {
+plot.bmgarch <- function(x, type = "means", askNewPage =  TRUE, CrI = c(.025, .975)) {
     plt <- list()
     if ( type == 'means' ) {
         estimated_mean <- array(NA, dim = c(object$TS_length, object$nt))
@@ -19,7 +20,7 @@ plot.bmgarch <- function(object, type = "means", askNewPage =  TRUE, CrI = c(.02
         for ( i in 1:object$nt ) {
             estimated_mean[,i] <- colMeans(rstan::extract(object$model_fit)[['mu']][,,i])
             ## Note: CIs will be overwritten - only stores CI's for current i
-            CIs <- apply(rstan::extract(object$model_fit)[['mu']][,,i], 2, bmgarch:::.qtile, CrI  )
+            CIs <- apply(rstan::extract(object$model_fit)[['mu']][,,i], 2, .qtile, CrI  )
             df <- data.frame(mu = estimated_mean[,i], CIu = CIs[1,], CIl = CIs[2,])
             df$period <- seq_len( nrow(df) )
             plt[[i]] <- ggplot(data = df, aes(x = period, y = mu))  + labs(y = 'Conditional Means',
@@ -33,7 +34,7 @@ plot.bmgarch <- function(object, type = "means", askNewPage =  TRUE, CrI = c(.02
             }
         }
     } else {
-        if ( type == 'ccor' ) {
+        if ( type == 'cor' ) {
              if (object$param == 'CCC') {
                  warning('Correlation is constant for CCC - no plot generated') 
              } else {
@@ -68,7 +69,7 @@ plot.bmgarch <- function(object, type = "means", askNewPage =  TRUE, CrI = c(.02
                 }
              }
         } else {
-            if ( type == 'cvar' ) {
+            if ( type == 'var' ) {
                 for ( i in 1:object$nt ) {
                     ## average conditional variance across iterations
                     mean_var = apply(rstan::extract(object$model_fit)[['H']][ , , i, i], 2, mean )
