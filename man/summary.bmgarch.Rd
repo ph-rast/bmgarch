@@ -14,7 +14,7 @@
 \item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
 }
 \value{
-Named list. model_summary contains summary table for model parameters.
+summary.bmgarch object. A named list containing "meta" and "model_summary". \code{model_summary} contains summary table for all model parameters.
 }
 \description{
 Computes posterior summaries for all parameters of interest for bmgarch objects.
