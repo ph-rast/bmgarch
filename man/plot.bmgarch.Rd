@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{bmgarch object.}
 
-\item{type}{String (Default: "var"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor").}
+\item{type}{String (Default: "mean"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor").}
 
 \item{askNewPage}{Logical (Default: True). Whether to ask for new plotting page.}
 

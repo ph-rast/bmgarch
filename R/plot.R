@@ -1,6 +1,6 @@
 ##' @title Plot 
 ##' @param x bmgarch object.
-##' @param type String (Default: "var"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor"). 
+##' @param type String (Default: "mean"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor"). 
 ##' @param askNewPage Logical (Default: True). Whether to ask for new plotting page.
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' @return plot.bmgarch (Invisibly). List of plots.
