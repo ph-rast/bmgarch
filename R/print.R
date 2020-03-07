@@ -1,3 +1,183 @@
+##' .. content for \description{} (no empty lines) ..
+##'
+##' .. content for \details{} ..
+##' @title 
+##' @param object bmgarch object.
+##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
+##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
+##' @return Named list. model_summary contains summary table for model parameters.
+##' @author Stephen R. Martin
+summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
+    
+    # Parameters for each model
+    common_params <- c("lp__", "nu")
+    arma_params <- c("phi0", "phi", "theta")
+
+    ccc_params <- c("c_h", "a_h", "b_h", "R", "beta", "c_h_var")
+    dcc_params <- c("c_h", "a_h", "b_h", "beta", "c_h_var", "a_q", "b_q", "S")
+    bekk_params <- c("C_R", "C_var", "A", "B")
+    
+    # Meta-data needed for printing
+    # TODO: Revisit this; some can be removed. Kitchen sink for now.
+    metaNames <- c("param", "distribution", "num_dist", "iter", "chains", "elapsed_time", "date", "nt", "TS_length", "TS_names", "RTS_last", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
+    meta <- with(object, mget(metaNames))
+    out <- list()
+    out$meta <- meta
+    out$meta$digits <- digits
+
+    # Get the model summaries. print.summary.bmgarch will process this + meta.
+    params <- switch(object$param,
+                     CCC = c(ccc_params, arma_params, common_params),
+                     DCC = c(dcc_params, arma_params, common_params),
+                     BEKK = c(bekk_params, arma_params, common_params),
+                     pdBEKK = c(bekk_params, arma_params, common_params),
+                     NULL
+                     )
+    if(is.null(params)) {
+        stop("bmgarch object 'param' does not match a supported model. ",
+             object$param, "is not one in ", paste0(supported_models, collapse = ", "), ".")
+    }
+
+    out$model_summary <- .get_stan_summary(object, params, CrI)
+
+    class(out) <- "summary.bmgarch"
+    return(out)
+}
+
+.get_stan_summary <- function(object, params, CrI) {
+    CrI <- c(.5, CrI)
+    cols <- c("mean","sd",paste0(CrI*100, "%"), "n_eff", "Rhat")
+    model_summary <- rstan::summary(object$model_fit, pars = params, probs = CrI)$summary[,cols]
+    colnames(model_summary)[colnames(model_summary) == "50%"] <- "mdn"
+    return(model_summary)
+}
+
+
+print.summary.bmgarch <- function(x, ...) {
+    if(x$meta$param == "CCC") {
+        .print.summary.ccc(x)
+    }
+
+    .print.summary.arma(x)
+}
+
+.print.summary.ccc <- function(bmsum) {
+    # Meta-data
+    cat("Model:", paste0(bmsum$meta$param, "-MGARCH\n"))
+    cat("Basic Specification: ")
+    cat("H_t = D_t R D_t")
+    .newline()
+    .tab()
+    cat("diag(D_t) = sqrt(h_[ii,t]) = c_h + a_h*y^2_[t-1] + b_h*h_[ii, t-1")
+    .newline()
+
+    # Sampling configuration
+    .print.config(bmsum)
+
+    # Get indices for params
+    ms <- bmsum$model_summary
+    ms <- ms[!grepl("c_h$", rownames(ms)),] # Remove c_h; will print c_h_var
+    garch_h_index <- grep("_h", rownames(ms))
+    cond_corr_index <- grep("R", rownames(ms))
+
+    # Settings
+    nt <- bmsum$meta$nt
+    P <- bmsum$meta$mgarchP
+    Q <- bmsum$meta$mgarchQ
+    digits <- bmsum$meta$digits
+
+    cat(paste0("GARCH(", P, ",", Q, ")"), " estimates for conditional variance:")
+    .newline(2)
+
+    # Shortened TS names, if needed.
+    short_names <- abbreviate(bmsum$meta$TS_names, minlength = 2)
+    # Off-diagonals
+    cormat_index <- matrix(1:(nt*nt), nrow = nt)
+    corr_only <- cormat_index[lower.tri(cormat_index)]
+    diag_only <- diag(cormat_index)
+    ## obtain all combinations of TS varnames for A and B in BEKK
+    full_varnames <- expand.grid( short_names, short_names)
+    ## obtain off-diagonal TS varnames
+    od_varnames <- full_varnames[corr_only, ]
+
+    #########
+    # GARCH #
+    #########
+
+    # Change out GARCH param labels
+    rn <- rownames(ms[garch_h_index,])
+    for(i in 1:nt) {
+        replace <- grep(paste0(as.character(i), "\\]"), rn)
+        rn[replace] <- gsub(paste0(as.character(i), "\\]"), paste0(short_names[i]), rn)[replace]
+        rn <- gsub("\\[", "_", rn)
+    }
+    garch_out <- ms[garch_h_index,]
+    rownames(garch_out) <- rn
+
+    ## Print GARCH params
+    print(round(garch_out, digits = digits))
+    .newline(2)
+
+    #####
+    # R #
+    #####
+    cat("Constant correlation (R) coefficients:")
+    .newline(2)
+
+    corr_out <- ms[cond_corr_index[corr_only],]
+    if( nt == 2 ) {
+        tmp <- matrix(corr_out, nrow = 1)
+        rownames(tmp) <- paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
+        colnames(tmp) <- names(corr_out)
+        corr_out <- tmp
+    } else {
+        rownames(corr_out) <- paste( paste0("R_", substr(od_varnames[ ,1], 1, 2) ), substr(od_varnames[ ,2], 1, 2) , sep = '-')
+    }
+    print(round(corr_out, digits = digits))
+    .newline(2)
+}
+
+.print.summary.arma <- function(bmsum) {
+    ms <- bmsum$model_summary
+    if(bmsum$meta$meanstructure == 0) {
+        arma_index <- grep("phi0", rownames(ms))
+    } else {
+        arma_index <- grep("^phi|^theta", rownames(ms))
+    }
+    cat("ARMA(1,1) estimates on the location:")
+    .newline(2)
+    print(round(bmsum$model_summary[arma_index,], digits = bmsum$meta$digits))
+}
+
+.newline <- function(n = 1) {
+    for(i in 1:n) {
+        cat("\n")
+    }
+}
+.tab <- function() {
+    cat("\t")
+}
+.sep <- function() {
+    cat("---")
+    .newline()
+}
+
+.print.config <- function(bmsum) {
+    .newline()
+    cat("Distribution: ", bmsum$meta$distribution)
+    .newline()
+    .sep()
+    cat("Iterations: ", bmsum$meta$iter)
+    .newline()
+    cat("Chains: ", bmsum$meta$chains)
+    .newline()
+    cat("Date: ", bmsum$meta$date)
+    .newline()
+    cat("Elapsed time (min): ", round((max(bmsum$meta$elapsed_time[,1]) + max(bmsum$meta$elapsed_time[,2]))/60, 2))
+    .newline(2)
+    
+}
+
 ##' @title Summary method for BMGARCH object
 ##' @param object bmgarch object.
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
