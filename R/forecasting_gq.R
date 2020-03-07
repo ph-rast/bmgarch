@@ -132,7 +132,7 @@ forecast <- function(object,
         if( plot ) {
             if ( object$meanstructure != 0 ) {                
                 ## Use conditional means plot of bmgarch::plot
-                retro <- plot(object, type = 'means', askNewPage = FALSE, CrI = CrI )
+                retro <- plot(object, type = 'mean', askNewPage = FALSE, CrI = CrI )
                 
                 for( i in seq_len(nt) ) {
                     df <- array( NA, dim = c(standat$T, 3) )
@@ -243,7 +243,7 @@ forecast <- function(object,
         ## Plots
         if( plot ) {
             ## Use conditional variance plot of bmgarch::plot
-            retro <- plot(object, type = 'cvar', askNewPage = FALSE, CrI = CrI)
+            retro <- plot(object, type = 'var', askNewPage = FALSE, CrI = CrI)
 
             ## Loop through nt's
             for(i in seq_len(nt) ) {
@@ -331,7 +331,7 @@ forecast <- function(object,
         ## Plots
         if( plot ) {
             ## Use conditional variance plot of bmgarch::plot
-            retro <- plot(object, type = 'ccor', askNewPage = FALSE, CrI = CrI)
+            retro <- plot(object, type = 'cor', askNewPage = FALSE, CrI = CrI)
 
             ## FOR LOOP HERE with number of correlations (corrs)
             for(i in 1:corrs ) {

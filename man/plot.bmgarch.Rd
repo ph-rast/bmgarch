@@ -4,7 +4,7 @@
 \alias{plot.bmgarch}
 \title{Plot}
 \usage{
-\method{plot}{bmgarch}(x, type = "means", askNewPage = TRUE, CrI = c(0.025, 0.975))
+\method{plot}{bmgarch}(x, type = "mean", askNewPage = TRUE, CrI = c(0.025, 0.975))
 }
 \arguments{
 \item{x}{bmgarch object.}
