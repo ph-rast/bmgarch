@@ -13,6 +13,7 @@
 ##' @importFrom ggplot2 coord_cartesian
 ##' @export
 plot.bmgarch <- function(x, type = "mean", askNewPage =  TRUE, CrI = c(.025, .975)) {
+    object <- x
     plt <- list()
     if ( type == 'mean' ) {
         estimated_mean <- array(NA, dim = c(object$TS_length, object$nt))
