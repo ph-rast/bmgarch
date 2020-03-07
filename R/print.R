@@ -79,6 +79,8 @@ print.summary.bmgarch <- function(x, ...) {
 
     .print.summary.lp(x)
     .newline()
+
+    return(invisible(x))
 }
 
 .print.summary.ccc <- function(bmsum) {
