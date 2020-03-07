@@ -90,9 +90,14 @@ bmgarch <- function(data,
                    standardize_data = FALSE,
                    distribution = 'Student_t',
                    meanstructure = 'constant', ...) {
-    num_dist <- NA
-    if ( distribution == 'Gaussian' ) num_dist <- 0 else {
-            if ( distribution == 'student_t' | distribution == 'Student_t') num_dist <- 1 else warning( '\n\n Specify distribution: Gaussian or Student_t \n\n', immediate. = TRUE) }
+    if ( tolower(distribution) == 'gaussian' ) {
+        num_dist <- 0
+    } else if ( tolower(distribution) == 'student_t' ) {
+        num_dist <- 1
+    } else {
+        stop( '\n\n Specify distribution: Gaussian or Student_t \n\n')
+    }
+
     return_standat <- standat(data, xC, P, Q,  standardize_data, distribution = num_dist, meanstructure )
     stan_data <- return_standat[ c('T', 'xC', 'rts', 'nt', 'distribution', 'P', 'Q', 'meanstructure')]
 
