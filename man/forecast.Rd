@@ -13,7 +13,7 @@ forecast(
   object,
   ahead = 1,
   type = "var",
-  xC_p = NULL,
+  xC = NULL,
   CrI = c(0.025, 0.975),
   seed = NA,
   plot = TRUE,
@@ -27,14 +27,14 @@ forecast(
 
 \item{type}{String (Default: "var"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor").}
 
+\item{xC}{Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).}
+
 \item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 Possible values are .025, .05, .10, .50, .90, .95, and .975}
 
 \item{plot}{Logical (Default: TRUE). Should forecasts be plotted.}
 
 \item{last_t}{Integer (Default: 100). For plotting only. Only show \code{last_t} observations in plot.}
-
-\item{xC}{Predictor for constant covariance.}
 }
 \value{
 Forecasted conditional means, variances and correlations. Forecasts are shown in plots (unless plot = FALSE).

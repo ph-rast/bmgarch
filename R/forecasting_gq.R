@@ -6,7 +6,7 @@
 ##' Time-varying predictors can be included in \code{xC}.
 ##' @param object bmgarch object. The fitted model used for forecasting.
 ##' @param ahead Integer (Default: 1). Periods to be forecasted ahead.
-##' @param xC Predictor for constant covariance.
+##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
 ##' @param type String (Default: "var"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor"). 
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' Possible values are .025, .05, .10, .50, .90, .95, and .975
@@ -24,7 +24,7 @@
 forecast <- function(object,
                      ahead =  1,
                      type =  "var",
-                     xC_p =  NULL,
+                     xC =  NULL,
                      CrI =  c(.025, .975),
                      seed = NA,
                      plot =  TRUE,
