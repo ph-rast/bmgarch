@@ -1,6 +1,7 @@
-##' @title Summary for BMGARCH object
-##' @param object 
-##' @param CrI 
+##' @title Summary method for BMGARCH object
+##' @param object bmgarch object.
+##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
+##' Possible values are .025, .05, .10, .50, .90, .95, and .975
 ##' @return Summary object
 ##' @author Philippe Rast
 ##' @export
