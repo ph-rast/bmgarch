@@ -9,7 +9,8 @@
 supported_models
 }
 \description{
-Models supported by bmgarch
+To be used when checking whether a parameterization or object type is a supported type.
+May facilitate more parameterizations, as we only have to update these, and the switch statements.
 }
 \author{
 Stephen R. Martin

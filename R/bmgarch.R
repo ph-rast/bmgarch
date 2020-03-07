@@ -35,7 +35,7 @@ standat = function(data, xC, P, Q, standardize_data, distribution, meanstructure
         warning("xC is not of right dimension - adapt xC dimension to match number of TS")
     }
 
-    if(standardize_data) {
+    if( standardize_data ) {
     ## Standardize time-series
         stdx <- scale(data)
         centered_data <- attr(stdx, "scaled:center")
@@ -153,6 +153,9 @@ bmgarch <- function(data,
 
 
 #' Models supported by bmgarch
+#'
+#' To be used when checking whether a parameterization or object type is a supported type.
+#' May facilitate more parameterizations, as we only have to update these, and the switch statements.
 #' @keywords internal
 #' @author Stephen R. Martin
 supported_models <- c("DCC", "CCC", "BEKK", "pdBEKK")
