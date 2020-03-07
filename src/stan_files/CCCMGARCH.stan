@@ -110,6 +110,7 @@ generated quantities {
   matrix[nt,T] rts_out;
   real log_lik[T];
   corr_matrix[nt] corH[T];
+  vector<lower=0>[nt] c_h_var = exp(c_h);
 
   // retrodict
 #include /generated/retrodict_H.stan
