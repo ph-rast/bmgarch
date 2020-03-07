@@ -16,22 +16,24 @@ standat = function(data, xC, P, Q, standardize_data, distribution, meanstructure
     ## Model for meanstructure
     if( meanstructure == "constant") {
         meanstructure <- 0
+    } else if ( meanstructure == "arma" ){
+        meanstructure <- 1
     } else {
-        if ( meanstructure == "arma") {
-            meanstructure <- 1
-        }
+        stop("meanstructure must be either 'constant' or 'arma'.")
     }
                                                        
     ## Tests on predictor
     ## Pass in a 0 matrix, so that stan does not complain
-    if ( is.null( xC ) ) xC = matrix(0, nrow = nrow( data ), ncol = ncol( data) )
+    if ( is.null(xC) ) {
+        xC = matrix(0, nrow = nrow(data), ncol = ncol(data))
+    }
     ## Match dimension of predictor to TS. If only one vector is given, it's assumed that it is the same for all TS's
-    if (  is.null( ncol( xC ) ) ) {
+    if ( is.null(ncol(xC)) | ncol(xC) == 1 ) {
         warning("xC is assumed constant across TS's")
-        xC <- matrix( xC, nrow = nrow( data ), ncol = ncol( data)) ## Risky, better to throw an error
-    } else { ## xC is not a vector  - check if it is of right dimension
-        if( dim( xC )[2] != dim( data )[2] ) warning("xC is not of right dimension - adapt xC dimension to match number of TS")
-        }
+        xC <- matrix(xC, nrow = nrow(data), ncol = ncol(data)) ## Risky, better to throw an error
+    } else if ( dim( xC )[2] != dim( data )[2] ) { ## xC is not a vector  - check if it is of right dimension
+        warning("xC is not of right dimension - adapt xC dimension to match number of TS")
+    }
 
     if(standardize_data) {
     ## Standardize time-series
