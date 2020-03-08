@@ -12,6 +12,7 @@
 ##' Possible values are .025, .05, .10, .50, .90, .95, and .975
 ##' @param plot Logical (Default: TRUE). Should forecasts be plotted.
 ##' @param last_t Integer (Default: 100). For plotting only. Only show \code{last_t} observations in plot.
+##' @param seed Integer (Optional). Specify seed for \code{\link[rstan]{sampling}}.
 ##' @return Forecasted conditional means, variances and correlations. Forecasts are shown in plots (unless plot = FALSE).
 ##' Conditional variance and correlation forecasts are appended to the corresponding plots with the estimates over the given period.
 ##' Mean forecasts are appended to the observed values if no meanstructure is estimated (default), otherwise they will be appended
