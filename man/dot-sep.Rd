@@ -7,7 +7,7 @@
 .sep()
 }
 \value{
-Prints "---\n"
+Prints "---" and a new line.
 }
 \description{
 Print helper - Separator, new line

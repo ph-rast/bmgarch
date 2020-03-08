@@ -505,7 +505,7 @@ print.summary.bmgarch <- function(x, ...) {
 }
 
 ##' @title Print helper - Separator, new line
-##' @return Prints "---\n"
+##' @return Prints "---" and a new line.
 ##' @author Stephen R. Martin
 ##' @keywords internal
 .sep <- function() {
