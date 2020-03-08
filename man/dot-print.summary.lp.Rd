@@ -16,6 +16,6 @@ Void.
 Print helper for LP component.
 }
 \author{
-Stephen R. Martin
+Stephen R. Martin, Philippe Rast
 }
 \keyword{internal}

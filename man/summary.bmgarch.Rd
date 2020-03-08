@@ -20,5 +20,5 @@ summary.bmgarch object. A named list containing "meta" and "model_summary". \cod
 Computes posterior summaries for all parameters of interest for bmgarch objects.
 }
 \author{
-Stephen R. Martin
+Stephen R. Martin, Philippe Rast
 }

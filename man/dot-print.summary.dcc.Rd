@@ -16,6 +16,6 @@ Void.
 Print helper for DCC.
 }
 \author{
-Stephen R. Martin
+Stephen R. Martin, Philippe Rast
 }
 \keyword{internal}

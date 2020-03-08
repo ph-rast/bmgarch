@@ -20,6 +20,6 @@ Stan summary for parameters. Columns: mean, sd, mdn, and CrIs.
 Get stan summaries.
 }
 \author{
-Stephen R. Martin
+Stephen R. Martin, Philippe Rast
 }
 \keyword{internal}

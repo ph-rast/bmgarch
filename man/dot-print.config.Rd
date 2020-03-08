@@ -16,6 +16,6 @@ Void.
 Print helper for Sampling Config.
 }
 \author{
-Stephen R. Martin
+Stephen R. Martin, Philippe Rast
 }
 \keyword{internal}

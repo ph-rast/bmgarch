@@ -20,6 +20,6 @@ Void.
 Print helper for CCC.
 }
 \author{
-Stephen R. Martin
+Stephen R. Martin, Philippe Rast
 }
 \keyword{internal}
