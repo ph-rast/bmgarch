@@ -51,7 +51,7 @@ plot.bmgarch <- function(x, type = "mean", askNewPage =  TRUE, CrI = c(.025, .97
                 for( i in 1:(object$nt-1) ) {
                     for( j in (i+1):object$nt ) {
                         cond_corr <- apply(rstan::extract(object$model_fit)[['corH']][ , , i, j], 2, mean )
-                        ci_corr <- apply(rstan::extract(object$model_fit)[['corH']][ , , i, j], 2, bmgarch:::.qtile, CrI )
+                        ci_corr <- apply(rstan::extract(object$model_fit)[['corH']][ , , i, j], 2, .qtile, CrI )
                         df <- data.frame(cond_corr, lower = ci_corr[1,], upper = ci_corr[2,] )
                         df$period <- seq_len( nrow(df) )
                         df[1,] <- NA
@@ -76,7 +76,7 @@ plot.bmgarch <- function(x, type = "mean", askNewPage =  TRUE, CrI = c(.025, .97
                 for ( i in 1:object$nt ) {
                     ## average conditional variance across iterations
                     mean_var = apply(rstan::extract(object$model_fit)[['H']][ , , i, i], 2, mean )
-                    ci_var = apply(rstan::extract(object$model_fit)[['H']][ , , i, i], 2, bmgarch:::.qtile, CrI  )
+                    ci_var = apply(rstan::extract(object$model_fit)[['H']][ , , i, i], 2, .qtile, CrI  )
                     df = data.frame(mean_var, lower = ci_var[1,], upper = ci_var[2,] )
                     df$period = 1:nrow(df)
                     df[1,] = NA
