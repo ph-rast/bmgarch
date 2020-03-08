@@ -19,7 +19,7 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
     
     # Meta-data needed for printing
     # TODO: Revisit this; some can be removed. Kitchen sink for now.
-    metaNames <- c("param", "distribution", "num_dist", "iter", "chains", "elapsed_time", "date", "nt", "TS_length", "TS_names", "RTS_last", "RTS_full", "mgarchQ", "mgarchP", "meanstructure")
+    metaNames <- c("param", "distribution", "num_dist", "iter", "chains", "elapsed_time", "date", "nt", "TS_names", "mgarchQ", "mgarchP", "meanstructure")
     meta <- with(object, mget(metaNames))
     meta$xC <- !all(object$xC == 0)
     out <- list()
