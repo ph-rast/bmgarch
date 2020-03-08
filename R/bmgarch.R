@@ -3,9 +3,8 @@
 #' @param data Time-series data
 #'
 #' @return bmgarch object 
-#' @export
 #' @keywords internal
-standat = function(data, xC, P, Q, standardize_data, distribution, meanstructure){
+standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructure){
 
     if(dim(data)[1] < dim(data)[2]) {
         data = t(data)
