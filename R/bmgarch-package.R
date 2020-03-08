@@ -6,8 +6,6 @@
 #' as forecasted series with corresponding plots. The fitted objects are rstan class objects that can be inspected and manipulated
 #' accordingly.
 #'
-#' @details
-#'
 #' @author Philippe Rast
 #' 
 #' @docType package

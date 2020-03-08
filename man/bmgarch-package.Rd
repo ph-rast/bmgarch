@@ -12,9 +12,6 @@ CCC(Q,P), and BEKK(Q,P) with arbitrary lags defined in Q, and P. The package pro
 as forecasted series with corresponding plots. The fitted objects are rstan class objects that can be inspected and manipulated
 accordingly.
 }
-\details{
-
-}
 \references{
 Stan Development Team (2018). RStan: the R interface to Stan. R package version 2.18.2. http://mc-stan.org
 }
