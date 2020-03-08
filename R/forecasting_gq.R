@@ -31,7 +31,7 @@ forecast <- function(object,
                      last_t =  100) {
 
     ## Define a 0 array as the stan models need some non-null matrix
-    if( is.null( xC_p ) ) xC <- array( rep(0, object$nt),  dim = c(ahead,  object$nt ) )
+    if( is.null( xC ) ) xC <- array( rep(0, object$nt),  dim = c(ahead,  object$nt ) )
 
     ## obtain data to be passed to gqs
     standat <-  list(T = object$TS_length,
