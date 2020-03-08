@@ -14,6 +14,7 @@
 ##' @return Matrix of observations.
 ##' @author Stephen R. Martin
 ##' @keywords internal
+##' @importFrom stats rnorm
 .sim.bekk <- function(N,C,A,B, phi = NULL, theta = NULL) {
     if(ncol(C) != nrow(C)){
         stop("C must be symmetric, square, PD.")

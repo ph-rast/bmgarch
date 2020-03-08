@@ -11,6 +11,8 @@
 ##' @importFrom ggplot2 aes
 ##' @importFrom ggplot2 labs
 ##' @importFrom ggplot2 coord_cartesian
+##' @importFrom graphics plot
+##' @importFrom grDevices devAskNewPage
 ##' @export
 plot.bmgarch <- function(x, type = "mean", askNewPage =  TRUE, CrI = c(.025, .975)) {
     object <- x
