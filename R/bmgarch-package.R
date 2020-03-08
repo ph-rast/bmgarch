@@ -10,7 +10,6 @@
 #' 
 #' @docType package
 #' @name bmgarch-package
-#' @aliases bmgarch
 #' @useDynLib bmgarch, .registration = TRUE
 #' @import methods
 #' @import Rcpp

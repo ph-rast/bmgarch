@@ -3,7 +3,6 @@
 \docType{package}
 \name{bmgarch-package}
 \alias{bmgarch-package}
-\alias{bmgarch}
 \title{The 'bmgarch' package.}
 \description{
 The *bmgrach* package fits Bayesian mutivariate GARCH models specified via stan,
