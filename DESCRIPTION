@@ -15,7 +15,7 @@ Authors@R: c( person(given = "Philippe",
            family = "Rodriguez",
            role = c("ctb"),
            email = "josue.rodriguez594@gmail.com"))
-Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. The fitted models are rstan objects and can be passed examined with rstan functions.  
+Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. The fitted models are rstan objects and can be examined with rstan functions.  
 License: GPL (>=3)
 Depends: 
     methods,
