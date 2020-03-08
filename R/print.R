@@ -5,7 +5,7 @@
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
 ##' @return summary.bmgarch object. A named list containing "meta" and "model_summary". \code{model_summary} contains summary table for all model parameters.
-##' @author Stephen R. Martin
+##' @author Stephen R. Martin, Philippe Rast
 ##' @export
 summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
     
@@ -50,7 +50,7 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
 ##' @param params Character vector. Names of params to pull from stan summary.
 ##' @param CrI Numeric vector (length 2).
 ##' @return Stan summary for parameters. Columns: mean, sd, mdn, and CrIs.
-##' @author Stephen R. Martin
+##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .get_stan_summary <- function(object, params, CrI) {
     CrI <- c(.5, CrI)
@@ -99,7 +99,7 @@ print.summary.bmgarch <- function(x, ...) {
 ##' @param x bmgarch.summary object.
 ##' @param ... Not used.
 ##' @return Void.
-##' @author Stephen R. Martin
+##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .print.summary.ccc <- function(bmsum) {
     # Meta-data
@@ -180,7 +180,7 @@ print.summary.bmgarch <- function(x, ...) {
 ##' @title Print helper for DCC.
 ##' @param bmsum summary.bmgarch object.
 ##' @return Void.
-##' @author Stephen R. Martin
+##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .print.summary.dcc <- function(bmsum) {
     # Meta-data
@@ -281,7 +281,7 @@ print.summary.bmgarch <- function(x, ...) {
 ##' @title Print helper for BEKK/pdBEKK.
 ##' @param bmsum summary.bmgarch object.
 ##' @return Void.
-##' @author Stephen R. Martin
+##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .print.summary.bekk <- function(bmsum) {
     # Meta-data
@@ -400,7 +400,7 @@ print.summary.bmgarch <- function(x, ...) {
 ##' @title Print helper for ARMA component.
 ##' @param bmsum summary.bmgarch object.
 ##' @return Void.
-##' @author Stephen R. Martin
+##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .print.summary.arma <- function(bmsum) {
     ms <- bmsum$model_summary
@@ -417,7 +417,7 @@ print.summary.bmgarch <- function(x, ...) {
 ##' @title Print helper for beta component.
 ##' @param bmsum summary.bmgarch object.
 ##' @return Void.
-##' @author Stephen R. Martin
+##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .print.summary.beta <- function(bmsum) {
 
@@ -465,7 +465,7 @@ print.summary.bmgarch <- function(x, ...) {
 ##' @title Print helper for nu component.
 ##' @param bmsum summary.bmgarch object.
 ##' @return Void.
-##' @author Stephen R. Martin
+##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .print.summary.nu <- function(bmsum) {
     nu <- bmsum$model_summary["nu",]
@@ -477,7 +477,7 @@ print.summary.bmgarch <- function(x, ...) {
 ##' @title Print helper for LP component.
 ##' @param bmsum summary.bmgarch object.
 ##' @return Void.
-##' @author Stephen R. Martin
+##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .print.summary.lp <- function(bmsum) {
     cat("Log density posterior estimate:")
@@ -516,7 +516,7 @@ print.summary.bmgarch <- function(x, ...) {
 ##' @title Print helper for Sampling Config.
 ##' @param bmsum summary.bmgarch object.
 ##' @return Void.
-##' @author Stephen R. Martin
+##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .print.config <- function(bmsum) {
     .newline()
