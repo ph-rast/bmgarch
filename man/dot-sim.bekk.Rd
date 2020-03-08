@@ -29,6 +29,7 @@ Simulates time series data from specified BEKK model.
 Simulates timeseries data from specified BEKK model.
 Number of time series computed from the number of columns in C.
 All matrices must be of the same dimension.
+If ARMA parameters (phi, theta) unspecified (NULL), then assumes a constant mean of zero.
 }
 \author{
 Stephen R. Martin
