@@ -1,4 +1,4 @@
-##' %@title Forecasting mean and variance 
+##' @title Forecasting mean and variance 
 ##' @param object Fitted bmgarch object
 ##' @param ahead Periods to be forecasted ahead
 ##' @param xC_p Predictor for H

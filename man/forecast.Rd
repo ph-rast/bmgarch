@@ -2,7 +2,7 @@
 % Please edit documentation in R/forecasting_gq.R
 \name{forecast}
 \alias{forecast}
-\title{%@title Forecasting mean and variance}
+\title{Forecasting mean and variance}
 \usage{
 forecast(
   object,
@@ -38,7 +38,7 @@ Mean forecasts are appended to the observed values if no meanstructure is estima
 to the esimated means.
 }
 \description{
-%@title Forecasting mean and variance
+Forecasting mean and variance
 }
 \author{
 philippe
