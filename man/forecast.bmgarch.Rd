@@ -3,12 +3,7 @@
 \name{forecast.bmgarch}
 \alias{forecast.bmgarch}
 \alias{forecast}
-\title{Forecasting mean and variance
-
-Forecasts the (conditional) mean and conditional variance.
-
-\code{forecast} takes a fitted \code{bmgarch} object, and predicts the next \code{ahead} means and variances, with uncertainty.
-Time-varying predictors can be included in \code{xC}.}
+\title{Forecast method for bmgarch objects.}
 \usage{
 \method{forecast}{bmgarch}(
   object,
@@ -46,10 +41,9 @@ Mean forecasts are appended to the observed values if no meanstructure is estima
 to the esimated means.
 }
 \description{
-Forecasting mean and variance
-
-Forecasts the (conditional) mean and conditional variance.
-
+Forecasts the (conditional) means, conditional variances, and conditional correlations.
+}
+\details{
 \code{forecast} takes a fitted \code{bmgarch} object, and predicts the next \code{ahead} means and variances, with uncertainty.
 Time-varying predictors can be included in \code{xC}.
 }

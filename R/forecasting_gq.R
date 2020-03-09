@@ -1,9 +1,8 @@
-##' @title Forecasting mean and variance
-##'
-##' Forecasts the (conditional) mean and conditional variance.
+##' Forecasts the (conditional) means, conditional variances, and conditional correlations.
 ##'
 ##' \code{forecast} takes a fitted \code{bmgarch} object, and predicts the next \code{ahead} means and variances, with uncertainty.
 ##' Time-varying predictors can be included in \code{xC}.
+##' @title Forecast method for bmgarch objects.
 ##' @param object bmgarch object. The fitted model used for forecasting.
 ##' @param ahead Integer (Default: 1). Periods to be forecasted ahead.
 ##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
