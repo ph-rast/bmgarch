@@ -21,8 +21,11 @@
 ##' @importFrom ggplot2 geom_point
 ##' @importFrom ggplot2 geom_errorbar
 ##' @importFrom ggplot2 aes_string
+##' @importFrom forecast forecast
+##' @export forecast
+##' @aliases forecast
 ##' @export
-forecast <- function(object,
+forecast.bmgarch <- function(object,
                      ahead =  1,
                      type =  "var",
                      xC =  NULL,
