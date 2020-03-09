@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{plot.bmgarch}
 \alias{plot.bmgarch}
-\title{Plot}
+\title{Plot method for bmgarch objects.}
 \usage{
 \method{plot}{bmgarch}(x, type = "mean", askNewPage = TRUE, CrI = c(0.025, 0.975))
 }
@@ -19,7 +19,7 @@
 plot.bmgarch (Invisibly). List of plots.
 }
 \description{
-Plot
+Plot method for bmgarch objects.
 }
 \author{
 Philippe Rast

@@ -1,4 +1,4 @@
-##' @title Plot 
+##' @title Plot method for bmgarch objects.
 ##' @param x bmgarch object.
 ##' @param type String (Default: "mean"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor"). 
 ##' @param askNewPage Logical (Default: True). Whether to ask for new plotting page.
