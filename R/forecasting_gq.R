@@ -369,3 +369,23 @@ forecast.bmgarch <- function(object,
         return( forecasted_R )
     }
 }
+
+# TODO
+print.forecast.bmgarch <- function(x, ...) {
+    
+}
+
+# TODO
+summary.forecast.bmgarch <- function(object, ...) {
+    
+}
+
+# TODO
+plot.forecast.bmgarch <- function(x, ...) {
+    
+}
+
+# TODO: Refactor this. I think we can have a forecast-object like object.
+# - forecast should return list of stuff (See `forecast`).
+# - Anything needed for plotting should be saved there.
+# - Print and summary method should both just return the predictions specified by 'type'
