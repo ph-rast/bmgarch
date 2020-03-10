@@ -75,6 +75,11 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
     
 }
 
+# TODO: Implement this. Should just do backcasting (i.e., get the estimated rts/cor/var at each time.) Structure it similarly to how forecast does it. Should allow us to combine together.
+fitted.bmgarch <- function(object, ...) {
+    
+}
+
 ##' Forecasts the (conditional) means, conditional variances, and conditional correlations.
 ##'
 ##' \code{forecast} takes a fitted \code{bmgarch} object, and predicts the next \code{ahead} means and variances, with uncertainty.
