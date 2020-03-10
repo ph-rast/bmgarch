@@ -99,6 +99,20 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
     if(object$param != CCC) {
         f.cor <- f.cor[-c(1:backcast), , , drop = FALSE]
     }
+
+    out <- list()
+    out$mean <- f.mean
+    out$var <- f.var
+    out$cor <- f.cor
+    out$xC <- xC
+
+    metaNames <- c("param", "distribution", "num_dist", "nt", "TS_length", "TS_names", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
+    meta <- with(object, mget(metaNames))
+    out$meta <- meta
+
+    class(out) <- "forecast.bmgarch"
+    return(out)
+
 }
 
 .stan_sum_to_array <- function(ssum) {
