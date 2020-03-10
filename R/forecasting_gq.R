@@ -43,6 +43,9 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
 
     backcast <- max(object$mgarchP, object$mgarchQ)
     nt <- object$nt
+    cast_start <- (object$TS_length - backcast + 1)
+    forecast_start <- (object$TS_length + 1)
+    forecast_end <- (object$TS_length + ahead)
 
     # TODO: Limit pars to only what is needed (H_p, R/R_p, rts_p, mu_p)
     forecasted <- rstan::gqs(gqs_model,
@@ -59,8 +62,11 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
     }
 
     # Restructure to array
+    stan_sum_cols <- colnames(f.mean)
     f.mean <- array(f.mean, dim = c(nt, backcast + ahead , ncol(f.mean)))
     f.mean <- aperm(f.mean, c(2,3,1))
+    dimnames(f.mean) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = object$TS_names)
+
     
     
 }
