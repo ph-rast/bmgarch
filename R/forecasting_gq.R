@@ -93,8 +93,12 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
         dimnames(f.cor) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = f.cor.indices.L.labels)
     }
 
-    
-    
+    # Remove backcasts from forecasts.
+    f.mean <- f.mean[-c(1:backcast), , , drop = FALSE]
+    f.var <- f.var[-c(1:backcast), , , drop = FALSE]
+    if(object$param != CCC) {
+        f.cor <- f.cor[-c(1:backcast), , , drop = FALSE]
+    }
 }
 
 .stan_sum_to_array <- function(ssum) {
