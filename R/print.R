@@ -46,7 +46,7 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
 }
 
 ##' @title Get stan summaries.
-##' @param object bmgarch object.
+##' @param model_fit stanfit object.
 ##' @param params Character vector. Names of params to pull from stan summary.
 ##' @param CrI Numeric vector (length 2).
 ##' @return Stan summary for parameters. Columns: mean, sd, mdn, and CrIs.

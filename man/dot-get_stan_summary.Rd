@@ -4,10 +4,10 @@
 \alias{.get_stan_summary}
 \title{Get stan summaries.}
 \usage{
-.get_stan_summary(object, params, CrI)
+.get_stan_summary(model_fit, params, CrI)
 }
 \arguments{
-\item{object}{bmgarch object.}
+\item{model_fit}{stanfit object.}
 
 \item{params}{Character vector. Names of params to pull from stan summary.}
 
