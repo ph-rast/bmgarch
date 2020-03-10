@@ -1,3 +1,74 @@
+# TODO: Refactor this. I think we can have a forecast-object like object.
+# - forecast should return list of stuff (See `forecast`).
+# - Anything needed for plotting should be saved there.
+# - Print and summary method should both just return the predictions specified by 'type'
+# - out$x should be a list of predictions. This should include BOTH backcasts (1:N) and forecasts ((N+1):(N+ahead)), perhaps with a code for whether it was backcast or forecast.
+# - Also include original time series data, for plotting purposes.
+# - Include the time period (1:(N + ahead)) as a column as well.
+# - Should contain meta-data about the model, ahead.
+# - out$x${mean, var}$tsname$matrix(1:(N+ahead), cols)?
+# - out$x${mean, var}$array(1:(N + ahead), cols, tsname)
+# - out$x$cor$array(1:(N + ahead), cols, cor_name)
+
+forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), seed = NA) {
+
+    # Define a 0 array for stan.
+    if(is.null(xC)) {
+        xC <- array(0, dim = c(ahead, object$nt))
+    }
+
+    # Get stan data
+    standat <- list(T = object$TS_length,
+                     nt = object$nt,
+                     rts = cbind(object$RTS_full),
+                     xC = object$xC,
+                     Q =  object$mgarchQ,
+                     P =  object$mgarchP,
+                     ahead =  ahead, 
+                     meanstructure =  object$meanstructure,
+                     distribution =  object$num_dist,
+                     xC_p =  xC)
+
+    gqs_model <- switch(object$param,
+                        DCC = stanmodels$forecastDCC,
+                        CCC = stanmodels$forecastCCC,
+                        BEKK = stanmodels$forecastBEKK,
+                        pdBEKK = stanmodels$forecastBEKK,
+                        NULL)
+
+    if(is.null(gqs_model)) {
+        stop("bmgarch object 'param' does not match a supported model. ",
+             object$param, "is not one in ", paste0(supported_models, collapse = ", "), ".")
+    }
+
+    backcast <- max(object$mgarchP, object$mgarchQ)
+    nt <- object$nt
+
+    # TODO: Limit pars to only what is needed (H_p, R/R_p, rts_p, mu_p)
+    forecasted <- rstan::gqs(gqs_model,
+                             draws = as.matrix(object$model_fit),
+                             data = standat,
+                             seed = seed)
+
+    # Get stan summaries for forecasted values.
+    f.mean <- .get_stan_summary(forecasted, "rts_p", CrI)
+    f.var <- .get_stan_summary(forecasted, "H_p", CrI)
+    f.cor <- NA
+    if(object$param != "CCC") {
+        f.cor <- .get_stan_summary(forecasted, "R_p", CrI)
+    }
+
+    # Restructure to array
+    f.mean <- array(f.mean, dim = c(nt, backcast + ahead , ncol(f.mean)))
+    f.mean <- aperm(f.mean, c(2,3,1))
+    
+    
+}
+
+.stan_sum_to_array <- function(ssum) {
+    
+}
+
 ##' Forecasts the (conditional) means, conditional variances, and conditional correlations.
 ##'
 ##' \code{forecast} takes a fitted \code{bmgarch} object, and predicts the next \code{ahead} means and variances, with uncertainty.
@@ -24,7 +95,7 @@
 ##' @export forecast
 ##' @aliases forecast
 ##' @export
-forecast.bmgarch <- function(object,
+forecast.bmgarch.old <- function(object,
                      ahead =  1,
                      type =  "var",
                      xC =  NULL,
@@ -385,7 +456,11 @@ plot.forecast.bmgarch <- function(x, ...) {
     
 }
 
-# TODO: Refactor this. I think we can have a forecast-object like object.
-# - forecast should return list of stuff (See `forecast`).
-# - Anything needed for plotting should be saved there.
-# - Print and summary method should both just return the predictions specified by 'type'
+as.data.frame.forecast.bmgarch <- function(x, ...) {
+    
+}
+
+as.matrix.forecast.bmgarch <- function(x, ...) {
+    
+}
+
