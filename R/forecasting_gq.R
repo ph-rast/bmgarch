@@ -62,12 +62,19 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
     }
 
     # Restructure to array
+    ## f.mean
     stan_sum_cols <- colnames(f.mean)
     f.mean <- array(f.mean, dim = c(nt, backcast + ahead , ncol(f.mean)))
     f.mean <- aperm(f.mean, c(2,3,1))
     dimnames(f.mean) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = object$TS_names)
 
-    
+    ## f.var
+    ### Pull out indices for [period, a, a]
+    f.var.indices <- grep("H_p\\[[[:digit:]]+,([[:digit:]]+),\\1]", rownames(f.var), value = TRUE)
+    f.var <- f.var[f.var.indices,]
+    f.var <- array(f.var, dim = c(nt, backcast + ahead, ncol(f.var)))
+    f.var <- aperm(f.var, c(2, 3, 1))
+    dimnames(f.var) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = object$TS_names)
     
 }
 
