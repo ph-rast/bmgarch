@@ -75,6 +75,25 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
     f.var <- array(f.var, dim = c(nt, backcast + ahead, ncol(f.var)))
     f.var <- aperm(f.var, c(2, 3, 1))
     dimnames(f.var) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = object$TS_names)
+
+    ## f.cor
+    if(object$param != "CCC") {
+        # Lower-triangular indices
+        f.cor.indices.L <- which(lower.tri(matrix(0, nt, nt)), arr.ind = TRUE)
+        # Labels mapping to TS names
+        f.cor.indices.L.labels <- paste0(object$TS_names[f.cor.indices.L[,1]], "_", object$TS_names[f.cor.indices.L[,2]])
+        # Indices as "a,b"
+        f.cor.indices.L.char <- paste0(f.cor.indices.L[,1], ",", f.cor.indices.L[,2])
+        # Indicices as "[period,a,b]"
+        f.cor.indices.L.all <- paste0("R_p[",1:(backcast + ahead), ",", rep(f.cor.indices.L.char, each = (backcast + ahead)),"]")
+        # Get only these elements.
+        f.cor <- f.cor[f.cor.indices.L.all,]
+        f.cor <- array(f.cor, dim = c(backcast + ahead, length(f.cor.indices.L.char), ncol(f.cor)))
+        f.cor <- aperm(f.cor, c(1, 3, 2))
+        dimnames(f.cor) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = f.cor.indices.L.labels)
+    }
+
+    
     
 }
 
