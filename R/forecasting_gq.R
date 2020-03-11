@@ -125,12 +125,13 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
 ##' @title Fitted (backcasting) method for bmgarch objects.
 ##' @param object bmgarch object.
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
+##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
 ##' @param ... Not used.
 ##' @return 
 ##' @author Stephen R. Martin
 ##' @importFrom stats fitted
 ##' @export
-fitted.bmgarch <- function(object, CrI = c(.025, .975), ...) {
+fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
     nt <- object$nt
     TS_length <- object$TS_length
 
@@ -183,6 +184,7 @@ fitted.bmgarch <- function(object, CrI = c(.025, .975), ...) {
     metaNames <- c("param", "distribution", "num_dist", "nt", "TS_length", "TS_names", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
     meta <- with(object, mget(metaNames))
     out$meta <- meta
+    out$meta$digits <- digits
 
     class(out) <- "fitted.bmgarch"
     return(out)
@@ -590,17 +592,17 @@ print.forecast.bmgarch <- function(x, ...) {
     .newline(2)
     for(t in 1:nt) {
         cat(TS_names[t], ":")
-        print(round(x$forecast$var[,,t], digits))
         .newline()
+        print(round(x$forecast$var[,,t], digits))
     }
     # Cors
     if(x$meta$param != "CCC") {
         cat("[Correlation]", "Forecast for", ahead, "ahead:")
         .newline(2)
-        for(t in 1:nt) {
+        for(t in 1:(nt*(nt - 1) / 2)) {
             cat(dimnames(x$forecast$cor)[[3]][t], ":")
-            print(round(x$forecast$cor[,,t], digits))
             .newline()
+            print(round(x$forecast$cor[,,t], digits))
         }
     }
 
@@ -609,7 +611,45 @@ print.forecast.bmgarch <- function(x, ...) {
 
 # TODO: Similar to above.
 print.fitted.bmgarch <- function(object, ...) {
-    
+    TS_length <- object$meta$TS_length
+    nt <- object$meta$nt
+    TS_names <- object$meta$TS_names
+    digits <- object$meta$digits
+
+    # Mean structure
+    if(object$meta$meanstructure == 1) {
+        .sep()
+        cat("[Mean]", "Fitted values:")
+        .newline(2)
+        for(t in 1:nt) {
+            cat(TS_names[t], ":")
+            .newline()
+            print(round(object$backcast$mean[,,t], digits))
+        }
+    }
+
+    # Variance
+    .sep()
+    cat("[Variance]", "Fitted values:")
+    .newline(2)
+    for(t in 1:nt) {
+        cat(TS_names[t], ":")
+        .newline()
+        print(round(object$backcast$var[,,t], digits))
+    }
+
+    # Cors
+    if(x$meta$param != "CCC") {
+        cat("[Correlation]", "Fitted values:")
+        .newline(2)
+        for(t in 1:(nt*(nt - 1) / 2)) {
+            cat(dimnames(object$backcast$cor)[[3]][t], ":")
+            .newline()
+            print(round(object$backcast$cor[,,t], digits))
+        }
+    }
+
+    return(invisible(object))
 }
 
 # TODO Not sure if necessary.
