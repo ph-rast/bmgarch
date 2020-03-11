@@ -562,7 +562,6 @@ fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
 #    }
 #}
 
-# TODO
 ##' @title Print method for forecast.bmgarch objects.
 ##' @param x forecast.bmgarch object. See \code{\link{forecast.bmgarch}}
 ##' @param ... Not used.
@@ -658,15 +657,6 @@ print.fitted.bmgarch <- function(object, ...) {
     return(invisible(object))
 }
 
-# TODO Not sure if necessary.
-summary.forecast.bmgarch <- function(object, ...) {
-    
-}
-
-# TODO
-plot.forecast.bmgarch <- function(x, ...) {
-    
-}
 ##' Helper function for as.data.frame.{fitted, forecast}. Converts predictive array to data.frame.
 ##' 
 ##' 
@@ -698,7 +688,13 @@ plot.forecast.bmgarch <- function(x, ...) {
     return(df)
 }
 
-# Should create something tidy-like. Mainly, rbinding back/forecast, and adding columns for param, period, etc. 
+##' @title as.data.frame method for forecast.bmgarch objects.
+##' @param x forecast.bmgarch object.
+##' @param backcast Logical (Default: True). Whether to include "backcasted" values from \code{\link{fitted.bmgarch}} in data frame.
+##' @param ... Not used.
+##' @return Data frame.
+##' @author Stephen R. Martin
+##' @export
 as.data.frame.forecast.bmgarch <- function(x, backcast = TRUE, ...) {
 
     # Forecast
@@ -744,7 +740,12 @@ as.data.frame.forecast.bmgarch <- function(x, backcast = TRUE, ...) {
 
 }
 
-# TODO: Similar to above.
+##' @title as.data.frame method for fitted.bmgarch objects.
+##' @param x fitted.bmgarch object.
+##' @param ... Not used.
+##' @return Data frame.
+##' @author Stephen R. Martin
+##' @export
 as.data.frame.fitted.bmgarch <- function(x, ...) {
     dfList <- list()
 
@@ -775,9 +776,3 @@ as.data.frame.fitted.bmgarch <- function(x, ...) {
     return(df)
 
 }
-
-# Not sure if necessary (or feasible, since doing so requires mixed types.)
-as.matrix.forecast.bmgarch <- function(x, ...) {
-    
-}
-
