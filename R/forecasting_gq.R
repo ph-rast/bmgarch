@@ -5,13 +5,14 @@
 ##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' @param seed Integer (Optional). Specify seed for \code{\link[rstan]{sampling}}.
+##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
 ##' @return forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data. See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
 ##' \code{forecast} is a list of four components. Three components (mean, var, cor) contain forecasted values in arrays. mean and var are structured as \code{[N, 7, TS]} arrays, where \code{N} is length of the time series, and \code{TS} is the number of time series. \code{cor} is structured as \code{[N, 7, TS_TS]}, where \code{TS_TS} represents a (lower triangular) correlation. All arguments are named. E.g., \code{forecasted$forecast$cor[, , "tsB_tsA"]} would the forecasted values for the correlation between the two time series, "tsB" and "tsA".
 ##' @author Stephen R. Martin
 ##' @importFrom forecast forecast
 ##' @export forecast
 ##' @export
-forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), seed = NA) {
+forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), seed = NA, digits = 2) {
 
     # Define a 0 array for stan.
     if(is.null(xC)) {
@@ -110,6 +111,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
     metaNames <- c("param", "distribution", "num_dist", "nt", "TS_length", "TS_names", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
     meta <- with(object, mget(metaNames))
     out$meta <- meta
+    out$meta$digits <- digits
 
     out$backcast <- fitted.bmgarch(object, CrI)$backcast
 
@@ -560,7 +562,44 @@ fitted.bmgarch <- function(object, CrI = c(.025, .975), ...) {
 
 # TODO
 print.forecast.bmgarch <- function(x, ...) {
-    
+    ahead <- x$forecast$meta$TS_length
+    nt <- x$meta$nt
+    TS_names <- x$meta$TS_names
+    digits <- x$meta$digits
+
+    # Mean structure
+    if(x$meta$meanstructure == 1) {
+        .sep()
+        cat("[Mean]", "Forecast for", ahead, "ahead:")
+        .newline(2)
+        for(t in 1:nt) {
+            cat(TS_names[t], ":")
+            .newline()
+            print(round(x$forecast$mean[,,t], digits))
+        }
+    }
+
+    # Variance
+    .sep()
+    cat("[Variance]", "Forecast for", ahead, "ahead:")
+    .newline(2)
+    for(t in 1:nt) {
+        cat(TS_names[t], ":")
+        print(round(x$forecast$var[,,t], digits))
+        .newline()
+    }
+    # Cors
+    if(x$meta$param != "CCC") {
+        cat("[Correlation]", "Forecast for", ahead, "ahead:")
+        .newline(2)
+        for(t in 1:nt) {
+            cat(dimnames(x$forecast$cor)[[3]][t], ":")
+            print(round(x$forecast$cor[,,t], digits))
+            .newline()
+        }
+    }
+
+    return(invisible(x))
 }
 
 # TODO
