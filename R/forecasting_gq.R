@@ -746,7 +746,34 @@ as.data.frame.forecast.bmgarch <- function(x, backcast = TRUE, ...) {
 
 # TODO: Similar to above.
 as.data.frame.fitted.bmgarch <- function(x, ...) {
-    
+    dfList <- list()
+
+    if(x$meta$meanstructure == 1) {
+        dfList$backcast.mean <- .pred_array_to_df(x$backcast$mean, "backcast", "mean")
+    }
+
+    dfList$backcast.var <- .pred_array_to_df(x$backcast$var, "backcast", "var")
+
+    if(x$meta$param != "CCC") {
+        dfList$backcast.cor <- .pred_array_to_df(x$backcast$cor, "backcast", "cor")
+    }
+
+    # Combine
+    df <- do.call(rbind, dfList)
+
+    # Re-order columns: period TS | type | param
+    desc <- c("period","TS","type","param")
+    cn <- colnames(df)
+    cn_not_desc <- cn[!(cn %in% desc)]
+    df <- df[,c(desc, cn_not_desc)]
+
+    # Sort
+    df <- df[with(df, order(param, TS, period)),]
+
+    rownames(df) <- NULL
+
+    return(df)
+
 }
 
 # Not sure if necessary (or feasible, since doing so requires mixed types.)
