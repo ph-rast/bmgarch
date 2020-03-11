@@ -39,23 +39,23 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
              object$param, "is not one in ", paste0(supported_models, collapse = ", "), ".")
     }
 
-    out$model_summary <- .get_stan_summary(object, params, CrI)
+    out$model_summary <- .get_stan_summary(object$model_fit, params, CrI)
 
     class(out) <- "summary.bmgarch"
     return(out)
 }
 
 ##' @title Get stan summaries.
-##' @param object bmgarch object.
+##' @param model_fit stanfit object.
 ##' @param params Character vector. Names of params to pull from stan summary.
 ##' @param CrI Numeric vector (length 2).
 ##' @return Stan summary for parameters. Columns: mean, sd, mdn, and CrIs.
 ##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
-.get_stan_summary <- function(object, params, CrI) {
+.get_stan_summary <- function(model_fit, params, CrI) {
     CrI <- c(.5, CrI)
     cols <- c("mean","sd",paste0(CrI*100, "%"), "n_eff", "Rhat")
-    model_summary <- rstan::summary(object$model_fit, pars = params, probs = CrI)$summary[,cols]
+    model_summary <- rstan::summary(model_fit, pars = params, probs = CrI)$summary[,cols]
     colnames(model_summary)[colnames(model_summary) == "50%"] <- "mdn"
     return(model_summary)
 }

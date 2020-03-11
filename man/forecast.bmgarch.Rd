@@ -2,51 +2,37 @@
 % Please edit documentation in R/forecasting_gq.R
 \name{forecast.bmgarch}
 \alias{forecast.bmgarch}
-\alias{forecast}
 \title{Forecast method for bmgarch objects.}
 \usage{
 \method{forecast}{bmgarch}(
   object,
   ahead = 1,
-  type = "var",
   xC = NULL,
   CrI = c(0.025, 0.975),
   seed = NA,
-  plot = TRUE,
-  last_t = 100
+  digits = 2
 )
 }
 \arguments{
-\item{object}{bmgarch object. The fitted model used for forecasting.}
+\item{object}{bmgarch object.}
 
 \item{ahead}{Integer (Default: 1). Periods to be forecasted ahead.}
 
-\item{type}{String (Default: "var"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor").}
-
 \item{xC}{Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).}
 
-\item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
-Possible values are .025, .05, .10, .50, .90, .95, and .975}
+\item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
 
 \item{seed}{Integer (Optional). Specify seed for \code{\link[rstan]{sampling}}.}
 
-\item{plot}{Logical (Default: TRUE). Should forecasts be plotted.}
-
-\item{last_t}{Integer (Default: 100). For plotting only. Only show \code{last_t} observations in plot.}
+\item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
 }
 \value{
-Forecasted conditional means, variances and correlations. Forecasts are shown in plots (unless plot = FALSE).
-Conditional variance and correlation forecasts are appended to the corresponding plots with the estimates over the given period.
-Mean forecasts are appended to the observed values if no meanstructure is estimated (default), otherwise they will be appended
-to the esimated means.
+forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data. See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
+\code{forecast} is a list of four components. Three components (mean, var, cor) contain forecasted values in arrays. mean and var are structured as \code{[N, 7, TS]} arrays, where \code{N} is length of the time series, and \code{TS} is the number of time series. \code{cor} is structured as \code{[N, 7, TS_TS]}, where \code{TS_TS} represents a (lower triangular) correlation. All arguments are named. E.g., \code{forecasted$forecast$cor[, , "tsB_tsA"]} would the forecasted values for the correlation between the two time series, "tsB" and "tsA".
 }
 \description{
-Forecasts the (conditional) means, conditional variances, and conditional correlations.
-}
-\details{
-\code{forecast} takes a fitted \code{bmgarch} object, and predicts the next \code{ahead} means and variances, with uncertainty.
-Time-varying predictors can be included in \code{xC}.
+Estimates forecasted means, variances, and correlations from a fitted bmgarch model.
 }
 \author{
-Philippe Rast, Stephen R. Martin
+Stephen R. Martin
 }
