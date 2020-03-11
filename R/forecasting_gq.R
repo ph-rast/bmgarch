@@ -97,7 +97,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
     # Remove backcasts from forecasts.
     f.mean <- f.mean[-c(1:backcast), , , drop = FALSE]
     f.var <- f.var[-c(1:backcast), , , drop = FALSE]
-    if(object$param != CCC) {
+    if(object$param != "CCC") {
         f.cor <- f.cor[-c(1:backcast), , , drop = FALSE]
     }
 
