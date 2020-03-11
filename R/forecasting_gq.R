@@ -115,14 +115,62 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
 
 }
 
-.stan_sum_to_array <- function(ssum) {
-    
-}
-
-# TODO: Implement this. Should just do backcasting (i.e., get the estimated rts/cor/var at each time.) Structure it similarly to how forecast does it. Should allow us to combine together.
-fitted.bmgarch <- function(object, ...) {
+fitted.bmgarch <- function(object, CrI = c(.025, .975), ...) {
     nt <- object$nt
+    TS_length <- object$TS_length
 
+    b.mean <- .get_stan_summary(object$model_fit, "mu", CrI)
+    b.var <- .get_stan_summary(object$model_fit, "H", CrI)
+    b.cor <- NA
+    if(object$param != "CCC") {
+        ## In forecast stan, R is the same as corH.
+        ## In DCC, corH is the same as R also.
+        ## Not worth changing the stan files to be consistent, since structures are the same.
+        b.cor <- .get_stan_summary(object$model_fit, "corH", CrI)
+    }
+
+    # Restructure
+    ## b.mean
+    stan_sum_cols <- colnames(b.mean)
+    b.mean <- array(b.mean, dim = c(nt, TS_length, ncol(b.mean)))
+    b.mean <- aperm(b.mean, c(2,3,1))
+    dimnames(b.mean) <- list(period = 1:TS_length, stan_sum_cols, TS = object$TS_names)
+
+    ## b.var
+    b.var.indices <- grep("H\\[[[:digit:]]+,([[:digit:]]+),\\1]", rownames(b.var), value = TRUE)
+    b.var <- b.var[b.var.indices,]
+    b.var <- array(b.var, dim = c(nt, TS_length, ncol(b.var)))
+    b.var <- aperm(b.var, c(2, 3, 1))
+    dimnames(b.var) <- list(period = 1:TS_length, stan_sum_cols, TS = object$TS_names)
+
+    ## b.cor
+    if(object$param != "CCC") {
+        # Lower-triangular indices
+        b.cor.indices.L <- which(lower.tri(matrix(0, nt, nt)), arr.ind = TRUE)
+        # Labels mapping to TS names
+        b.cor.indices.L.labels <- paste0(object$TS_names[b.cor.indices.L[,1]], "_", object$TS_names[b.cor.indices.L[,2]])
+        # Indices as "a,b"
+        b.cor.indices.L.char <- paste0(b.cor.indices.L[,1], ",", b.cor.indices.L[,2])
+        # Indicices as "[period,a,b]"
+        b.cor.indices.L.all <- paste0("corH[",1:object$TS_length, ",", rep(b.cor.indices.L.char, each = object$TS_length),"]")
+        # Get only these elements.
+        b.cor <- b.cor[b.cor.indices.L.all,]
+        b.cor <- array(b.cor, dim = c(object$TS_length, length(b.cor.indices.L.char), ncol(b.cor)))
+        b.cor <- aperm(b.cor, c(1, 3, 2))
+        dimnames(b.cor) <- list(period = 1:object$TS_length, stan_sum_cols, TS = b.cor.indices.L.labels)
+    }
+
+    out <- list()
+    out$backcast$mean <- b.mean
+    out$backcast$var <- b.var
+    out$backcast$cor <- b.cor
+
+    metaNames <- c("param", "distribution", "num_dist", "nt", "TS_length", "TS_names", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
+    meta <- with(object, mget(metaNames))
+    out$meta <- meta
+
+    class(out) <- "fitted.bmgarch"
+    return(out)
 }
 
 ##' Forecasts the (conditional) means, conditional variances, and conditional correlations.
