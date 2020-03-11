@@ -645,7 +645,7 @@ print.fitted.bmgarch <- function(object, ...) {
     }
 
     # Cors
-    if(x$meta$param != "CCC") {
+    if(object$meta$param != "CCC") {
         cat("[Correlation]", "Fitted values:")
         .newline(2)
         for(t in 1:(nt*(nt - 1) / 2)) {
@@ -667,9 +667,40 @@ summary.forecast.bmgarch <- function(object, ...) {
 plot.forecast.bmgarch <- function(x, ...) {
     
 }
+##' Helper function for as.data.frame.{fitted, forecast}. Converts predictive array to data.frame.
+##' 
+##' 
+##' @title Convert predictive array to data.frame.
+##' @param arr Array to convert into data frame.
+##' @param type String. "backcast" or "forecast".
+##' @param param String. "var", "mean", or "cor".
+##' @return data.frame. Columns: period, type (backcast, forecast), param (var, mean, cor), TS (which time series, or which correlation for param = cor), summary columns.
+##' @author Stephen R. Martin
+##' @keywords internal
+.pred_array_to_df <- function(arr, type = "backcast", param = "var") {
+    dims <- dim(arr)
+    arrnames <- dimnames(arr)
+
+    dfList <- apply(arr, 3, function(x) {
+        out <- as.data.frame(x)
+        out$period <- as.numeric(rownames(x))
+        out
+    })
+    for(i in seq_len(length(dfList))) {
+        dfList[[i]]$TS <- arrnames[[3]][i]
+    }
+    df <- do.call(rbind, dfList)
+    df$type <- type
+    df$param <- param
+
+    rownames(df) <- NULL
+
+    return(df)
+}
 
 # Should create something tidy-like. Mainly, rbinding back/forecast, and adding columns for param, period, etc. 
 as.data.frame.forecast.bmgarch <- function(x, ...) {
+
     
 }
 
