@@ -602,7 +602,7 @@ print.forecast.bmgarch <- function(x, ...) {
     return(invisible(x))
 }
 
-# TODO
+# TODO Not sure if necessary.
 summary.forecast.bmgarch <- function(object, ...) {
     
 }
@@ -612,10 +612,12 @@ plot.forecast.bmgarch <- function(x, ...) {
     
 }
 
+# Should create something tidy-like. Mainly, rbinding back/forecast, and adding columns for param, period, etc. 
 as.data.frame.forecast.bmgarch <- function(x, ...) {
     
 }
 
+# Not sure if necessary (or feasible, since doing so requires mixed types.)
 as.matrix.forecast.bmgarch <- function(x, ...) {
     
 }
