@@ -561,6 +561,11 @@ fitted.bmgarch <- function(object, CrI = c(.025, .975), ...) {
 #}
 
 # TODO
+##' @title Print method for forecast.bmgarch objects.
+##' @param x forecast.bmgarch object. See \code{\link{forecast.bmgarch}}
+##' @param ... Not used.
+##' @return Void.
+##' @author Stephen R. Martin
 print.forecast.bmgarch <- function(x, ...) {
     ahead <- x$forecast$meta$TS_length
     nt <- x$meta$nt

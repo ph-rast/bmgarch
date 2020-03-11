@@ -4,7 +4,14 @@
 \alias{forecast.bmgarch}
 \title{Forecast method for bmgarch objects.}
 \usage{
-\method{forecast}{bmgarch}(object, ahead = 1, xC = NULL, CrI = c(0.025, 0.975), seed = NA)
+\method{forecast}{bmgarch}(
+  object,
+  ahead = 1,
+  xC = NULL,
+  CrI = c(0.025, 0.975),
+  seed = NA,
+  digits = 2
+)
 }
 \arguments{
 \item{object}{bmgarch object.}
@@ -16,6 +23,8 @@
 \item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
 
 \item{seed}{Integer (Optional). Specify seed for \code{\link[rstan]{sampling}}.}
+
+\item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
 }
 \value{
 forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data. See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
