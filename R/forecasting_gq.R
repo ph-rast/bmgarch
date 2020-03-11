@@ -699,9 +699,49 @@ plot.forecast.bmgarch <- function(x, ...) {
 }
 
 # Should create something tidy-like. Mainly, rbinding back/forecast, and adding columns for param, period, etc. 
-as.data.frame.forecast.bmgarch <- function(x, ...) {
+as.data.frame.forecast.bmgarch <- function(x, backcast = TRUE, ...) {
 
-    
+    # Forecast
+    dfList <- list()
+    if(x$meta$meanstructure == 1) {
+        dfList$forecast.mean <- .pred_array_to_df(x$forecast$mean, "forecast", "mean")
+    }
+
+    dfList$forecast.var <- .pred_array_to_df(x$forecast$var, "forecast", "var")
+
+    if(x$meta$param != "CCC") {
+        dfList$forecast.cor <- .pred_array_to_df(x$forecast$cor, "forecast", "cor")
+    }
+
+    if(backcast) {
+        # Backcast
+        if(x$meta$meanstructure == 1) {
+            dfList$backcast.mean <- .pred_array_to_df(x$backcast$mean, "backcast", "mean")
+        }
+
+        dfList$backcast.var <- .pred_array_to_df(x$backcast$var, "backcast", "var")
+
+        if(x$meta$param != "CCC") {
+            dfList$backcast.cor <- .pred_array_to_df(x$backcast$cor, "backcast", "cor")
+        }
+    }
+
+    # Combine
+    df <- do.call(rbind, dfList)
+
+    # Re-order columns: period TS | type | param
+    desc <- c("period","TS","type","param")
+    cn <- colnames(df)
+    cn_not_desc <- cn[!(cn %in% desc)]
+    df <- df[,c(desc, cn_not_desc)]
+
+    # Sort
+    df <- df[with(df, order(param, TS, period)),]
+
+    rownames(df) <- NULL
+
+    return(df)
+
 }
 
 # TODO: Similar to above.
