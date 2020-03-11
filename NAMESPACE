@@ -3,6 +3,8 @@
 S3method(fitted,bmgarch)
 S3method(forecast,bmgarch)
 S3method(plot,bmgarch)
+S3method(print,fitted.bmgarch)
+S3method(print,forecast.bmgarch)
 S3method(print,summary.bmgarch)
 S3method(summary,bmgarch)
 export(bmgarch)

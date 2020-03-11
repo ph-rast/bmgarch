@@ -12,7 +12,7 @@
 \item{...}{Not used.}
 }
 \value{
-Void.
+x (invisible).
 }
 \description{
 Print method for forecast.bmgarch objects.

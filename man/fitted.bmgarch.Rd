@@ -4,12 +4,14 @@
 \alias{fitted.bmgarch}
 \title{Fitted (backcasting) method for bmgarch objects.}
 \usage{
-\method{fitted}{bmgarch}(object, CrI = c(0.025, 0.975), ...)
+\method{fitted}{bmgarch}(object, CrI = c(0.025, 0.975), digits = 2, ...)
 }
 \arguments{
 \item{object}{bmgarch object.}
 
 \item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
+
+\item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
 
 \item{...}{Not used.}
 }
