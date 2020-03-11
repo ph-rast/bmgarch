@@ -123,7 +123,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
 ##' @title Fitted (backcasting) method for bmgarch objects.
 ##' @param object bmgarch object.
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
-##' @param ... 
+##' @param ... Not used.
 ##' @return 
 ##' @author Stephen R. Martin
 ##' @importFrom stats fitted

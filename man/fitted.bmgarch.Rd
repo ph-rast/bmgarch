@@ -11,7 +11,7 @@
 
 \item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
 
-\item{...}{}
+\item{...}{Not used.}
 }
 \value{
 
