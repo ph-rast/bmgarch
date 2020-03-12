@@ -11,16 +11,16 @@
 
 \item{type}{String (Default: "mean"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor").}
 
-\item{askNewPage}{Logical (Default: True). Whether to ask for new plotting page.}
+\item{askNewPage}{askNewPage Logical (Default: True). Whether to ask for new plotting page.}
 
-\item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
+\item{CrI}{CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
 }
 \value{
-plot.bmgarch (Invisibly). List of plots.
+List of ggplot objects (one per time series).
 }
 \description{
 Plot method for bmgarch objects.
 }
 \author{
-Philippe Rast
+Stephen R. Martin
 }

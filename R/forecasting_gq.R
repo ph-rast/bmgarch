@@ -112,6 +112,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
     meta <- with(object, mget(metaNames))
     out$meta <- meta
     out$meta$digits <- digits
+    out$meta$CrI <- CrI
 
     out$backcast <- fitted.bmgarch(object, CrI)$backcast
 
@@ -699,9 +700,7 @@ as.data.frame.forecast.bmgarch <- function(x, backcast = TRUE, ...) {
 
     # Forecast
     dfList <- list()
-    if(x$meta$meanstructure == 1) {
-        dfList$forecast.mean <- .pred_array_to_df(x$forecast$mean, "forecast", "mean")
-    }
+    dfList$forecast.mean <- .pred_array_to_df(x$forecast$mean, "forecast", "mean")
 
     dfList$forecast.var <- .pred_array_to_df(x$forecast$var, "forecast", "var")
 
@@ -711,9 +710,7 @@ as.data.frame.forecast.bmgarch <- function(x, backcast = TRUE, ...) {
 
     if(backcast) {
         # Backcast
-        if(x$meta$meanstructure == 1) {
-            dfList$backcast.mean <- .pred_array_to_df(x$backcast$mean, "backcast", "mean")
-        }
+        dfList$backcast.mean <- .pred_array_to_df(x$backcast$mean, "backcast", "mean")
 
         dfList$backcast.var <- .pred_array_to_df(x$backcast$var, "backcast", "var")
 
@@ -749,9 +746,7 @@ as.data.frame.forecast.bmgarch <- function(x, backcast = TRUE, ...) {
 as.data.frame.fitted.bmgarch <- function(x, ...) {
     dfList <- list()
 
-    if(x$meta$meanstructure == 1) {
-        dfList$backcast.mean <- .pred_array_to_df(x$backcast$mean, "backcast", "mean")
-    }
+    dfList$backcast.mean <- .pred_array_to_df(x$backcast$mean, "backcast", "mean")
 
     dfList$backcast.var <- .pred_array_to_df(x$backcast$var, "backcast", "var")
 
