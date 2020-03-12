@@ -534,13 +534,13 @@ print.summary.bmgarch <- function(x, ...) {
     
 }
 
-##' @title Summary method for BMGARCH object
-##' @param object bmgarch object.
-##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
-##' Possible values are .025, .05, .10, .50, .90, .95, and .975
-##' @return Summary object
-##' @author Philippe Rast
-##' @export
+## @title Summary method for BMGARCH object
+## @param object bmgarch object.
+## @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
+## Possible values are .025, .05, .10, .50, .90, .95, and .975
+## @return Summary object
+## @author Philippe Rast
+## @export
 ## summary.bmgarch <- function(object, CrI = c(0.025, 0.975), digits = 2 ) {
 ##     cat( "Model:", paste0(object$param, "-MGARCH\n"))
 ##     if( object$param == 'CCC') {
