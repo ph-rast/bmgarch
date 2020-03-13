@@ -404,14 +404,34 @@ print.summary.bmgarch <- function(x, ...) {
 ##' @keywords internal
 .print.summary.arma <- function(bmsum) {
     ms <- bmsum$model_summary
+    nt <- bmsum$meta$nt
+    TS_names <- bmsum$meta$TS_names
+
+    intercept_index <- grep("phi0", rownames(ms))
+    ar_index <- grep("phi\\[", rownames(ms))
+    ma_index <- grep("theta\\[", rownames(ms))
+
+    ar_indices <- gsub("phi\\[([[:digit:]]+),([[:digit:]]+)]", "\\1,\\2", rownames(ms)[ar_index])
+    ma_indices <- gsub("theta\\[([[:digit:]]+),([[:digit:]]+)]", "\\1,\\2", rownames(ms)[ma_index])
+    ar_indices <- strsplit(ar_indices, ",")
+    ma_indices <- strsplit(ma_indices, ",")
+    ar_indices <- apply(do.call(rbind, ar_indices), 1:2, as.numeric)
+    ma_indices <- apply(do.call(rbind, ma_indices), 1:2, as.numeric)
+
+    rownames(ms)[intercept_index] <- paste0("(Intercept)_", bmsum$meta$TS_names)
+    rownames(ms)[ar_index] <- paste0("Phi_", TS_names[ar_indices[,1]], "-", TS_names[ar_indices[,2]])
+    rownames(ms)[ma_index] <- paste0("Theta_", TS_names[ma_indices[,1]], "-", TS_names[ma_indices[,2]])
+
     if(bmsum$meta$meanstructure == 0) {
-        arma_index <- grep("phi0", rownames(ms))
+        arma_index <- intercept_index
+        msg <- "Intercept estimates on the location:"
     } else {
-        arma_index <- grep("^phi|^theta", rownames(ms))
+        arma_index <- c(intercept_index, ar_index, ma_index)
+        msg <- "ARMA(1,1) estimates on the location:"
     }
-    cat("ARMA(1,1) estimates on the location:")
+    cat(msg)
     .newline(2)
-    print(round(bmsum$model_summary[arma_index,], digits = bmsum$meta$digits))
+    print(round(ms[arma_index,], digits = bmsum$meta$digits))
 }
 
 ##' @title Print helper for beta component.
