@@ -8,9 +8,21 @@ standat(data, xC, P, Q, standardize_data, distribution, meanstructure)
 }
 \arguments{
 \item{data}{Time-series data}
+
+\item{xC}{Numeric vector or matrix.}
+
+\item{P}{Numeric.}
+
+\item{Q}{Numeric.}
+
+\item{standardize_data}{Logical.}
+
+\item{distribution}{Character.}
+
+\item{meanstructure}{Character.}
 }
 \value{
-bmgarch object
+bmgarch stan data list.
 }
 \description{
 Standardize input data to facilitate computation

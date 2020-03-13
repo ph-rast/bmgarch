@@ -1,8 +1,13 @@
 #' Standardize input data to facilitate computation
 #' 
 #' @param data Time-series data
-#'
-#' @return bmgarch object 
+#' @param xC Numeric vector or matrix.
+#' @param P Numeric.
+#' @param Q Numeric.
+#' @param standardize_data Logical.
+#' @param distribution Character.
+#' @param meanstructure Character.
+#' @return bmgarch stan data list. 
 #' @keywords internal
 standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructure){
 
