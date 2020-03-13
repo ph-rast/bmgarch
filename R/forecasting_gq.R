@@ -160,10 +160,33 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
 ##' @param ... Not used.
-##' @return 
+##' @return fitted.bmgarch object. List containing \code{meta}data and the \code{backcast}. Backcast is a list containing three elements:
+##' \describe{
+##'   \item{mean}{\code{[N, 7, TS]} array of mean backcasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{bc$backcast$mean[3,,"tsA"]} is the mean backcast for the third observation in time series "tsA".}
+##'   \item{var}{\code{[N, 7, TS]} array of variance backcasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{bc$backcast$var[3,,"tsA"]} is the variance backcast for the third observation in time series "tsA".}
+##'   \item{cor}{\code{[N, 7, TS(TS - 1)/2]} array of correlation backcasts, where N is the timeseries length, and \code{TS(TS - 1)/2} is the number of correlations. E.g., \code{bc$backcast$cor[3,, "tsB_tsA"]} is the backcast for the correlation between "tsB" and "tsA" on the third observation. Lower triangular correlations are saved.}
+##' }
 ##' @author Stephen R. Martin
 ##' @importFrom stats fitted
 ##' @export
+##' @examples
+##' \dontrun{
+##' data(panas)
+##' # Fit CCC(1,1) and constant meanstructure.
+##' fit <- bmgarch(panas, parameterization = "CCC", meanstructure = "constant")
+##'
+##' # Obtain fitted values
+##' fit.bc <- fitted(fit)
+##'
+##' # Print fitted values
+##' print(fit.bc)
+##'
+##' # Plot fitted values (plot.bmgarch calls fitted internally)
+##' plot(fit, type = "var")
+##'
+##' # Save fitted values as data frame
+##' fit.bc.df <- as.data.frame(fit.bc)
+##' }
 fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
     nt <- object$nt
     TS_length <- object$TS_length

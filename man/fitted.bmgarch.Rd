@@ -16,13 +16,37 @@
 \item{...}{Not used.}
 }
 \value{
-
+fitted.bmgarch object. List containing \code{meta}data and the \code{backcast}. Backcast is a list containing three elements:
+\describe{
+  \item{mean}{\code{[N, 7, TS]} array of mean backcasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{bc$backcast$mean[3,,"tsA"]} is the mean backcast for the third observation in time series "tsA".}
+  \item{var}{\code{[N, 7, TS]} array of variance backcasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{bc$backcast$var[3,,"tsA"]} is the variance backcast for the third observation in time series "tsA".}
+  \item{cor}{\code{[N, 7, TS(TS - 1)/2]} array of correlation backcasts, where N is the timeseries length, and \code{TS(TS - 1)/2} is the number of correlations. E.g., \code{bc$backcast$cor[3,, "tsB_tsA"]} is the backcast for the correlation between "tsB" and "tsA" on the third observation. Lower triangular correlations are saved.}
+}
 }
 \description{
 Extracts the model-predicted means, variances, and correlations for the fitted data.
 }
 \details{
 Whereas \code{\link{forecast.bmgarch}} computes the \emph{forecasted} values for future time periods, \code{fitted.bmgarch} computes the \emph{backcasted} (model-predicted) values for the observed time periods.
+}
+\examples{
+\dontrun{
+data(panas)
+# Fit CCC(1,1) and constant meanstructure.
+fit <- bmgarch(panas, parameterization = "CCC", meanstructure = "constant")
+
+# Obtain fitted values
+fit.bc <- fitted(fit)
+
+# Print fitted values
+print(fit.bc)
+
+# Plot fitted values (plot.bmgarch calls fitted internally)
+plot(fit, type = "var")
+
+# Save fitted values as data frame
+fit.bc.df <- as.data.frame(fit.bc)
+}
 }
 \author{
 Stephen R. Martin
