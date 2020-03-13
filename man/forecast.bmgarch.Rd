@@ -27,11 +27,44 @@
 \item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
 }
 \value{
-forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data. See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
-\code{forecast} is a list of four components. Three components (mean, var, cor) contain forecasted values in arrays. mean and var are structured as \code{[N, 7, TS]} arrays, where \code{N} is length of the time series, and \code{TS} is the number of time series. \code{cor} is structured as \code{[N, 7, TS_TS]}, where \code{TS_TS} represents a (lower triangular) correlation. All arguments are named. E.g., \code{forecasted$forecast$cor[, , "tsB_tsA"]} would the forecasted values for the correlation between the two time series, "tsB" and "tsA".
+forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data.
+See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
+\code{forecast} is a list of four components:
+\describe{
+  \item{mean}{\code{[N, 7, TS]} array of mean forecasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{fc$forecast$mean[3,,"tsA"]} is the 3-ahead mean forecast for time series "tsA".}
+  \item{var}{\code{[N, 7, TS]} array of variance forecasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{fc$forecast$var[3,,"tsA"]} is the 3-ahead variance forecast for time series "tsA".}
+  \item{cor}{\code{[N, 7, TS(TS - 1)/2]} array of correlation forecasts, where N is the timeseries length, and \code{TS(TS - 1)/2} is the number of correlations. E.g., \code{fc$forecast$cor[3,, "tsB_tsA"]} is the 3-ahead forecast for the correlation between "tsB" and "tsA". Lower triangular correlations are saved.}
+  \item{meta}{Meta-data specific to the forecast. I.e., TS_length (number ahead) and xC.}
+}
 }
 \description{
 Estimates forecasted means, variances, and correlations from a fitted bmgarch model.
+}
+\examples{
+\dontrun{
+data(panas)
+# Fit DCC(2,2) with constant mean structure.
+fit <- bmgarch(panas, parameterization = "DCC", P = 2, Q = 2, meanstructure = "constant")
+
+# Forecast 8 ahead
+fit.fc <- forecast(fit, ahead = 8)
+
+# Print forecasts
+fit.fc
+print(fit.fc)
+
+# Plot variance forecasts
+plot(fit.fc, type = "var")
+
+# Plot correlation forecasts
+plot(fit.fc, type = "cor")
+
+# Save backcasted and forecasted values as data frame.
+fit.fc.df <- as.data.frame(fit.fc)
+
+# Save only forecasted values as data frame.
+fit.fc.df <- as.data.frame(fit.fc, backcast = FALSE)
+}
 }
 \author{
 Stephen R. Martin
