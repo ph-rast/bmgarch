@@ -61,7 +61,7 @@ plot.bmgarch <- function(x, type = "mean", askNewPage = TRUE, CrI = c(.025, .975
 ##' @param x forecast.bmgarch object. See \code{\link{forecast.bmgarch}}.
 ##' @param type String (Default: "mean"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor"). 
 ##' @param askNewPage Logical (Default: True). Whether to ask for new plotting page.
-##' @param last_t Integer (Default: 100). For plotting only. Only show \code{last_t} observations in plot.
+##' @param last_t Integer (Default: 100). Only show \code{last_t} observations in plot.
 ##' @return List of ggplot objects (one per time series).
 ##' @author Stephen R. Martin
 ##' @import ggplot2
