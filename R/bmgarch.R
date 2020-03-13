@@ -157,7 +157,8 @@ bmgarch <- function(data,
                                  verbose = TRUE,
                                  iter = iterations,
                                  control = list(adapt_delta = .99),
-                                 chains = chains)
+                                 chains = chains,
+                                 init_r = .05)
 
     ## Model fit is based on standardized values.
     mns <- return_standat$centered_data
