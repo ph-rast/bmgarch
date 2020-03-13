@@ -116,7 +116,7 @@ print.summary.bmgarch <- function(x, ...) {
 
     # Get indices for params
     ms <- bmsum$model_summary
-    ms <- ms[!grepl("c_h$", rownames(ms)),] # Remove c_h; will print c_h_var
+    ms <- ms[!grepl("c_h\\[", rownames(ms)),] # Remove c_h; will print c_h_var
     garch_h_index <- grep("_h", rownames(ms))
     cond_corr_index <- grep("R", rownames(ms))
 
@@ -200,7 +200,7 @@ print.summary.bmgarch <- function(x, ...) {
 
     # Get indices for params
     ms <- bmsum$model_summary
-    ms <- ms[!grepl("c_h$", rownames(ms)),] # Remove c_h; will print c_h_var
+    ms <- ms[!grepl("c_h\\[", rownames(ms)),] # Remove c_h; will print c_h_var
     garch_h_index <- grep("_h", rownames(ms))
     garch_q_index  <- grep("_q", rownames(ms) )
     cond_corr_index <- grep("R", rownames(ms))
@@ -297,7 +297,7 @@ print.summary.bmgarch <- function(x, ...) {
 
     # Get indices for params
     ms <- bmsum$model_summary
-    ms <- ms[!grepl("c_h$", rownames(ms)),] # Remove c_h; will print c_h_var
+    ms <- ms[!grepl("c_h\\[", rownames(ms)),] # Remove c_h; will print c_h_var
     garch_h_index <- grep("_h", rownames(ms))
     garch_q_index  <- grep("_q", rownames(ms) )
     cond_corr_index <- grep("R", rownames(ms))
