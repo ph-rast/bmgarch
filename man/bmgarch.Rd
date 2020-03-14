@@ -50,6 +50,38 @@ Draw samples from a specified multivariate GARCH model, given multivariate time-
 \details{
 Three paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK.
 }
+\examples{
+\dontrun{
+data(panas)
+# Fit pdBEKK(1,1) mgarch model with a ARMA(1,1) meanstructure, and student-t residual distribution
+fit <- bmgarch(panas, parameterization = "pdBEKK", P = 1, Q = 1, meanstructure = "arma", distribution = "Student_t")
+
+# Summarize the parameters
+summary(fit)
+
+# Forecast 5 ahead
+fit.fc <- forecast(fit, ahead = 5)
+print(fit.fc)
+
+# Plot mean forecasts
+plot(fit.fc, type = "mean")
+
+# Plot variance forecasts
+plot(fit.fc, type = "var")
+
+# Plot correlation forecasts
+plot(fit.fc, type = "cor")
+
+# Plot modeled data ("backcasted values").
+plot(fit, type = "mean")
+
+# Save "backcasted" values
+fit.bc <- fitted(fit)
+
+# Save estimated and forecasted data as a data.frame
+df.fc <- as.data.frame(fit.fc)
+}
+}
 \author{
 Philippe Rast, Stephen R. Martin
 }

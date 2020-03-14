@@ -13,7 +13,7 @@
 
 \item{askNewPage}{Logical (Default: True). Whether to ask for new plotting page.}
 
-\item{last_t}{Integer (Default: 100). For plotting only. Only show \code{last_t} observations in plot.}
+\item{last_t}{Integer (Default: 100). Only show \code{last_t} observations in plot.}
 }
 \value{
 List of ggplot objects (one per time series).

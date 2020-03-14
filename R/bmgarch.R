@@ -1,8 +1,13 @@
 #' Standardize input data to facilitate computation
 #' 
 #' @param data Time-series data
-#'
-#' @return bmgarch object 
+#' @param xC Numeric vector or matrix.
+#' @param P Numeric.
+#' @param Q Numeric.
+#' @param standardize_data Logical.
+#' @param distribution Character.
+#' @param meanstructure Character.
+#' @return bmgarch stan data list. 
 #' @keywords internal
 standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructure){
 
@@ -81,6 +86,37 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##' @return \code{bmgarch} object.
 ##' @author Philippe Rast, Stephen R. Martin
 ##' @export
+##' @examples
+##' \dontrun{
+##' data(panas)
+##' # Fit pdBEKK(1,1) mgarch model with a ARMA(1,1) meanstructure, and student-t residual distribution
+##' fit <- bmgarch(panas, parameterization = "pdBEKK", P = 1, Q = 1, meanstructure = "arma", distribution = "Student_t")
+##'
+##' # Summarize the parameters
+##' summary(fit)
+##'
+##' # Forecast 5 ahead
+##' fit.fc <- forecast(fit, ahead = 5)
+##' print(fit.fc)
+##'
+##' # Plot mean forecasts
+##' plot(fit.fc, type = "mean")
+##' 
+##' # Plot variance forecasts
+##' plot(fit.fc, type = "var")
+##' 
+##' # Plot correlation forecasts
+##' plot(fit.fc, type = "cor")
+##'
+##' # Plot modeled data ("backcasted values").
+##' plot(fit, type = "mean")
+##' 
+##' # Save "backcasted" values
+##' fit.bc <- fitted(fit)
+##'
+##' # Save estimated and forecasted data as a data.frame
+##' df.fc <- as.data.frame(fit.fc)
+##' }
 bmgarch <- function(data,
                    xC = NULL,
                    parameterization = "CCC",
@@ -121,7 +157,8 @@ bmgarch <- function(data,
                                  verbose = TRUE,
                                  iter = iterations,
                                  control = list(adapt_delta = .99),
-                                 chains = chains)
+                                 chains = chains,
+                                 init_r = .05)
 
     ## Model fit is based on standardized values.
     mns <- return_standat$centered_data

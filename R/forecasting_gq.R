@@ -6,12 +6,44 @@
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' @param seed Integer (Optional). Specify seed for \code{\link[rstan]{sampling}}.
 ##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
-##' @return forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data. See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
-##' \code{forecast} is a list of four components. Three components (mean, var, cor) contain forecasted values in arrays. mean and var are structured as \code{[N, 7, TS]} arrays, where \code{N} is length of the time series, and \code{TS} is the number of time series. \code{cor} is structured as \code{[N, 7, TS_TS]}, where \code{TS_TS} represents a (lower triangular) correlation. All arguments are named. E.g., \code{forecasted$forecast$cor[, , "tsB_tsA"]} would the forecasted values for the correlation between the two time series, "tsB" and "tsA".
+##' @return forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data.
+##' See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
+##' \code{forecast} is a list of four components:
+##' \describe{
+##'   \item{mean}{\code{[N, 7, TS]} array of mean forecasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{fc$forecast$mean[3,,"tsA"]} is the 3-ahead mean forecast for time series "tsA".}
+##'   \item{var}{\code{[N, 7, TS]} array of variance forecasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{fc$forecast$var[3,,"tsA"]} is the 3-ahead variance forecast for time series "tsA".}
+##'   \item{cor}{\code{[N, 7, TS(TS - 1)/2]} array of correlation forecasts, where N is the timeseries length, and \code{TS(TS - 1)/2} is the number of correlations. E.g., \code{fc$forecast$cor[3,, "tsB_tsA"]} is the 3-ahead forecast for the correlation between "tsB" and "tsA". Lower triangular correlations are saved.}
+##'   \item{meta}{Meta-data specific to the forecast. I.e., TS_length (number ahead) and xC.}
+##' }
 ##' @author Stephen R. Martin
 ##' @importFrom forecast forecast
 ##' @export forecast
 ##' @export
+##' @examples
+##' \dontrun{
+##' data(panas)
+##' # Fit DCC(2,2) with constant mean structure.
+##' fit <- bmgarch(panas, parameterization = "DCC", P = 2, Q = 2, meanstructure = "constant")
+##'
+##' # Forecast 8 ahead
+##' fit.fc <- forecast(fit, ahead = 8)
+##'
+##' # Print forecasts
+##' fit.fc
+##' print(fit.fc)
+##'
+##' # Plot variance forecasts
+##' plot(fit.fc, type = "var")
+##'
+##' # Plot correlation forecasts
+##' plot(fit.fc, type = "cor")
+##'
+##' # Save backcasted and forecasted values as data frame.
+##' fit.fc.df <- as.data.frame(fit.fc)
+##'
+##' # Save only forecasted values as data frame.
+##' fit.fc.df <- as.data.frame(fit.fc, backcast = FALSE)
+##' }
 forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), seed = NA, digits = 2) {
 
     # Define a 0 array for stan.
@@ -128,10 +160,33 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
 ##' @param ... Not used.
-##' @return 
+##' @return fitted.bmgarch object. List containing \code{meta}data and the \code{backcast}. Backcast is a list containing three elements:
+##' \describe{
+##'   \item{mean}{\code{[N, 7, TS]} array of mean backcasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{bc$backcast$mean[3,,"tsA"]} is the mean backcast for the third observation in time series "tsA".}
+##'   \item{var}{\code{[N, 7, TS]} array of variance backcasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{bc$backcast$var[3,,"tsA"]} is the variance backcast for the third observation in time series "tsA".}
+##'   \item{cor}{\code{[N, 7, TS(TS - 1)/2]} array of correlation backcasts, where N is the timeseries length, and \code{TS(TS - 1)/2} is the number of correlations. E.g., \code{bc$backcast$cor[3,, "tsB_tsA"]} is the backcast for the correlation between "tsB" and "tsA" on the third observation. Lower triangular correlations are saved.}
+##' }
 ##' @author Stephen R. Martin
 ##' @importFrom stats fitted
 ##' @export
+##' @examples
+##' \dontrun{
+##' data(panas)
+##' # Fit CCC(1,1) and constant meanstructure.
+##' fit <- bmgarch(panas, parameterization = "CCC", meanstructure = "constant")
+##'
+##' # Obtain fitted values
+##' fit.bc <- fitted(fit)
+##'
+##' # Print fitted values
+##' print(fit.bc)
+##'
+##' # Plot fitted values (plot.bmgarch calls fitted internally)
+##' plot(fit, type = "var")
+##'
+##' # Save fitted values as data frame
+##' fit.bc.df <- as.data.frame(fit.bc)
+##' }
 fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
     nt <- object$nt
     TS_length <- object$TS_length
