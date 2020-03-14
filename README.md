@@ -63,21 +63,6 @@ fit <- bmgarch(panas,
                P = 1, Q = 1,
                distribution = "Student_t",
                meanstructure = "constant")
-#> 
-#> CHECKING DATA AND PREPROCESSING FOR MODEL 'pdBEKKMGARCH' NOW.
-#> 
-#> COMPILING MODEL 'pdBEKKMGARCH' NOW.
-#> 
-#> STARTING SAMPLER FOR MODEL 'pdBEKKMGARCH' NOW.
-#> Warning: There were 2 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. See
-#> http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded
-#> Warning: Examine the pairs() plot to diagnose sampling problems
-#> Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
-#> Running the chains for more iterations may help. See
-#> http://mc-stan.org/misc/warnings.html#bulk-ess
-#> Warning: Tail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
-#> Running the chains for more iterations may help. See
-#> http://mc-stan.org/misc/warnings.html#tail-ess
 ```
 
 ### Parameter estimates
@@ -152,6 +137,7 @@ summary(fit)
 fit.fc <- forecast(fit, ahead = 5)
 
 fit.fc
+
 #> ---
 #> [Variance] Forecast for 5 ahead:
 #> 

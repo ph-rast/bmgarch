@@ -39,7 +39,7 @@ devtools::install_github("ph-rast/bmgarch")
 
 In this example, we use the pdBEKK(1,1) model for the variances, and an intercept-only model for the means.
 
-```{r example}
+```{r example, error = FALSE, warning = FALSE, message = FALSE}
 library(bmgarch)
 
 data(panas)
