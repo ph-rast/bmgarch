@@ -127,11 +127,16 @@ sim.bekk <- function(N,C,A,B, phi = NULL, theta = NULL) {
 }
 
 set.seed(13)
+
 # nt = 2
-N <-  100
-C <-  matrix( c(2,  0.5,  0.5,  2 ) ,  ncol = 2)
-A <-  matrix( c(.4,  0.1,  -0.3,  .2 ) ,  ncol = 2)
-B <-  matrix( c(.2,  0.1,  0.3,  .3 ) ,  ncol = 2)
+N <-  200
+C <-  matrix( c(1,  .3,  .3,  1 ) ,  ncol = 2)
+
+A <-  matrix( c(.43,  -.07,  0.03,  .53 ) ,  ncol = 2, byrow = TRUE)
+A <-  matrix( c(.34,  -.43,  -.35,  .16 ) ,  ncol = 2, byrow = TRUE)
+
+B <-  matrix( c(.85,  -.11,  0.09,  .57 ) ,  ncol = 2, byrow = TRUE)
+B <-  matrix(c(.81, -.23, .63, .31), ncol =  2, byrow = TRUE)
 
 # nt = 3
 set.seed(13)
@@ -150,14 +155,14 @@ theta <- matrix(0, ncol = nt, nrow = nt)
 diag(phi) <- rep(.8, nt)
 diag(theta) <- rep(.5, nt)
 
-y <- sim.bekk(N, C, A, B, phi, theta)
+y <- sim.bekk(N, C, A, B, phi = NULL, theta =  NULL)
 
 fit <- bmgarch(y,
                 iterations = 1000,
                 P = 1, Q = 1,
-                meanstructure = "arma",
+                meanstructure = "constant",
                 standardize_data = FALSE,
-                parameterization = "BEKK",
+                parameterization = "pdBEKK",
                 distribution = "Gaussian",
                 xH = NULL,
                 adapt_delta = .95)
