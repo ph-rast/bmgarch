@@ -24,6 +24,6 @@ matrix
 Multiply matrices in array with a vector
 }
 \author{
-philippe
+Philippe Rast
 }
 \keyword{internal}

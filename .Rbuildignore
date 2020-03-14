@@ -4,3 +4,5 @@
 ^\.Rproj\.user$
 ^local$
 ^.covrignore$
+^README\.Rmd$
+^man/figures$
