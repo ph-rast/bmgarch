@@ -69,4 +69,6 @@ fit.fc
 
 ```{r forecastPlot}
 plot(fit.fc, askNewPage = FALSE, type = "var")
+
+plot(fit.fc, askNewPage = FALSE, type = "cor")
 ```
