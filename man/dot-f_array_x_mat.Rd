@@ -22,6 +22,6 @@ matrix
 Multiply matrices in array with a vector -- generic
 }
 \author{
-philippe
+Philippe Rast
 }
 \keyword{internal}

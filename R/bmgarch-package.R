@@ -6,13 +6,10 @@
 #' as forecasted series with corresponding plots. The fitted objects are rstan class objects that can be inspected and manipulated
 #' accordingly.
 #'
-#' @details
-#'
 #' @author Philippe Rast
 #' 
 #' @docType package
 #' @name bmgarch-package
-#' @aliases bmgarch
 #' @useDynLib bmgarch, .registration = TRUE
 #' @import methods
 #' @import Rcpp

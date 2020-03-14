@@ -1,20 +1,21 @@
 Package: bmgarch
 Title: Bayesian Multivariate GARCH
 Version: 0.0.0.9000
-Authors@R: c(
-   person( "Philippe", "Rast",
+Authors@R: c( person(given = "Philippe",
+           family = "Rast",
            role = c("aut", "cre"),
            email = "rast.ph@gmail.com",
            comment = c(ORCID = "0000-0003-3630-6629")),
    person(given = "Stephen",
            family = "Martin",
            role = c("aut"),
-           email = "stephenSRMmartin@gmail.com"),
+           email = "stephenSRMmartin@gmail.com",
+	   comment = c(ORCID = "0000-0001-8085-2390")),
    person(given = "Josue",
            family = "Rodriguez",
            role = c("ctb"),
            email = "josue.rodriguez594@gmail.com"))
-Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. The fitted models are rstan objects and can be passed examined with rstan functions.  
+Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. The fitted models are rstan objects and can be examined with rstan functions.  
 License: GPL (>=3)
 Depends: 
     methods,
@@ -23,7 +24,9 @@ Depends:
 Imports: 
     rstan (>= 2.18.2),
     rstantools (>= 1.5.1),
-    ggplot2
+    ggplot2,
+    MASS,
+    forecast
 LinkingTo: 
     BH (>= 1.69.0-1),
     Rcpp (>= 1.0.1),
@@ -34,6 +37,6 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
 SystemRequirements: GNU make
-RoxygenNote: 7.0.0
+RoxygenNote: 7.0.2
 Suggests: 
     testthat (>= 2.1.0)

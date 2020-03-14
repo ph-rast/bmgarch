@@ -1,0 +1,74 @@
+---
+output:
+    github_document:
+        df_print: kable
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# bmgarch
+
+`bmgarch` estimates Bayesian multivariate generalized autoregressive conditional heteroskedasticity (MGARCH) models.
+Currently, bmgarch supports ARMA(1,1) and intercept-only (Constant) mean structures, and a variety of MGARCH(P,Q) parameterizations.
+In increasing order of complexity:
+
+* CCC(P, Q): Constant Conditional Correlation
+* DCC(P, Q): Dynamic Conditional Correlation
+* BEKK(P, Q): Baba, Engle, Kraft, and Kroner
+* pdBEKK(P, Q): BEKK(P, Q) with positive diagonal constraints
+
+## Installation
+
+`bmgarch` is not yet available on CRAN.
+
+The development version can be installed from [GitHub](https://github.com/) with:
+
+``` r
+devtools::install_github("ph-rast/bmgarch")
+```
+## Example
+
+In this example, we use the pdBEKK(1,1) model for the variances, and an intercept-only model for the means.
+
+```{r example, error = FALSE, warning = FALSE, message = FALSE}
+library(bmgarch)
+
+data(panas)
+head(panas)
+
+# Fit pdBEKK(1, 1) with ARMA(1,1) on the mean structure.
+fit <- bmgarch(panas,
+               parameterization = "pdBEKK",
+               iterations = 1000,
+               P = 1, Q = 1,
+               distribution = "Student_t",
+               meanstructure = "constant")
+
+```
+
+### Parameter estimates
+```{r}
+summary(fit)
+```
+
+### Forecasted values
+```{r}
+fit.fc <- forecast(fit, ahead = 5)
+
+fit.fc
+```
+
+```{r forecastPlot}
+plot(fit.fc, askNewPage = FALSE, type = "var")
+
+plot(fit.fc, askNewPage = FALSE, type = "cor")
+```

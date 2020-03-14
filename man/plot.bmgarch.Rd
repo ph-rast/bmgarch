@@ -2,23 +2,25 @@
 % Please edit documentation in R/plot.R
 \name{plot.bmgarch}
 \alias{plot.bmgarch}
-\title{Plot}
+\title{Plot method for bmgarch objects.}
 \usage{
-\method{plot}{bmgarch}(object, type = "means", askNewPage = TRUE, CrI = c(0.025, 0.975))
+\method{plot}{bmgarch}(x, type = "mean", askNewPage = TRUE, CrI = c(0.025, 0.975))
 }
 \arguments{
-\item{object}{stan object}
+\item{x}{bmgarch object.}
 
-\item{type}{Plot past expected means ("means"), or past conditional volatilyt ("cvar"), or past conditinoal correlation ("ccor")}
+\item{type}{String (Default: "mean"). Whether to plot conditional means ("mean"), variance ("var"), or correlations ("cor").}
 
-\item{CrI}{Lower and upper bound of credible interval. Default is "c( 0.025, .975)".}
+\item{askNewPage}{askNewPage Logical (Default: True). Whether to ask for new plotting page.}
+
+\item{CrI}{CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
 }
 \value{
-plot.bmgarch
+List of ggplot objects (one per time series).
 }
 \description{
-Plot
+Plot method for bmgarch objects.
 }
 \author{
-Philippe Rast <rast.ph@gmail.com>
+Stephen R. Martin
 }

@@ -24,7 +24,7 @@ parameters {
 #include /parameters/predH.stan
 
   // GARCH h parameters on variance metric
-  vector<lower=0>[nt] c_h; 
+  vector[nt] c_h; 
   vector<lower=0, upper = 1 >[nt] a_h[Q];
   vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
 
@@ -110,6 +110,7 @@ generated quantities {
   matrix[nt,T] rts_out;
   real log_lik[T];
   corr_matrix[nt] corH[T];
+  vector<lower=0>[nt] c_h_var = exp(c_h);
 
   // retrodict
 #include /generated/retrodict_H.stan
