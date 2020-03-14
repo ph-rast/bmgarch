@@ -58,7 +58,7 @@ fit <- bmgarch(r2,
 system("notify-send 'Done sampling' " )
 summary(fit )
 
-plot(fit, type = 'var' )
+plot(fit, type = 'ccor' )
 
 forecast(fit, ahead = 3 ,  type = "cor")
 
