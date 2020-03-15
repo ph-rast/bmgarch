@@ -11,11 +11,19 @@ transformed data {
   vector[nt] rts_sd;
 
 #include /transformed_data/xh_marker.stan
-   
-  for ( i in 1:nt ){
-    rts_m[i] = mean(rts[,i]);
-    rts_sd[i] = sd(rts[,i]);
-  }
+
+  if( meanstructure == 0 ){
+    for ( i in 1:nt ){
+      rts_m[i] = mean(rts[,i]);
+      rts_sd[i] = sd(rts[,i]);
+    }
+  } else if (meanstructure == 1 ){
+      // set rts_m to first element in ts
+      for ( i in 1:nt ){
+	rts_m[i] = rts[1,i];
+	rts_sd[i] = sd(rts[,i]);
+      }
+    }
 }
 parameters {
  // ARMA parameters 

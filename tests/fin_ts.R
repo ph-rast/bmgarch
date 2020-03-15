@@ -43,22 +43,22 @@ rlag <- scale( diff(r2, lag = 1,  log = FALSE )[-1, ]  )
 colnames(rlag ) <- colnames(r2 )
 
 # If using arma
-sr2 <- scale(r2 )
+sr2 <- scale(r2 )+5
 sr2
 r2
 
-fit <- bmgarch(r2,
+fit <- bmgarch(sr2,
                iterations = 1000,
                P = 1, Q = 1,
-               meanstructure = "arma",
-               standardize_data = TRUE,
-               parameterization = 'DCC',
+               meanstructure = "constant",
+               standardize_data = FALSE,
+               parameterization = 'BEKK',
                xH = NULL,
                adapt_delta=0.85)
 system("notify-send 'Done sampling' " )
 summary(fit )
 
-plot(fit, type = 'ccor' )
+plot(fit, type = 'mean' )
 
 forecast(fit, ahead = 3 ,  type = "cor")
 
