@@ -10,11 +10,7 @@ Authors@R: c( person(given = "Philippe",
            family = "Martin",
            role = c("aut"),
            email = "stephenSRMmartin@gmail.com",
-	   comment = c(ORCID = "0000-0001-8085-2390")),
-   person(given = "Josue",
-           family = "Rodriguez",
-           role = c("ctb"),
-           email = "josue.rodriguez594@gmail.com"))
+	   comment = c(ORCID = "0000-0001-8085-2390")))
 Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. The fitted models are rstan objects and can be examined with rstan functions.  
 License: GPL (>=3)
 Depends: 
@@ -37,6 +33,6 @@ Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
 SystemRequirements: GNU make
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests: 
     testthat (>= 2.1.0)

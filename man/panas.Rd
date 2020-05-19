@@ -4,11 +4,13 @@
 \name{panas}
 \alias{panas}
 \title{Positive and Negative Affect Scores.}
-\format{Data frame with 200 rows and 2 variables:
+\format{
+Data frame with 200 rows and 2 variables:
 \describe{
   \item{Pos}{Positive Affect score}
   \item{Neg}{Negative Affect score}
-}}
+}
+}
 \usage{
 panas
 }

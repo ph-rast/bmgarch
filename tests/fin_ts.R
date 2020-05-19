@@ -50,9 +50,9 @@ r2
 fit <- bmgarch(sr2,
                iterations = 1000,
                P = 1, Q = 1,
-               meanstructure = "constant",
+               meanstructure = "arma",
                standardize_data = FALSE,
-               parameterization = 'BEKK',
+               parameterization = 'DCC',
                xH = NULL,
                adapt_delta=0.85)
 system("notify-send 'Done sampling' " )
@@ -60,7 +60,8 @@ summary(fit )
 
 plot(fit, type = 'mean' )
 
-forecast(fit, ahead = 3 ,  type = "cor")
+forecast(fit, ahead = 3)
+sr2[98:100,]
 
 fit.constant <- bmgarch(rlag[,1:2],
                         iterations = 800,
