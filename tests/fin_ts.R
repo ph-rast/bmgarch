@@ -173,3 +173,15 @@ summary(fit)
 mcmc_trace(as.array(fit$model_fit, pars = c("A","B","Cnst")))
 mcmc_dens_overlay(as.array(fit$model_fit, pars = c("A","B","Cnst")))
 mcmc_parcoord(as.array(fit$model_fit, pars = c("A","B","Cnst","beta0","beta1","phi","theta")), np = nuts_params(fit$model_fit))
+
+
+library(bmgarch )
+data(stocks )
+
+stocks[]
+
+fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],  parameterization = "CCC", standardize_data = TRUE)
+summary( fit )
+
+forecast( fit,  ahead = 5 )
+
