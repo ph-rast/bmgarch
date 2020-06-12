@@ -3,6 +3,7 @@
 ##' @param object bmgarch object.
 ##' @param ahead Integer (Default: 1). Periods to be forecasted ahead.
 ##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
+##' @param newdata Future datapoints for LFO-CV computation
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' @param seed Integer (Optional). Specify seed for \code{\link[rstan]{sampling}}.
 ##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
@@ -44,24 +45,33 @@
 ##' # Save only forecasted values as data frame.
 ##' fit.fc.df <- as.data.frame(fit.fc, backcast = FALSE)
 ##' }
-forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), seed = NA, digits = 2) {
+forecast.bmgarch <- function(object, ahead = 1, xC = NULL, newdata = NULL, CrI = c(.025, .975), seed = NA, digits = 2) {
 
     # Define a 0 array for stan.
     if(is.null(xC)) {
         xC <- array(0, dim = c(ahead, object$nt))
     }
+    if(is.null(newdata)) {
+        newdata <- array(0, dim = c(ahead, object$nt))
+        compute_log_lik <- 0
+    } else {
+        compute_log_lik <- 1
+    }
 
+    
     # Get stan data
     standat <- list(T = object$TS_length,
-                     nt = object$nt,
-                     rts = cbind(object$RTS_full),
-                     xC = object$xC,
-                     Q =  object$mgarchQ,
-                     P =  object$mgarchP,
-                     ahead =  ahead, 
-                     meanstructure =  object$meanstructure,
-                     distribution =  object$num_dist,
-                     xC_p =  xC)
+                    nt = object$nt,
+                    rts = cbind(object$RTS_full),
+                    xC = object$xC,
+                    Q =  object$mgarchQ,
+                    P =  object$mgarchP,
+                    ahead =  ahead, 
+                    meanstructure =  object$meanstructure,
+                    distribution =  object$num_dist,
+                    xC_p =  xC,
+                    future_rts = newdata,
+                    compute_log_lik =  compute_log_lik)
 
     gqs_model <- switch(object$param,
                         DCC = stanmodels$forecastDCC,
@@ -87,7 +97,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
                              data = standat,
                              seed = seed)
 
-    # Get stan summaries for forecasted values.
+    ## Get stan summaries for forecasted values.
     f.mean <- .get_stan_summary(forecasted, "rts_p", CrI)
     f.var <- .get_stan_summary(forecasted, "H_p", CrI)
     f.cor <- NA
@@ -134,12 +144,20 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
         f.cor <- f.cor[-c(1:backcast), , , drop = FALSE]
     }
 
+   
     out <- list()
     out$forecast$mean <- f.mean
     out$forecast$var <- f.var
     out$forecast$cor <- f.cor
     out$forecast$meta <- list(xC = xC, TS_length = ahead)
 
+        ## Extract all log_lik simulations
+    if(compute_log_lik == 1 ) {
+        log_lik <- rstan::extract( forecasted, pars = "log_lik" )$log_lik
+        out$forecast$log_lik <- log_lik
+    }
+
+    
     metaNames <- c("param", "distribution", "num_dist", "nt", "TS_length", "TS_names", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
     meta <- with(object, mget(metaNames))
     out$meta <- meta
@@ -150,7 +168,6 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, CrI = c(.025, .975), 
 
     class(out) <- "forecast.bmgarch"
     return(out)
-
 }
 ##' Extracts the model-predicted means, variances, and correlations for the fitted data.
 ##'

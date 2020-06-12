@@ -18,9 +18,9 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     if ( is.null( colnames( data ) ) ) colnames( data ) = paste0('t', 1:ncol( data ) )
 
     ## Model for meanstructure
-    if( meanstructure == "constant") {
+    if( meanstructure == "constant" | meanstructure == 0 ) {
         meanstructure <- 0
-    } else if ( meanstructure == "arma" ){
+    } else if ( meanstructure == "arma" | meanstructure == 1 ){
         meanstructure <- 1
     } else {
         stop("meanstructure must be either 'constant' or 'arma'.")
@@ -182,7 +182,8 @@ bmgarch <- function(data,
                        mgarchQ = stan_data$Q,
                        mgarchP = stan_data$P,
                        xC = stan_data$xC,
-                       meanstructure = stan_data$meanstructure)
+                       meanstructure = stan_data$meanstructure,
+                       std_data = standardize_data)
     class(return_fit) <- "bmgarch"
     return(return_fit)
 }

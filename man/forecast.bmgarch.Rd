@@ -8,6 +8,7 @@
   object,
   ahead = 1,
   xC = NULL,
+  newdata = NULL,
   CrI = c(0.025, 0.975),
   seed = NA,
   digits = 2
@@ -19,6 +20,8 @@
 \item{ahead}{Integer (Default: 1). Periods to be forecasted ahead.}
 
 \item{xC}{Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).}
+
+\item{newdata}{Future datapoints for LFO-CV computation}
 
 \item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
 

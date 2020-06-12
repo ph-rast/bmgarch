@@ -1,11 +1,12 @@
 data {
 #include /data/gq_data.stan
+  vector[nt] future_rts[ahead]; // future observations to obtain log_lik
+  int<lower = 0, upper = 1> compute_log_lik;
 }
 
 transformed data {
-#include /transformed_data/xh_marker.stan  
+#include /transformed_data/xh_marker.stan 
 }
-
 
 parameters {
   // ARMA parameters
@@ -13,8 +14,7 @@ parameters {
   // predictor for H
 #include /parameters/predH.stan
   // DF constant nu for student t
-  real< lower = 2 > nu;
-  
+  real< lower = 2 > nu; 
   
    // GARCH h parameters on variance metric
   vector[nt] c_h;
@@ -48,7 +48,9 @@ generated quantities {
   cov_matrix[nt] Qr_p[ahead + max(Q,P)];
   vector[nt] u_p[ahead + max(Q,P)];
   vector[nt] Qr_sdi_p[ahead + max(Q,P)];
-
+  // log lik for LFO-CV
+  real log_lik[ahead];
+  
   // Placeholders
   real<lower = 0> vd_p[nt];
   real<lower = 0> ma_d_p[nt];
@@ -67,7 +69,7 @@ generated quantities {
   
   R_p[ 1:(ahead + max(Q,P)), ] = R[ 1:(ahead + max(Q,P)), ];
 
-  // Obtain needed elements from mu and fill into mu_p
+  // Obtain needed elements (depends on lags in Q and P) from mu and fill into mu_p
   rts_p[1:max(Q, P), ] = rts[(T-(max(Q,P)-1) ):T, ];
   H_p[  1:max(Q, P), ] =  H[ (T-(max(Q,P)-1) ):T, ];
   mu_p[ 1:max(Q, P), ] = mu[ (T-(max(Q,P)-1) ):T, ];
@@ -122,8 +124,18 @@ generated quantities {
   
     if ( distribution == 0 ) {
       rts_p[t,] = multi_normal_rng( mu_p[t,], H_p[t,]);
+      if( compute_log_lik ) {
+	for( i in 1:ahead ){
+	  log_lik[i] = multi_normal_lpdf( future_rts[i] |  mu_p[t,], H_p[t,] );
+	}
+      }
     } else if ( distribution == 1 ) {
       rts_p[t,] = multi_student_t_rng( nu, mu_p[t,], H_p[t,]);
+      if( compute_log_lik ) {
+	for( i in 1:ahead ){
+	  log_lik[i] = multi_student_t_lpdf( future_rts[i] | nu, mu_p[t,], H_p[t,] );
+	    }
+	  }
     }
   }
 }
