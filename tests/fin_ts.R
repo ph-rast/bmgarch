@@ -180,8 +180,51 @@ data(stocks )
 
 stocks[]
 
-fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],  parameterization = "CCC", standardize_data = TRUE)
+fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+               parameterization = "DCC", standardize_data = TRUE,
+               iterations = 1000)
 summary( fit )
 
-forecast( fit,  ahead = 5 )
+#object <- fit
 
+fcst <- forecast( fit,  ahead = 1, xC = NULL, newdata =  stocks[101, c("toyota",  "nissan" ), drop = FALSE])
+fcst
+
+ll <- rstan::extract(fit$model_fit, pars =  "log_lik")$log_lik
+llf <- cbind(ll, fcst$forecast$log_lik)
+loo::loo( llf[,  51:100] )
+
+
+
+fwd <- lfocv( fit, mode = 'forward', L =  50)
+
+sum( fwd$out, na.rm = TRUE )
+fwd$ks
+fwd$loglik[1:3,]
+
+backw <- lfocv( fit, mode = 'backward')
+backw$approx_elpd_1sap
+sum( backw$out, na.rm = TRUE )
+dim( backw$loglik )
+
+lrat <- .sum_log_ratios( backw$loglik )
+psisobj <- loo::psis( lrat )
+psisobj
+wgt <- weights(psisobj,  normalize = TRUE )
+
+sum( apply(lfoobj$loglik, 2, FUN = function(x) {
+    .log_sum_exp(wgt + x)    }
+    ))
+
+
+str(lfoobj)
+
+
+exct <- lfocv( fit, mode = 'exact', L =  70)
+sum( exct$out )
+
+awd <- lfocv( fit, mode = 'forward',  L =  95 )
+sum(awd$out, na.rm = T)
+
+bkwd <- lfocv( fit, mode = 'backward',  L =  70 )
+sum(bkwd$out, na.rm = T)

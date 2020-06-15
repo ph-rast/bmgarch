@@ -48,9 +48,9 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
 ##' @title Leave-Future-Out Cross Validation (LFO-CV)
 ##' @param object Fitted bmgarch model. \code{lfocv} inherits all attributes from the bmgarch object.
 ##' @param L Minimal length of times series before computing LFO 
-##' @param mode forward or backward elpd_lfo approximation, or exact elpd-lfo.
-##' Takes 'forward', 'backward', and 'exact'. 'exact' fits N-L models and may
-##' take a \emph{very} long time to complete. 
+##' @param mode backward elpd_lfo approximation, or exact elpd-lfo; 
+##' Takes 'backward', and 'exact'. 'exact' fits N-L models and may
+##' take a \emph{very} long time to complete. \code{forward} works too but is not complete yet. 
 ##' @return Approximate LFO-CV value and log-likelihood values across (L+1):N timepoints
 ##' @author philippe
 ##' @importFrom Rdpack reprompt
@@ -71,12 +71,11 @@ lfocv <- function(object, L = 50, mode = "backward") {
     ks <- NULL
 
     refits <- ks <- NULL
-    i_refit <- N
     
     if( mode == "backward" ) {
         k_thres <- 0.6
         fit_past <- object
-        
+        i_refit <- N
 
         for (i in (N - 1):L) {
             loglik[, i + 1] <- .log_lik(fit_past)[, i + 1]
@@ -116,7 +115,7 @@ lfocv <- function(object, L = 50, mode = "backward") {
         df_dat <- object$RTS_full
         xC_dat <- object$xC
         
-        oos <- L + ahead
+        oos <- L + 1
         
         ## Refit the model using the first L observations
         df_start <- object$RTS_full[1:L, , drop = FALSE]
@@ -131,22 +130,23 @@ lfocv <- function(object, L = 50, mode = "backward") {
         loglik[, oos ] <- fc$forecast$log_lik
         exact_elpds_1sap[ L ] <- .log_mean_exp( loglik[, oos ] )
         out[ L ] <- exact_elpds_1sap[L]    
-
+        i_refit <- L + 1
+            
         for (i in (L + 1):(N-ahead) ) {
-            logratio <- .sum_log_ratios(loglik, i )#(L+1):(i+1))
+            
+            logratio <- .sum_log_ratios(loglik, i_refit:i )#(L+1):(i+1))
             psis_obj <- suppressWarnings(loo::psis(logratio))
             k <- loo::pareto_k_values(psis_obj)
             ks <- c(ks, k)
             print( ks )
             if( k > k_thres ) {
-                i_refit <- i
                 refits <- c(refits, i)
 
                 df_start <- object$RTS_full[1:i, , drop = FALSE]
                 xC_start <- object$xC[1:i, , drop = FALSE]
 
                 fit_start <- .refit(object, data = df_start, xC_data = xC_start )
-
+                ahead <- 1
                 fc <- bmgarch::forecast(fit_start, ahead = ahead, xC = xC_dat[ i+1, , drop = FALSE], newdata = df_dat[ i+1, ,drop = FALSE])
 
                 ## Exact log_lik
@@ -158,16 +158,17 @@ lfocv <- function(object, L = 50, mode = "backward") {
                 out[ i ] <- exact_elpds_1sap[ i ]
                 psis_obj <- suppressWarnings(loo::psis(logratio))
                 k <- loo::pareto_k_values(psis_obj)
+                i_refit <- i+1
                 #k <- 0
             } else {
                 lw <- weights(psis_obj, normalize = TRUE)[, 1]
+                ahead <- ( i+1 )-( i_refit-1 )
+                fc <- bmgarch::forecast(fit_start, ahead = ahead, xC = xC_dat[ ( i_refit ):(i+1), , drop = FALSE], newdata = df_dat[  ( i_refit ):(i+1), ,drop = FALSE])
 
-                fc <- bmgarch::forecast(fit_start, ahead = ahead, xC = xC_dat[ i+1, , drop = FALSE], newdata = df_dat[ i+1, ,drop = FALSE])
-
-                loglik[, i+1 ] <-  fc$forecast$log_lik
-                approx_elpds_1sap[ i ] <-  .log_sum_exp(lw + loglik[, i+ahead ])
+                loglik[, i+1 ] <- fc$forecast$log_lik[, ahead]
+                approx_elpds_1sap[ i ] <-  .log_sum_exp(lw + loglik[, i+1 ])
                 out[i] <- approx_elpds_1sap[ i ] 
-            }
+            }          
         }
     } else if (mode == "exact" ) {
         k_thres <- 0
@@ -188,6 +189,9 @@ lfocv <- function(object, L = 50, mode = "backward") {
         stop("'mode' needs to be either 'forward', 'backward' or 'exact'." )
     }
 
+    warn <- function() warning("'forward' method not fully implemented")
+    if( mode == 'forward' ) warn( )
+    
     refit_info <- cat("Using threshold ", k_thres, 
                       ", model was refit ", length(refits), 
                       " times, at observations", refits)
