@@ -202,8 +202,27 @@ lfocv <- function(object, L = 50, mode = "backward") {
     outl$ks <- ks
     outl$approx_elpd_1sap <- sum( approx_elpds_1sap, na.rm = TRUE )
     outl$out <- out
+    outl$mode <- mode
+    outl$L <- L
     
     outl$loglik <- loglik[, ( L + 1 ):N ]
 
-    return( outl )    
+    attr(outl, "class" ) <- "lfocv"
+    return( outl )
+}
+
+##' @title print method for lfocv
+##' @param x 
+##' @return Invisible lfocv object
+##' @author philippe
+##' @export
+print.lfocv <- function( x ) {
+    if(x$mode == 'backward' | x$mode == 'forward' ) {
+        cat("Model was fit using ", x$mode, " mode.\n")
+        cat("Approximate ELPD_LFO: ", x$approx_elpd_1sap, "\n" )
+    } else {
+        cat("Model was fit using ", x$mode, " mode.\n")
+        cat("Exact ELPD_LFO: ", sum( x$out, na.rm = TRUE), "\n" )
+    }
+    return(invisible(x))
 }

@@ -178,11 +178,11 @@ mcmc_parcoord(as.array(fit$model_fit, pars = c("A","B","Cnst","beta0","beta1","p
 library(bmgarch )
 data(stocks )
 
-stocks[]
 
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
-               parameterization = "DCC", standardize_data = TRUE,
+               parameterization = "BEKK", standardize_data = TRUE,
                iterations = 1000)
+fit 
 summary( fit )
 
 #object <- fit
@@ -195,17 +195,31 @@ llf <- cbind(ll, fcst$forecast$log_lik)
 loo::loo( llf[,  51:100] )
 
 
-
-fwd <- lfocv( fit, mode = 'forward', L =  50)
+system.time( {
+    fwd <- lfocv( fit, mode = 'forward', L =  50)
+})
+## five times slower than backward
 
 sum( fwd$out, na.rm = TRUE )
 fwd$ks
+fwd$refits
 fwd$loglik[1:3,]
 
-backw <- lfocv( fit, mode = 'backward')
+backw <- lfocv( fit, mode = 'backward', L =  95)
+
+backw
+
+
+
+
+backw$refits
 backw$approx_elpd_1sap
 sum( backw$out, na.rm = TRUE )
-dim( backw$loglik )
+
+ll_ccc <- backw$loglik 
+ll_dcc <- backw$loglik 
+ll_bekk <- backw$loglik 
+
 
 lrat <- .sum_log_ratios( backw$loglik )
 psisobj <- loo::psis( lrat )
@@ -220,11 +234,19 @@ sum( apply(lfoobj$loglik, 2, FUN = function(x) {
 str(lfoobj)
 
 
-exct <- lfocv( fit, mode = 'exact', L =  70)
-sum( exct$out )
-
-awd <- lfocv( fit, mode = 'forward',  L =  95 )
+exct <- lfocv( fit, mode = 'exact', L =  50)
+awd <- lfocv( fit, mode = 'forward',  L = 50 )
+bkwd <- lfocv( fit, mode = 'backward',  L =  50 )
+sum(exct$out, na.rm = T)
 sum(awd$out, na.rm = T)
-
-bkwd <- lfocv( fit, mode = 'backward',  L =  70 )
 sum(bkwd$out, na.rm = T)
+
+
+
+
+log_lik_list <- list(  ll_dcc,  ll_bekk )
+
+wts <- loo::loo_model_weights( log_lik_list, method = "stacking")
+wts
+
+

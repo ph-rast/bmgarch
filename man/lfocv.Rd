@@ -11,9 +11,9 @@ lfocv(object, L = 50, mode = "backward")
 
 \item{L}{Minimal length of times series before computing LFO}
 
-\item{mode}{forward or backward elpd_lfo approximation, or exact elpd-lfo.
-Takes 'forward', 'backward', and 'exact'. 'exact' fits N-L models and may
-take a \emph{very} long time to complete.}
+\item{mode}{backward elpd_lfo approximation, or exact elpd-lfo; 
+Takes 'backward', and 'exact'. 'exact' fits N-L models and may
+take a \emph{very} long time to complete. \code{forward} works too but is not complete yet.}
 }
 \value{
 Approximate LFO-CV value and log-likelihood values across (L+1):N timepoints

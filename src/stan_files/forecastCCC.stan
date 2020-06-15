@@ -43,11 +43,14 @@ generated quantities {
   // Define matrix for rts prediction
   vector[nt] rts_p[ahead + max(Q,P)];
   vector[nt] rr_p[ahead + max(Q,P)];
+
+  // log lik for LFO-CV
+  real log_lik[ahead];
   
   real<lower = 0> vd[nt];
   real<lower = 0> ma_d[nt];
   real<lower = 0> ar_d[nt];
-
+  
   // Populate with non-NA values to avoid Error in stan
   mu_p[ 1:(ahead + max(Q,P)), ] = mu[  1:(ahead + max(Q,P)), ];
   rts_p[1:(ahead + max(Q,P)), ] = rts[ 1:(ahead + max(Q,P)), ];
@@ -96,12 +99,23 @@ generated quantities {
     }
     H_p[t,] = quad_form_diag(R, D_p[t,]);  // H = DRD;
 
-    /* // likelihood */
-    if ( distribution == 0 ) {
-      rts_p[t,] = multi_normal_rng( mu_p[t,], H_p[t,]);
-    } else if ( distribution == 1 ) {
-      rts_p[t,] = multi_student_t_rng( nu, mu_p[t,], H_p[t,]);
-    }
-   }
+    /* sampling distriutions  */
+#include /generated/forecast_sampling.stan
+    /* if ( distribution == 0 ) { */
+    /*   rts_p[t,] = multi_normal_rng( mu_p[t,], H_p[t,]); */
+    /*   if( compute_log_lik ) { */
+    /* 	for( i in 1:ahead ){ */
+    /* 	   log_lik[i] = multi_normal_lpdf( future_rts[i] |  mu_p[t,], H_p[t,] ); */
+    /* 	 } */
+    /*   } */
+    /* } else if ( distribution == 1 ) { */
+    /*   rts_p[t,] = multi_student_t_rng( nu, mu_p[t,], H_p[t,]); */
+    /*   if( compute_log_lik ) { */
+    /* 	for( i in 1:ahead ){ */
+    /* 	  log_lik[i] = multi_student_t_lpdf( future_rts[i] | nu, mu_p[t,], H_p[t,] ); */
+    /* 	} */
+    /*   } */
+    /* } */
+  }
 }
 

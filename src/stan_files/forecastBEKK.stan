@@ -3,7 +3,7 @@ functions {
 }
 
 data {
-#include /data/gq_data.stan 
+#include /data/gq_data.stan
 }
 
 transformed data {
@@ -48,6 +48,9 @@ generated quantities {
   vector[nt] mu_p[ahead + max(Q,P)];
 
   matrix[nt+1, nt] beta = append_row( beta0, diag_matrix(beta1) );
+
+  // log lik for LFO-CV
+  real log_lik[ahead];
   
   // Placeholders
   matrix[nt, nt] A_part_p;
@@ -96,11 +99,23 @@ generated quantities {
 	A_part_p +  B_part_p;
     }
     R_p[t, ] = cov2cor(H_p[t,]);
-    
-    if ( distribution == 0 ) {
-      rts_p[t,] = multi_normal_rng( mu_p[t,], H_p[t,]);
-    } else if ( distribution == 1 ) {
-      rts_p[t,] = multi_student_t_rng( nu, mu_p[t,], H_p[t,]);
-    }
+
+    /* sampling distributions */
+#include /generated/forecast_sampling.stan
+    /* if ( distribution == 0 ) { */
+    /*   rts_p[t,] = multi_normal_rng( mu_p[t,], H_p[t,]); */
+    /*   if( compute_log_lik ) { */
+    /* 	for( i in 1:ahead ){ */
+    /* 	  log_lik[i] = multi_normal_lpdf( future_rts[i] |  mu_p[t,], H_p[t,] ); */
+    /* 	} */
+    /*   } */
+    /* } else if ( distribution == 1 ) { */
+    /*   rts_p[t,] = multi_student_t_rng( nu, mu_p[t,], H_p[t,]); */
+    /*   if( compute_log_lik ) { */
+    /* 	for( i in 1:ahead ){ */
+    /* 	  log_lik[i] = multi_student_t_lpdf( future_rts[i] | nu, mu_p[t,], H_p[t,] ); */
+    /* 	} */
+    /*   } */
+    /* } */
   }
 }

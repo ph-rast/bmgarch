@@ -679,7 +679,7 @@ print.forecast.bmgarch <- function(x, ...) {
         }
     }
 
-    return(invisible(x))
+
 }
 
 ##' @title Print method for fitted.bmgarch objects.
