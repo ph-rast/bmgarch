@@ -84,6 +84,7 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##' @param meanstructure Character (Default: "constant"). Defines model for means. Either 'constant'  or 'arma'. Currently arma(1,1) only.
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[rstan]{stan}}.
 ##' @return \code{bmgarch} object.
+##' @importFrom Rdpack reprompt
 ##' @author Philippe Rast, Stephen R. Martin
 ##' @export
 ##' @examples
