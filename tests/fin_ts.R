@@ -209,7 +209,7 @@ lfo2
 
 bmgarch_objects <- list(fit, fit2 )
 
-mw <- model_weights(bmgarch_objects = bmgarch_objects, L =  80)
+mw <- model_weights(bmgarch_objects = bmgarch_objects, L =  90)
 mw
 
                                         #object <- fit

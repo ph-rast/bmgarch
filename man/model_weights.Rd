@@ -2,9 +2,14 @@
 % Please edit documentation in R/model_weights.R
 \name{model_weights}
 \alias{model_weights}
-\title{Model averaging}
+\title{Model weights}
 \usage{
-model_weights(bmgarch_objects, lfo_objects = NULL, L = NULL)
+model_weights(
+  bmgarch_objects = NULL,
+  lfo_objects = NULL,
+  L = NULL,
+  method = "stacking"
+)
 }
 \arguments{
 \item{bmgarch_objects}{}
@@ -12,13 +17,16 @@ model_weights(bmgarch_objects, lfo_objects = NULL, L = NULL)
 \item{lfo_objects}{}
 
 \item{L}{}
+
+\item{method}{Ensemble methods, 'stacking' (default) or 'pseudobma'}
 }
 \value{
 Model weights
 }
 \description{
-.. content for \description{} (no empty lines) ..
-.. content for \details{} ..
+Model averaging via stacking of predictive distribution.
+content for \description{Desc} (no empty lines) ..
+.. content for \details{Det} ..
 }
 \author{
 philippe

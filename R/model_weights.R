@@ -13,16 +13,18 @@
                       chain_id = rep(1:n_chains,  each = iter-warmup ))
 }
 
-##' .. content for \description{} (no empty lines) ..
-##' .. content for \details{} ..
-##' @title Model averaging
+##' Model averaging via stacking of predictive distribution.
+##' content for \description{Desc} (no empty lines) ..
+##' .. content for \details{Det} ..
+##' @title Model weights
 ##' @param bmgarch_objects 
 ##' @param lfo_objects 
 ##' @param L 
+##' @param method Ensemble methods, 'stacking' (default) or 'pseudobma' 
 ##' @return Model weights
 ##' @author philippe
 ##' @export
-model_weights <- function(bmgarch_objects = NULL,  lfo_objects = NULL, L = NULL ) {   
+model_weights <- function(bmgarch_objects = NULL,  lfo_objects = NULL, L = NULL, method = "stacking") {   
 
     if( !is.null(bmgarch_objects ) & !is.null(lfo_objects )) stop( "Supply only 'bmgarch_objects' or 'lfo_objects', not both" )
     
@@ -38,8 +40,25 @@ model_weights <- function(bmgarch_objects = NULL,  lfo_objects = NULL, L = NULL 
     ## obtain iter, warmup and n_chains from first model
     r_eff_list <- lapply( ll_list, FUN = .rel_eff, bmgarch_objects[[1]] )
 
-    wts <- loo::loo_model_weights( ll_list, method = "stacking",
+    wts <- loo::loo_model_weights( ll_list, method = method,
                                   r_eff_list = r_eff_list,
                                   optim_control = list(reltol=1e-10))
-    return(wts)
+    out <- list()
+    out$wts <- wts
+    out$ll_list <- ll_list
+    out$r_eff_list <- r_eff_list
+
+    attr( out, "class" ) <- "model_weights"
+    return(out)
+}
+
+
+##' @title Print method for model_weights
+##' @param x 
+##' @return model_weights objects with weights, list of log-likelihoods, and r_eff_list 
+##' @author philippe
+##' @export
+print.model_weights <- function(x ) {
+    print(x$wts)
+    return(invisible(x) )
 }
