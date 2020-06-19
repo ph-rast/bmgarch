@@ -3,7 +3,15 @@ data {
 }
 
 transformed data {
-#include /transformed_data/xh_marker.stan 
+  matrix[ahead + max(Q,P), nt] xC_c;
+#include /transformed_data/xh_marker.stan
+// Concatenate xC with xC_p
+  for(i in 1:max(Q,P) ) {
+    xC_c[i] = xC[T - (max(Q,P) - 1)]';
+  }
+  for(i in 1:ahead) {
+    xC_c[i + max(Q,P)] = xC_p[i]';
+  }  
 }
 
 parameters {
@@ -47,7 +55,8 @@ generated quantities {
   vector[nt] u_p[ahead + max(Q,P)];
   vector[nt] Qr_sdi_p[ahead + max(Q,P)];
   // log lik for LFO-CV
-  real log_lik[ahead];
+// only compute log_lik if it is actually requested 
+  real log_lik[compute_log_lik ==1 ? ahead:0];
   
   // Placeholders
   real<lower = 0> vd_p[nt];
@@ -104,7 +113,7 @@ generated quantities {
 
       // Predictor on diag (given in xC)
       if ( xC_marker >= 1) {
-	vd_p[d] = exp( c_h[d] + beta[d] * xC_p[t-1, d] ) + ma_d_p[d] + ar_d_p[d];
+	vd_p[d] = exp( c_h[d] + beta[d] * xC_c[t, d] ) + ma_d_p[d] + ar_d_p[d];
       } else if ( xC_marker == 0) {
       	vd_p[d] = exp( c_h[d] )  + ma_d_p[d] + ar_d_p[d];
       }

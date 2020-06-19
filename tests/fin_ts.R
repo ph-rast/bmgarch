@@ -176,40 +176,53 @@ mcmc_parcoord(as.array(fit$model_fit, pars = c("A","B","Cnst","beta0","beta1","p
 
 
 library(bmgarch )
-data(stocks )
+data( stocks )
+head( stocks )
+
+tail(panas )
+
+fit <- bmgarch(data = panas[1:100, c("Pos", "Neg")],
+               parameterization = "BEKK",
+               iterations = 100)
+fit 
 
 
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
-               parameterization = "BEKK", standardize_data = TRUE,
-               iterations = 1000)
-fit 
+               parameterization = "CCC", standardize_data = TRUE,
+               iterations = 100)
+fit
+
 summary( fit )
 
-#object <- fit
+fit2 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )], P =  1, Q = 1,
+                xC = stocks[1:100, "honda"],
+                parameterization = "DCC", standardize_data = TRUE, #meanstructure = 'arma',
+                iterations = 100)
+summary(fit2)
 
-fcst <- forecast( fit,  ahead = 1, xC = NULL, newdata =  stocks[101, c("toyota",  "nissan" ), drop = FALSE])
-fcst
+forecast(fit2, ahead = 1,
+#         newdata = stocks[101:102, c("toyota", "nissan" )],
+         xC = stocks[101, c("toyota", "nissan" )] )
 
-ll <- rstan::extract(fit$model_fit, pars =  "log_lik")$log_lik
-llf <- cbind(ll, fcst$forecast$log_lik)
-loo::loo( llf[,  51:100] )
+lfo2 <- loo(fit2, mode = 'backward',  L = 65 )
+lfo2
 
+bmgarch_objects <- list(fit, fit2 )
 
-system.time( {
-    fwd <- lfocv( fit, mode = 'forward', L =  50)
-})
-## five times slower than backward
+mw <- model_weights(bmgarch_objects = bmgarch_objects, L =  80)
+mw
 
-sum( fwd$out, na.rm = TRUE )
-fwd$ks
-fwd$refits
-fwd$loglik[1:3,]
+                                        #object <- fit
 
-backw <- lfocv( fit, mode = 'backward', L =  95)
-
-backw
+back <- loo( fit, type = 'lfo', L =  95)$loglik
+back
 
 
+back <- loo( fit2, type = 'lfo', L =  95)$loglik
+back
+
+ll_lfo <- function(x) loo( x, type = 'lfo', L =  95)$loglik
+ll_lfo(fit2 )
 
 
 backw$refits
