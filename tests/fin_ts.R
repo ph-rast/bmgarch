@@ -176,75 +176,267 @@ mcmc_parcoord(as.array(fit$model_fit, pars = c("A","B","Cnst","beta0","beta1","p
 
 
 library(bmgarch )
-data( stocks )
-head( stocks )
-
-tail(panas )
-
-fit <- bmgarch(data = panas[1:100, c("Pos", "Neg")],
-               parameterization = "BEKK",
-               iterations = 100)
-fit 
-
 
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
                parameterization = "CCC", standardize_data = TRUE,
                iterations = 100)
-fit
 
-summary( fit )
-
-fit2 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )], P =  1, Q = 1,
-                xC = stocks[1:100, "honda"],
+fit1 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )], 
                 parameterization = "DCC", standardize_data = TRUE, #meanstructure = 'arma',
                 iterations = 100)
-summary(fit2)
 
-forecast(fit2, ahead = 1,
-#         newdata = stocks[101:102, c("toyota", "nissan" )],
-         xC = stocks[101, c("toyota", "nissan" )] )
+forecast(fit, ahead = 1 )
 
-lfo2 <- loo(fit2, mode = 'backward',  L = 65 )
+lfo2 <- loo(fit, mode = 'backward',  L = 85 )
 lfo2
 
-bmgarch_objects <- list(fit, fit2 )
-
-mw <- model_weights(bmgarch_objects = bmgarch_objects, L =  90)
+bmgarch_objects <- list(fit, fit1 )
+mw <-  model_weights(bmgarch_objects = bmgarch_objects, L =  90)
 mw
 
-                                        #object <- fit
+bmgarch_objects[1]
 
-back <- loo( fit, type = 'lfo', L =  95)$loglik
-back
+forecast( bmgarch_objects[[1]], ahead = 1)
+forecast( bmgarch_objects[[2]], ahead = 1)
 
-
-back <- loo( fit2, type = 'lfo', L =  95)$loglik
-back
-
-ll_lfo <- function(x) loo( x, type = 'lfo', L =  95)$loglik
-ll_lfo(fit2 )
+forecast( bmgarch_objects, ahead = 1)
 
 
-backw$refits
-backw$approx_elpd_1sap
-sum( backw$out, na.rm = TRUE )
-
-ll_ccc <- backw$loglik 
-ll_dcc <- backw$loglik 
-ll_bekk <- backw$loglik 
 
 
-lrat <- .sum_log_ratios( backw$loglik )
-psisobj <- loo::psis( lrat )
-psisobj
-wgt <- weights(psisobj,  normalize = TRUE )
+## Figure out whther object is a list of models or just one model
+## Check for nesting structure; If depth == 1, one object else list of models
+.depth <- function(this,thisdepth=0){
+  if(!is.list(this)){
+    return(thisdepth)
+  }else{
+    return(max(unlist(lapply(this,.depth,thisdepth=thisdepth+1))))    
+  }
+}
 
-sum( apply(lfoobj$loglik, 2, FUN = function(x) {
-    .log_sum_exp(wgt + x)    }
-    ))
+
+    
+depth( fit )
+n_mods <- depth( bmgarch_objects )
+n_mods
+
+object <- fit
+object <- fit1 
+##
+
+## Define Weight for given model
+wgt <- mw$wts
+wgt <- c( 0.7, 0.3 )
+wgt
+
+seq_len(2)
 
 
-str(lfoobj)
+for(i in 1:2 )
+
+    i <- 2
+object <- bmgarch_objects[[i]]
+object$param
+standat <- list(T = object$TS_length,
+                nt = object$nt,
+                rts = cbind(object$RTS_full),
+                xC = object$xC,
+                Q =  object$mgarchQ,
+                P =  object$mgarchP,
+                ahead =  ahead, 
+                meanstructure =  object$meanstructure,
+                distribution =  object$num_dist,
+                xC_p =  xC,
+                future_rts = newdata,
+                compute_log_lik =  compute_log_lik)
+standat
+
+forecasted <- rstan::gqs( object = bmgarch:::stanmodels$forecastDCC,
+                         draws = as.matrix(wgt_object$model_fit),data = standat)
+##
+forecasted
+
+
+#rtsp <- rstan::extract(forecasted,  par = "rts_p" )
+#Hp <- rstan::extract(forecasted,  par = "H_p" )
+forecasted
+
+
+## Try to recreate the structure of the list for the DCC model
+## in order to be able to add the constant correlation
+constant_r <- rstan::extract( fit$model_fit,  pars = "R" )
+
+constant_r$R[,,2][,1] %*% array(1, dim = c(1, 3 ) )
+
+lapply(constant_r, FUN = function(x ) {
+    dims <- dim(x )
+    apply(x, 2:length(dims), FUN = function(x) { mean(x )
+#        x %*% array(1, dim = c(1, 3 ) )
+    })})
+
+lapply(constant_r, FUN = function(x ) {
+    dims <- dim(x )
+})
+
+constant_r$R[,1,2]
+
+
+bmgarch:::.get_stan_summary(forecasted,  "R_p",  c(.1, .9 ) )
+
+parms <- rstan::extract(forecasted, par = c( "rts_p", "H_p") )
+parms
+
+corr_parms <- rstan::extract(forecasted, par = c( "R_p") )
+corr_parms
+
+
+
+
+if(i == 1 ) {
+    ## write samples
+    weighted_samp <-  Map("*", parms, wgt[i])    
+} else if( i > 1 ) {
+    ## sum over individual list elements given the weights
+    weighted_tmp <- Map("*", parms, wgt[i])
+    weighted_samp <-
+        Map("+", weighted_samp, weighted_tmp)
+}
+#####
+## Done combining samples
+#####
+
+#####
+## Compute summary stats on weighted sample
+####
+weighted_samp
+
+##
+## Means 
+weighted_means <- Map(colMeans,  weighted_samp)
+weighted_means
+
+c( t( weighted_means$rts_p ) )
+
+bmgarch:::.get_stan_summary(forecasted, "rts_p",  c(.025, .975) )
+
+## SD's 
+.colSDs <- function(x) {
+    lapply(x, function(x) {
+        dims <- dim(x)
+        apply(x, 2:length(dims), sd)
+    })
+}
+
+weighted_sds <- .colSDs(weighted_samp )
+weighted_sds
+
+c( t( weighted_sds$rts_p ) )
+
+
+## Quantiles
+.colQTs <- function(x, probs = c(.025, .975 )) {
+#    probs <- sort( c( probs, .5))
+    lapply(weighted_samp, function(x) {
+        dims <- dim(x)
+        apply(x, 2:length(dims), quantile, probs)
+    })
+}
+
+weighted_mdn <- .colQTs(weighted_samp,  probs = c(0.5) )
+weighted_mdn
+
+c( t( weighted_mdn$rts_p ) )
+
+weighted_lower <- .colQTs(weighted_samp,  probs = c(0.025) )
+c( t( weighted_lower$rts_p ) )
+
+weighted_upper <- .colQTs(weighted_samp,  probs = c(0.095) )
+c( t( weighted_upper$rts_p ) )
+
+
+f.mean <- bmgarch:::.get_stan_summary(forecasted,  "rts_p",  c(0.025, .975 ) )
+f.mean
+
+f.mean[,"mean"] <- c( t( weighted_means$rts_p ) )
+f.mean[,"sd"] <- c( t( weighted_sds$rts_p ) )
+f.mean[,"mdn"] <- c( t( weighted_mdn$rts_p ) )
+f.mean[,4] <- c( t( weighted_lower$rts_p ) )
+f.mean[,5] <- c( t( weighted_upper$rts_p ) )
+f.mean[,'n_eff'] <- NA
+f.mean[,'Rhat'] <- NA
+f.mean
+
+colnames(f.mean )[4:5] <-
+    c( paste0(min(0.025)*100, "%" ), paste0(max(0.095)*100, "%" )
+
+
+f.var = bmgarch:::.get_stan_summary(forecasted,  "H_p",  c(0.025,  .975 ) )
+
+
+.sort = function(x ) {
+    c(apply( x, 1, FUN = function(x) {
+        c(x )
+    }))
+}
+
+
+f.var[,"mean"] <- .sort(weighted_means$H_p)
+f.var[,"sd"] <- .sort(weighted_sds$H_p)
+f.var[,"mdn"] <- .sort(weighted_mdn$H_p)
+f.var[,4] <- .sort(weighted_lower$H_p)
+f.var[,5] <- .sort(weighted_upper$H_p)
+f.var[,'n_eff'] <- NA
+f.var[,'Rhat'] <- NA
+f.var
+
+
+
+
+
+rstan::summary(weighted_forecasted, pars = "ar_d")$summary[, "mean"]
+rstan::summary(forecasted, pars = "ar_d", probs = c(.1, .9))$summary
+
+rstan::get_posterior_mean(forecasted)
+rstan::get_posterior_mean(weighted_forecasted)
+rstan::extract(forecasted, pars = "ar_d" )[[1]]
+
+
+
+.get_stan_summary <- function(model_fit, params, CrI) {
+    CrI <- c(.5, CrI)
+    cols <- c("mean","sd",paste0(CrI*100, "%"), "n_eff", "Rhat")
+    model_summary <- rstan::summary(model_fit, pars = params, probs = CrI)$summary[,cols]
+    colnames(model_summary)[colnames(model_summary) == "50%"] <- "mdn"
+    return(model_summary)
+}
+.get_stan_summary(forecasted, "ar_d",  c(.1, .92 ) )
+
+
+.append_weight <- function(x ) {
+    x$weight <- 
+        }
+
+bmgarch_objects[[1]]$weight <- 1
+
+.weighted_forecast <- function(x, ahead = 1, xC = NULL, weight = 1) {
+    fc <- forecast( x, ahead = 1, xC = xC , weight = weight)
+    return(fc )
+}
+
+round( mw$wts[], 2)
+
+
+## pass weight from model_weights to the forecasting function
+## Map passes the corresponding elemnets of both lists to the
+## forecasting function
+
+
+
+
+
+rstan::summary(weighted_forecasted, pars = "rts_p")$summary[, "mean"]
+
+rstan::summary(forecasted, pars = "rts_p")$summary[, "mean"]
 
 
 exct <- lfocv( fit, mode = 'exact', L =  50)

@@ -1,3 +1,59 @@
+##' Figure out whther object is a list of models or just one model
+##' Check for nesting structure; If depth == 1, one object else list of models
+##' from: \url{https://stackoverflow.com/questions/13432863/determine-level-of-nesting-in-r}
+##' @title Obtain nesting depth of list
+##' @param this 
+##' @param thisdepth 
+##' @return Depth
+##' @author philippe
+##' @keywords internal
+.depth <- function(this,thisdepth=0){
+  if(!is.list(this)){
+    return(thisdepth)
+  }else{
+    return(max(unlist(lapply(this,.depth,thisdepth=thisdepth+1))))    
+  }
+}
+##' Obtain SD's over columns in lists
+##' @title Column SD's
+##' @param x 
+##' @return SD's at the columns level witin list
+##' @author philippe
+##' @keywords internal 
+.colSDs <- function(x) {
+    lapply(x, function(x) {
+        dims <- dim(x)
+        apply(x, 2:length(dims), sd)
+    })
+}
+
+##' Obtain quantiles over columns in lists
+##' @title Quantiles within lists
+##' @param x 
+##' @param probs Quantile(s). Inherits from \code{forecast} which defaults to \code{c(.025, .975)}.
+##' @return Quantiles at the column level within lists
+##' @author philippe
+##' @keywords internal
+.colQTs <- function(x, probs = CrI) {
+    lapply(x, function(x) {
+        dims <- dim(x)
+        apply(x, 2:length(dims), quantile, probs)
+    })
+}
+
+##' @title Sort list object 
+##' @param x 
+##' @return sorted list as vector
+##' @author philippe
+##' @keywords internal
+.sort <- function(x ) {
+    c(apply( x, 1, FUN = function(x) {
+        c(x )
+    }))
+}
+
+
+
 ##' Estimates forecasted means, variances, and correlations from a fitted bmgarch model.
 ##' @title Forecast method for bmgarch objects.
 ##' @param object bmgarch object.
@@ -7,6 +63,7 @@
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' @param seed Integer (Optional). Specify seed for \code{\link[rstan]{sampling}}.
 ##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
+##' @param weight Takes weights from model_weight function. Defaults to 1 -- this parameter is not typically set by user.
 ##' @return forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data.
 ##' See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
 ##' \code{forecast} is a list of four components:
@@ -45,7 +102,10 @@
 ##' # Save only forecasted values as data frame.
 ##' fit.fc.df <- as.data.frame(fit.fc, backcast = FALSE)
 ##' }
-forecast.bmgarch <- function(object, ahead = 1, xC = NULL, newdata = NULL, CrI = c(.025, .975), seed = NA, digits = 2) {
+forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
+                             newdata = NULL, CrI = c(.025, .975),
+                             seed = NA, digits = 2, weights = NULL,
+                             L = NA, method = 'stacking') {
 
     # Define a 0 array for stan.
     if(is.null(xC)) {
@@ -58,59 +118,130 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, newdata = NULL, CrI =
         compute_log_lik <- 1
     }
 
+    ## Are we dealing with one object or a list of objects
+    n_mods <- .depth( object )
+
+    ## if user provides weights from the model_weigths function
+    ## proceed directly to forecasting, else, run model_weights
+    ## and extract model weights here
+    if(n_mods > 1 & is.null( weights ) ) {
+        mw <- bmgarch::model_weights(bmgarch_objects = object, L = L)
+        weights <- mw$wts[] 
+    } else if( n_mods == 1 ) {
+        weights <- 1
+        object[[1]] <- object
+    }
     
-    # Get stan data
-    standat <- list(T = object$TS_length,
-                    nt = object$nt,
-                    rts = cbind(object$RTS_full),
-                    xC = object$xC,
-                    Q =  object$mgarchQ,
-                    P =  object$mgarchP,
-                    ahead =  ahead, 
-                    meanstructure =  object$meanstructure,
-                    distribution =  object$num_dist,
-                    xC_p =  xC,
-                    future_rts = newdata,
-                    compute_log_lik =  compute_log_lik)
+    for(i in seq_len(n_mods) ) {
+        wgt_object <- object[[i]]
+        
+        ## Get stan data
+        standat <- list(T = wgt_object$TS_length,
+                        nt = wgt_object$nt,
+                        rts = cbind(wgt_object$RTS_full),
+                        xC = wgt_object$xC,
+                        Q =  wgt_object$mgarchQ,
+                        P =  wgt_object$mgarchP,
+                        ahead =  ahead, 
+                        meanstructure =  wgt_object$meanstructure,
+                        distribution =  wgt_object$num_dist,
+                        xC_p =  xC,
+                        future_rts = newdata,
+                        compute_log_lik =  compute_log_lik)
 
-    gqs_model <- switch(object$param,
-                        DCC = stanmodels$forecastDCC,
-                        CCC = stanmodels$forecastCCC,
-                        BEKK = stanmodels$forecastBEKK,
-                        pdBEKK = stanmodels$forecastBEKK,
-                        NULL)
+        gqs_model <- switch(wgt_object$param,
+                            DCC = stanmodels$forecastDCC,
+                            CCC = stanmodels$forecastCCC,
+                            BEKK = stanmodels$forecastBEKK,
+                            pdBEKK = stanmodels$forecastBEKK,
+                            NULL)
 
-    if(is.null(gqs_model)) {
-        stop("bmgarch object 'param' does not match a supported model. ",
-             object$param, "is not one in ", paste0(supported_models, collapse = ", "), ".")
+        if(is.null(gqs_model)) {
+            stop("bmgarch object 'param' does not match a supported model. ",
+                 wgt_object$param, "is not one in ", paste0(supported_models, collapse = ", "),
+                 ".")
+        }
+
+        ## TODO: This backcast now depends on what model was fit
+        backcast <- max(wgt_object$mgarchP, wgt_object$mgarchQ)
+        nt <- wgt_object$nt
+        cast_start <- (wgt_object$TS_length - backcast + 1)
+        forecast_start <- (wgt_object$TS_length + 1)
+        forecast_end <- (wgt_object$TS_length + ahead)
+
+        ## TODO: Limit pars to only what is needed (H_p, R/R_p, rts_p, mu_p)
+        forecasted <- rstan::gqs(gqs_model,
+                                 draws = as.matrix(wgt_object$model_fit),
+                                 data = standat,
+                                 seed = seed)
+
+
+        
+        ## Extract relevant parameters: rts_p, H_p
+        ## For models with dynamic corrs: R_p
+        parms <- rstan::extract(forecasted, par = c( "rts_p", "H_p" ) )
+
+        ## TODO For models with constant corr, obtain from fitted object: R
+
+        ## Weight and sum up samples 
+        if( i == 1 ) {
+            ## write samples
+            weighted_samp <-  Map("*", parms, weights[i])    
+        } else if( i > 1 ) {
+            ## sum over individual list elements given the weights
+            weighted_tmp <- Map("*", parms, weights[i])
+            weighted_samp <- Map("+", weighted_samp, weighted_tmp)
+        }
     }
+    
+    ## Get stan summaries for forecasted values to put into table
+    weighted_means <- Map(colMeans,  weighted_samp)
+    weighted_sds <- .colSDs(weighted_samp )
+    weighted_mdn <- .colQTs(weighted_samp,  probs = c(0.5) )
+    weighted_lower <- .colQTs(weighted_samp,  probs = min(CrI))
+    weighted_upper <- .colQTs(weighted_samp,  probs = max(CrI))
 
-    backcast <- max(object$mgarchP, object$mgarchQ)
-    nt <- object$nt
-    cast_start <- (object$TS_length - backcast + 1)
-    forecast_start <- (object$TS_length + 1)
-    forecast_end <- (object$TS_length + ahead)
+    ## Init f.mean
+    f.mean <- bmgarch:::.get_stan_summary(forecasted,  "rts_p",  c(0.025, .975 ) )
+    f.mean[,"mean"] <- c( t( weighted_means$rts_p ) )
+    f.mean[,"sd"] <- c( t( weighted_sds$rts_p ) )
+    f.mean[,"mdn"] <- c( t( weighted_mdn$rts_p ) )
+    f.mean[,4] <- c( t( weighted_lower$rts_p ) )
+    f.mean[,5] <- c( t( weighted_upper$rts_p ) )
+    f.mean[,'n_eff'] <- NA
+    f.mean[,'Rhat'] <- NA
+    
+    colnames(f.mean )[4:5] <-
+        c( paste0(min(CrI)*100, "%" ), paste0(max(CrI)*100, "%" ))
 
-    # TODO: Limit pars to only what is needed (H_p, R/R_p, rts_p, mu_p)
-    forecasted <- rstan::gqs(gqs_model,
-                             draws = as.matrix(object$model_fit),
-                             data = standat,
-                             seed = seed)
+    ## init var
+    f.var <- bmgarch:::.get_stan_summary(forecasted,  "H_p",  c(0.025, .975 ) )
+    f.var[,"mean"] <- .sort(weighted_means$H_p)
+    f.var[,"sd"] <- .sort(weighted_sds$H_p)
+    f.var[,"mdn"] <- .sort(weighted_mdn$H_p)
+    f.var[,4] <- .sort(weighted_lower$H_p)
+    f.var[,5] <- .sort(weighted_upper$H_p)
+    f.var[,'n_eff'] <- NA
+    f.var[,'Rhat'] <- NA
 
-    ## Get stan summaries for forecasted values.
-    f.mean <- .get_stan_summary(forecasted, "rts_p", CrI)
-    f.var <- .get_stan_summary(forecasted, "H_p", CrI)
-    f.cor <- NA
-    if(object$param != "CCC") {
-        f.cor <- .get_stan_summary(forecasted, "R_p", CrI)
-    }
+    colnames(f.var )[4:5] <-
+        c( paste0(min(CrI)*100, "%" ), paste0(max(CrI)*100, "%" ))
+          
+    
+    ## f.mean <- .get_stan_summary(forecasted, "rts_p", CrI)
+    ## f.var <- .get_stan_summary(forecasted, "H_p", CrI)
+    ## f.cor <- NA
+     if(object$param != "CCC") {
+         f.cor <- .get_stan_summary(forecasted, "R_p", CrI)
+         f.cor[1,1] <- "TODO Version with weighted corr across CCC and DCC etc"
+     }
 
     # Restructure to array
     ## f.mean
     stan_sum_cols <- colnames(f.mean)
     f.mean <- array(f.mean, dim = c(nt, backcast + ahead , ncol(f.mean)))
     f.mean <- aperm(f.mean, c(2,3,1))
-    dimnames(f.mean) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = object$TS_names)
+    dimnames(f.mean) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = wgt_object$TS_names)
 
     ## f.var
     ### Pull out indices for [period, a, a]
@@ -118,14 +249,14 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, newdata = NULL, CrI =
     f.var <- f.var[f.var.indices,]
     f.var <- array(f.var, dim = c(nt, backcast + ahead, ncol(f.var)))
     f.var <- aperm(f.var, c(2, 3, 1))
-    dimnames(f.var) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = object$TS_names)
+    dimnames(f.var) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = wgt_object$TS_names)
 
     ## f.cor
-    if(object$param != "CCC") {
+    if(wgt_object$param != "CCC") {
         # Lower-triangular indices
         f.cor.indices.L <- which(lower.tri(matrix(0, nt, nt)), arr.ind = TRUE)
         # Labels mapping to TS names
-        f.cor.indices.L.labels <- paste0(object$TS_names[f.cor.indices.L[,1]], "_", object$TS_names[f.cor.indices.L[,2]])
+        f.cor.indices.L.labels <- paste0(wgt_object$TS_names[f.cor.indices.L[,1]], "_", wgt_object$TS_names[f.cor.indices.L[,2]])
         # Indices as "a,b"
         f.cor.indices.L.char <- paste0(f.cor.indices.L[,1], ",", f.cor.indices.L[,2])
         # Indicices as "[period,a,b]"
@@ -140,7 +271,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, newdata = NULL, CrI =
     # Remove backcasts from forecasts.
     f.mean <- f.mean[-c(1:backcast), , , drop = FALSE]
     f.var <- f.var[-c(1:backcast), , , drop = FALSE]
-    if(object$param != "CCC") {
+    if(wgt_object$param != "CCC") {
         f.cor <- f.cor[-c(1:backcast), , , drop = FALSE]
     }
 
@@ -159,12 +290,12 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL, newdata = NULL, CrI =
 
     
     metaNames <- c("param", "distribution", "num_dist", "nt", "TS_length", "TS_names", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
-    meta <- with(object, mget(metaNames))
+    meta <- with(wgt_object, mget(metaNames))
     out$meta <- meta
     out$meta$digits <- digits
     out$meta$CrI <- CrI
 
-    out$backcast <- fitted.bmgarch(object, CrI)$backcast
+    out$backcast <- fitted.bmgarch(wgt_object, CrI)$backcast
 
     class(out) <- "forecast.bmgarch"
     return(out)

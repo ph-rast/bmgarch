@@ -11,7 +11,10 @@
   newdata = NULL,
   CrI = c(0.025, 0.975),
   seed = NA,
-  digits = 2
+  digits = 2,
+  weights = NULL,
+  L = NA,
+  method = "stacking"
 )
 }
 \arguments{
@@ -28,6 +31,8 @@
 \item{seed}{Integer (Optional). Specify seed for \code{\link[rstan]{sampling}}.}
 
 \item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
+
+\item{weight}{Takes weights from model_weight function. Defaults to 1 -- this parameter is not typically set by user.}
 }
 \value{
 forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data.

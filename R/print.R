@@ -60,6 +60,8 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
     return(model_summary)
 }
 
+
+
 ##' @title Print method for bmgarch.summary objects.
 ##' @param x summary.bmgarch object.
 ##' @param ... Not used.
