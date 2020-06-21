@@ -119,7 +119,13 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     }
 
     ## Are we dealing with one object or a list of objects
-    n_mods <- .depth( object )
+    n_mods <- 1
+    if("bmgarch_list" %in% class(object)) {
+        n_mods <- length(object)
+    } else {
+        object <- list(object)
+    }
+    ## n_mods <- .depth( object )
 
     ## if user provides weights from the model_weigths function
     ## proceed directly to forecasting, else, run model_weights
@@ -129,7 +135,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
         weights <- mw$wts[] 
     } else if( n_mods == 1 ) {
         weights <- 1
-        object[[1]] <- object
+        ## object[[1]] <- object
     }
     
     for(i in seq_len(n_mods) ) {
