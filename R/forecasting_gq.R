@@ -974,3 +974,14 @@ as.data.frame.fitted.bmgarch <- function(x, ...) {
     return(df)
 
 }
+
+##' @title Collect bmgarch objects into list.
+##' @param ... bmgarch objects.
+##' @return List of bmgarch objects. Class: bmgarch_list and bmgarch.
+##' @author Stephen R. Martin
+##' @export
+bmgarch_list <- function(...) {
+    out <- list(...)
+    class(out) <- c("bmgarch_list", "bmgarch")
+    return(out)
+}
