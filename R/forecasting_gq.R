@@ -801,7 +801,9 @@ print.forecast.bmgarch <- function(x, ...) {
     digits <- x$meta$digits
 
     # Mean structure
-    if(x$meta$meanstructure == 1) {
+    meanstructure <- any(sapply(x$meta_list, function(x) {x$meanstructure == 1}))
+    ## if(x$meta$meanstructure == 1 | x$meta$n_mod > 1) {
+    if(meanstructure) {
         .sep()
         cat("[Mean]", "Forecast for", ahead, "ahead:")
         .newline(2)
@@ -822,7 +824,9 @@ print.forecast.bmgarch <- function(x, ...) {
         print(round(x$forecast$var[,,t], digits))
     }
     # Cors
-    if(x$meta$param != "CCC") {
+    condCor <- any(sapply(x$meta_list, function(x) {x$param != "CCC"}))
+    ## if(x$meta$param != "CCC" | x$meta$n_mod > 1) {
+    if(condCor) {
         cat("[Correlation]", "Forecast for", ahead, "ahead:")
         .newline(2)
         for(t in 1:(nt*(nt - 1) / 2)) {
