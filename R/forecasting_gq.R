@@ -309,7 +309,10 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
 
     
     metaNames <- c("param", "distribution", "num_dist", "nt", "TS_length", "TS_names", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
-    meta <- with(wgt_object, mget(metaNames))
+    meta <- with(object[[1]], mget(metaNames))
+    meta_bmgarch_list <- lapply(object, function(x) {with(x, mget(metaNames))})
+    out$meta_list <- meta_bmgarch_list
+    out$meta$n_mods <- n_mods
     out$meta <- meta
     out$meta$digits <- digits
     out$meta$CrI <- CrI
