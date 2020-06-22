@@ -43,6 +43,7 @@ parameters {
 generated quantities {
   // Params for prediction
   vector[nt] D_p[ahead + max(Q,P)];
+  corr_matrix[nt] R_p[ahead + max(Q, P)] = rep_array(R, ahead + max(Q, P)); // R_p = R for all t.
 
   cov_matrix[nt] H_p[ahead + max(Q,P)];
   
