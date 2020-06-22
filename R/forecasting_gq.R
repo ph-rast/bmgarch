@@ -312,8 +312,8 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     meta <- with(object[[1]], mget(metaNames))
     meta_bmgarch_list <- lapply(object, function(x) {with(x, mget(metaNames))})
     out$meta_list <- meta_bmgarch_list
-    out$meta$n_mods <- n_mods
     out$meta <- meta
+    out$meta$n_mods <- n_mods
     out$meta$digits <- digits
     out$meta$CrI <- CrI
 
