@@ -939,7 +939,9 @@ as.data.frame.forecast.bmgarch <- function(x, backcast = TRUE, ...) {
 
     dfList$forecast.var <- .pred_array_to_df(x$forecast$var, "forecast", "var")
 
-    if(x$meta$param != "CCC") {
+    ## if(x$meta$param != "CCC") {
+    condCor <- any(sapply(x$meta_list, function(x) {x$param != "CCC"}))
+    if(condCor) {
         dfList$forecast.cor <- .pred_array_to_df(x$forecast$cor, "forecast", "cor")
     }
 
