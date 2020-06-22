@@ -195,9 +195,8 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
         
         ## Extract relevant parameters: rts_p, H_p
         ## For models with dynamic corrs: R_p
-        parms <- rstan::extract(forecasted, par = c( "rts_p", "H_p" ) )
-
-        ## TODO For models with constant corr, obtain from fitted object: R
+        ## CCC now has R_p, which is just R repeated multiple times.
+        parms <- rstan::extract(forecasted, par = c( "rts_p", "H_p", "R_p") )
 
         ## Weight and sum up samples 
         if( i == 1 ) {
@@ -247,17 +246,26 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     ## f.mean <- .get_stan_summary(forecasted, "rts_p", CrI)
     ## f.var <- .get_stan_summary(forecasted, "H_p", CrI)
     ## f.cor <- NA
-     if(object$param != "CCC") {
-         f.cor <- .get_stan_summary(forecasted, "R_p", CrI)
-         f.cor[1,1] <- "TODO Version with weighted corr across CCC and DCC etc"
-     }
+    # TODO: Change CCC forecast model to provide R_p; remove CCC conditionals that are caused by R_p not existing.
+    f.cor <- bmgarch:::.get_stan_summary(forecasted,  "R_p",  c(0.025, .975 ) )
+    f.cor[,"mean"] <- .sort(weighted_means$R_p)
+    f.cor[,"sd"] <- .sort(weighted_sds$R_p)
+    f.cor[,"mdn"] <- .sort(weighted_mdn$R_p)
+    f.cor[,4] <- .sort(weighted_lower$R_p)
+    f.cor[,5] <- .sort(weighted_upper$R_p)
+    f.cor[,'n_eff'] <- NA
+    f.cor[,'Rhat'] <- NA
+     ## if(object$param != "CCC") {
+     ##     f.cor <- .get_stan_summary(forecasted, "R_p", CrI)
+     ##     f.cor[1,1] <- "TODO Version with weighted corr across CCC and DCC etc"
+     ## }
 
     # Restructure to array
     ## f.mean
     stan_sum_cols <- colnames(f.mean)
     f.mean <- array(f.mean, dim = c(nt, backcast + ahead , ncol(f.mean)))
     f.mean <- aperm(f.mean, c(2,3,1))
-    dimnames(f.mean) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = wgt_object$TS_names)
+    dimnames(f.mean) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = TS_names)
 
     ## f.var
     ### Pull out indices for [period, a, a]
@@ -265,32 +273,28 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     f.var <- f.var[f.var.indices,]
     f.var <- array(f.var, dim = c(nt, backcast + ahead, ncol(f.var)))
     f.var <- aperm(f.var, c(2, 3, 1))
-    dimnames(f.var) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = wgt_object$TS_names)
+    dimnames(f.var) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = TS_names)
 
+    # TODO: Check that TS_names is same for all objects in list; error if not.
     ## f.cor
-    if(wgt_object$param != "CCC") {
-        # Lower-triangular indices
-        f.cor.indices.L <- which(lower.tri(matrix(0, nt, nt)), arr.ind = TRUE)
-        # Labels mapping to TS names
-        f.cor.indices.L.labels <- paste0(wgt_object$TS_names[f.cor.indices.L[,1]], "_", wgt_object$TS_names[f.cor.indices.L[,2]])
-        # Indices as "a,b"
-        f.cor.indices.L.char <- paste0(f.cor.indices.L[,1], ",", f.cor.indices.L[,2])
-        # Indicices as "[period,a,b]"
-        f.cor.indices.L.all <- paste0("R_p[",1:(backcast + ahead), ",", rep(f.cor.indices.L.char, each = (backcast + ahead)),"]")
-        # Get only these elements.
-        f.cor <- f.cor[f.cor.indices.L.all,]
-        f.cor <- array(f.cor, dim = c(backcast + ahead, length(f.cor.indices.L.char), ncol(f.cor)))
-        f.cor <- aperm(f.cor, c(1, 3, 2))
-        dimnames(f.cor) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = f.cor.indices.L.labels)
-    }
+    # Lower-triangular indices
+    f.cor.indices.L <- which(lower.tri(matrix(0, nt, nt)), arr.ind = TRUE)
+    # Labels mapping to TS names
+    f.cor.indices.L.labels <- paste0(TS_names[f.cor.indices.L[, 1]], "_", TS_names[f.cor.indices.L[, 2]])
+    # Indices as "a,b"
+    f.cor.indices.L.char <- paste0(f.cor.indices.L[, 1], ",", f.cor.indices.L[,2])
+    # Indicices as "[period,a,b]"
+    f.cor.indices.L.all <- paste0("R_p[",1:(backcast + ahead), ",", rep(f.cor.indices.L.char, each = (backcast + ahead)),"]")
+    # Get only these elements.
+    f.cor <- f.cor[f.cor.indices.L.all,]
+    f.cor <- array(f.cor, dim = c(backcast + ahead, length(f.cor.indices.L.char), ncol(f.cor)))
+    f.cor <- aperm(f.cor, c(1, 3, 2))
+    dimnames(f.cor) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = f.cor.indices.L.labels)
 
     # Remove backcasts from forecasts.
     f.mean <- f.mean[-c(1:backcast), , , drop = FALSE]
     f.var <- f.var[-c(1:backcast), , , drop = FALSE]
-    if(wgt_object$param != "CCC") {
-        f.cor <- f.cor[-c(1:backcast), , , drop = FALSE]
-    }
-
+    f.cor <- f.cor[-c(1:backcast), , , drop = FALSE]
    
     out <- list()
     out$forecast$mean <- f.mean
