@@ -125,6 +125,16 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     } else {
         object <- list(object)
     }
+    TS_names <- object[[1]]$TS_names
+    # Check for TS name consistency
+    TS_names_consistent <- all(sapply(object, function(x) {
+                                all(x$TS_names == TS_names)
+                            }))
+    if(!TS_names_consistent) {
+        # Could *possibly* rearrange the column orders to 'fix' this, but this is a much safer default.
+        # Could also check whether the training data are the same across models, to ensure the predictions make sense.
+        stop("Time series column names are not consistent across models. Forecasting halted.")
+    }
     ## n_mods <- .depth( object )
 
     ## if user provides weights from the model_weigths function
