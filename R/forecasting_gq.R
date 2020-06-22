@@ -800,6 +800,12 @@ print.forecast.bmgarch <- function(x, ...) {
     TS_names <- x$meta$TS_names
     digits <- x$meta$digits
 
+    if(x$meta$n_mods > 1) {
+        .sep()
+        cat("LFO-weighted forecasts across ", x$meta$n_mods, "models.")
+        .newline()
+    }
+
     # Mean structure
     meanstructure <- any(sapply(x$meta_list, function(x) {x$meanstructure == 1}))
     ## if(x$meta$meanstructure == 1 | x$meta$n_mod > 1) {
