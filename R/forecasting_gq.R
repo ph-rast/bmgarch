@@ -107,17 +107,6 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
                              seed = NA, digits = 2, weights = NULL,
                              L = NA, method = 'stacking') {
 
-    # Define a 0 array for stan.
-    if(is.null(xC)) {
-        xC <- array(0, dim = c(ahead, object$nt))
-    }
-    if(is.null(newdata)) {
-        newdata <- array(0, dim = c(ahead, object$nt))
-        compute_log_lik <- 0
-    } else {
-        compute_log_lik <- 1
-    }
-
     ## Are we dealing with one object or a list of objects
     n_mods <- 1
     if("bmgarch_list" %in% class(object)) {
@@ -136,6 +125,16 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
         stop("Time series column names are not consistent across models. Forecasting halted.")
     }
     ## n_mods <- .depth( object )
+    # Define a 0 array for stan.
+    if(is.null(xC)) {
+        xC <- array(0, dim = c(ahead, object[[1]]$nt))
+    }
+    if(is.null(newdata)) {
+        newdata <- array(0, dim = c(ahead, object[[1]]$nt))
+        compute_log_lik <- 0
+    } else {
+        compute_log_lik <- 1
+    }
 
     ## if user provides weights from the model_weigths function
     ## proceed directly to forecasting, else, run model_weights
