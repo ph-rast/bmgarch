@@ -195,7 +195,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
         ## Extract relevant parameters: rts_p, H_p
         ## For models with dynamic corrs: R_p
         ## CCC now has R_p, which is just R repeated multiple times.
-        parms <- rstan::extract(forecasted, par = c( "rts_p", "H_p", "R_p") )
+        parms <- rstan::extract(forecasted, pars = c( "rts_p", "H_p", "R_p") )
 
         ## Weight and sum up samples 
         if( i == 1 ) {
