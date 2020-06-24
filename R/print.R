@@ -68,7 +68,7 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
         ##################
         # Extract method #
         ##################
-        samps <- lapply(model_fit, extract, pars = params)
+        samps <- lapply(model_fit, rstan::extract, pars = params)
         # Apply weights
         for(i in seq_len(length(samps))) { # Each model
             samps[[i]] <- lapply(samps[[i]], function(p) { # Each parameter
