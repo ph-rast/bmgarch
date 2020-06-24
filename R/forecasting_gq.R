@@ -112,7 +112,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     if("bmgarch_list" %in% class(object)) {
         n_mods <- length(object)
     } else {
-        object <- list(object)
+        object <- bmgarch_list(object)
     }
     TS_names <- object[[1]]$TS_names
     # Check for TS name consistency
@@ -258,7 +258,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     out$meta$digits <- digits
     out$meta$CrI <- CrI
 
-    out$backcast <- fitted.bmgarch(wgt_object, CrI)$backcast
+    out$backcast <- fitted.bmgarch(object, CrI, digits = digits, weights = weights)$backcast
 
     class(out) <- "forecast.bmgarch"
     return(out)
@@ -298,50 +298,56 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
 ##' # Save fitted values as data frame
 ##' fit.bc.df <- as.data.frame(fit.bc)
 ##' }
-fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
-    nt <- object$nt
-    TS_length <- object$TS_length
-
-    b.mean <- .get_stan_summary(object$model_fit, "mu", CrI)
-    b.var <- .get_stan_summary(object$model_fit, "H", CrI)
-    b.cor <- NA
-    if(object$param != "CCC") {
-        ## In forecast stan, R is the same as corH.
-        ## In DCC, corH is the same as R also.
-        ## Not worth changing the stan files to be consistent, since structures are the same.
-        b.cor <- .get_stan_summary(object$model_fit, "corH", CrI)
+fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, weights = NULL, ...) {
+    n_mods <- 1
+    if("bmgarch_list" %in% class(object)) {
+        n_mods <- length(object)
+    } else {
+        object <- bmgarch_list(object)
     }
+    nt <- object[[1]]$nt
+    TS_length <- object[[1]]$TS_length
+    TS_names <- object[[1]]$TS_names
+
+    if(n_mods > 1 & is.null(weights)) {
+        stop("Weights must be provided.")
+    } else if(n_mods == 1) {
+        weights <- 1
+    }
+
+    fits <- lapply(object, function(m) {m$model_fit})
+    b.mean <- .get_stan_summary(fits, "mu", CrI, weights)
+    b.var <- .get_stan_summary(fits, "H", CrI, weights)
+    b.cor <- .get_stan_summary(fits, "corH", CrI, weights)
 
     # Restructure
     ## b.mean
     stan_sum_cols <- colnames(b.mean)
     b.mean <- array(b.mean, dim = c(nt, TS_length, ncol(b.mean)))
     b.mean <- aperm(b.mean, c(2,3,1))
-    dimnames(b.mean) <- list(period = 1:TS_length, stan_sum_cols, TS = object$TS_names)
+    dimnames(b.mean) <- list(period = 1:TS_length, stan_sum_cols, TS = TS_names)
 
     ## b.var
     b.var.indices <- grep("H\\[[[:digit:]]+,([[:digit:]]+),\\1]", rownames(b.var), value = TRUE)
     b.var <- b.var[b.var.indices,]
     b.var <- array(b.var, dim = c(nt, TS_length, ncol(b.var)))
     b.var <- aperm(b.var, c(2, 3, 1))
-    dimnames(b.var) <- list(period = 1:TS_length, stan_sum_cols, TS = object$TS_names)
+    dimnames(b.var) <- list(period = 1:TS_length, stan_sum_cols, TS = TS_names)
 
     ## b.cor
-    if(object$param != "CCC") {
-        # Lower-triangular indices
-        b.cor.indices.L <- which(lower.tri(matrix(0, nt, nt)), arr.ind = TRUE)
-        # Labels mapping to TS names
-        b.cor.indices.L.labels <- paste0(object$TS_names[b.cor.indices.L[,1]], "_", object$TS_names[b.cor.indices.L[,2]])
-        # Indices as "a,b"
-        b.cor.indices.L.char <- paste0(b.cor.indices.L[,1], ",", b.cor.indices.L[,2])
-        # Indicices as "[period,a,b]"
-        b.cor.indices.L.all <- paste0("corH[",1:object$TS_length, ",", rep(b.cor.indices.L.char, each = object$TS_length),"]")
-        # Get only these elements.
-        b.cor <- b.cor[b.cor.indices.L.all,]
-        b.cor <- array(b.cor, dim = c(object$TS_length, length(b.cor.indices.L.char), ncol(b.cor)))
-        b.cor <- aperm(b.cor, c(1, 3, 2))
-        dimnames(b.cor) <- list(period = 1:object$TS_length, stan_sum_cols, TS = b.cor.indices.L.labels)
-    }
+    # Lower-triangular indices
+    b.cor.indices.L <- which(lower.tri(matrix(0, nt, nt)), arr.ind = TRUE)
+    # Labels mapping to TS names
+    b.cor.indices.L.labels <- paste0(TS_names[b.cor.indices.L[,1]], "_", TS_names[b.cor.indices.L[,2]])
+    # Indices as "a,b"
+    b.cor.indices.L.char <- paste0(b.cor.indices.L[,1], ",", b.cor.indices.L[,2])
+    # Indicices as "[period,a,b]"
+    b.cor.indices.L.all <- paste0("corH[",1:TS_length, ",", rep(b.cor.indices.L.char, each = TS_length),"]")
+    # Get only these elements.
+    b.cor <- b.cor[b.cor.indices.L.all,]
+    b.cor <- array(b.cor, dim = c(TS_length, length(b.cor.indices.L.char), ncol(b.cor)))
+    b.cor <- aperm(b.cor, c(1, 3, 2))
+    dimnames(b.cor) <- list(period = 1:TS_length, stan_sum_cols, TS = b.cor.indices.L.labels)
 
     out <- list()
     out$backcast$mean <- b.mean
@@ -349,9 +355,12 @@ fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
     out$backcast$cor <- b.cor
 
     metaNames <- c("param", "distribution", "num_dist", "nt", "TS_length", "TS_names", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
-    meta <- with(object, mget(metaNames))
+    meta <- with(object[[1]], mget(metaNames))
+    out$meta_list <- lapply(object, function(x) {with(x, mget(metaNames))})
     out$meta <- meta
     out$meta$digits <- digits
+    out$meta$n_mods <- n_mods
+    out$meta$CrI <- CrI
 
     class(out) <- "fitted.bmgarch"
     return(out)
