@@ -257,6 +257,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     out$meta$n_mods <- n_mods
     out$meta$digits <- digits
     out$meta$CrI <- CrI
+    out$meta$weights <- weights
 
     out$backcast <- fitted.bmgarch(object, CrI, digits = digits, weights = weights)$backcast
 
@@ -361,6 +362,7 @@ fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, weights = NU
     out$meta$digits <- digits
     out$meta$n_mods <- n_mods
     out$meta$CrI <- CrI
+    out$meta$weights <- weights
 
     class(out) <- "fitted.bmgarch"
     return(out)
