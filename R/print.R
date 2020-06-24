@@ -46,18 +46,85 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
 }
 
 ##' @title Get stan summaries.
-##' @param model_fit stanfit object.
+##' @param model_fit stanfit object or list of stanfit objects.
 ##' @param params Character vector. Names of params to pull from stan summary.
 ##' @param CrI Numeric vector (length 2).
+##' @param weights Numeric vector. Weights for each model in model_fit, if list.
 ##' @return Stan summary for parameters. Columns: mean, sd, mdn, and CrIs.
 ##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
-.get_stan_summary <- function(model_fit, params, CrI) {
-    CrI <- c(.5, CrI)
-    cols <- c("mean","sd",paste0(CrI*100, "%"), "n_eff", "Rhat")
-    model_summary <- rstan::summary(model_fit, pars = params, probs = CrI)$summary[,cols]
-    colnames(model_summary)[colnames(model_summary) == "50%"] <- "mdn"
-    return(model_summary)
+.get_stan_summary <- function(model_fit, params, CrI, weights = NULL) {
+    if(class(model_fit) == "stanfit" | (class(model_fit) == "list" & length(model_fit) == 1)) { # One model fit
+        if(class(model_fit) == "list") {
+            model_fit <- model_fit[[1]]
+        }
+        CrI <- c(.5, CrI)
+        cols <- c("mean","sd",paste0(CrI*100, "%"), "n_eff", "Rhat")
+        model_summary <- rstan::summary(model_fit, pars = params, probs = CrI)$summary[,cols]
+        colnames(model_summary)[colnames(model_summary) == "50%"] <- "mdn"
+        return(model_summary)
+    } else { # List of stanfits
+        if(length(model_fit) != length(weights)) {
+            stop("Weights must be same length as model_fit list.")
+        }
+
+        ##################
+        # Extract method #
+        ##################
+        samps <- lapply(model_fit, rstan::extract, pars = params)
+        # Apply weights
+        for(i in seq_len(length(samps))) { # Each model
+            samps[[i]] <- lapply(samps[[i]], function(p) { # Each parameter
+                p * weights[i] # Weight them
+            })
+        }
+        # Reduce
+        samps_comb <- lapply(params, function(p) { # For each parameter
+            Reduce("+", lapply(samps, function(m) {m[[p]]})) # Sum samples together
+        })
+        names(samps_comb) <- params
+
+        # Model summaries
+        m <- Map(colMeans, samps_comb)
+        SD <- .colSDs(samps_comb)
+        qts <- .colQTs(samps_comb, c(.5, CrI))
+
+        # Permutate
+        ## Stan's summary() goes in right-fastest ([1, 1, 1] -> [1, 1, 2])
+        ## Stan's extract/matrix/array goes in left-fastest ([1, 1, 1] -> [2, 1, 1])
+        ## We want the wt'd method to return same order as stan's summary.
+        ## R makes vectors in left-fastest; this reverses indexing, then fills a summary matrix.
+        dims <- lapply(samps_comb, function(p) { # Each parameter
+            dim(p)[2:length(dim(p))]
+        })
+        num_dims <- lapply(dims, length)
+
+        out <- list()
+        for(p in seq_len(length(num_dims))) { # Each parameter
+            m[[p]] <- aperm(m[[p]], rev(1:num_dims[[p]])) # Right-most varies fastest
+            SD[[p]] <- aperm(SD[[p]], rev(1:num_dims[[p]]))
+            qts[[p]] <- aperm(qts[[p]], rev(1:(num_dims[[p]] + 1)))
+            out[[p]] <- cbind(as.numeric(m[[p]]),
+                              as.numeric(SD[[p]]),
+                              matrix(as.numeric(qts[[p]]), ncol = 3),
+                              n_eff = NA,
+                              Rhat = NA)
+            colnames(out[[p]]) <- c("mean", "sd", "mdn", paste0(CrI * 100, "%"), "n_eff", "Rhat")
+        }
+        names(out) <- names(m)
+
+        # Recreate row names
+        for(p in seq_len(length(num_dims))) {
+            ind_mat <- do.call(expand.grid, rev(lapply(dims[[p]], seq_len)))
+            ind_mat <- ind_mat[,rev(seq_len(ncol(ind_mat)))]
+            prefix <- names(out)[p]
+            inner <- apply(ind_mat, 1, paste0, collapse = ",")
+            rownames(out[[p]]) <- paste0(prefix, "[", inner, "]")
+        }
+        # Combine all to single data.frame
+        out <- as.matrix(do.call(rbind, out))
+        return(out)
+    }
 }
 
 

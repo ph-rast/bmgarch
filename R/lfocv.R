@@ -213,7 +213,7 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
         
         refit_info <- cat("Using threshold ", k_thres, 
                           ", model was refit ", length(refits), 
-                          " times, at observations", refits)
+                          " times, at observations", refits, "\n")
     
         ## Return relevant objects
         
