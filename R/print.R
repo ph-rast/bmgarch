@@ -54,10 +54,13 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
 ##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .get_stan_summary <- function(model_fit, params, CrI, weights = NULL) {
-    if(class(model_fit) == "stanfit") {
+    if(class(model_fit) == "stanfit" | (class(model_fit) == "list" & length(model_fit) == 1)) { # One model fit
+        if(class(model_fit) == "list") {
+            model_fit <- model_fit[[1]]
+        }
         CrI <- c(.5, CrI)
         cols <- c("mean","sd",paste0(CrI*100, "%"), "n_eff", "Rhat")
-        model_summary <- rstan::summary(model_fit[[1]], pars = params, probs = CrI)$summary[,cols]
+        model_summary <- rstan::summary(model_fit, pars = params, probs = CrI)$summary[,cols]
         colnames(model_summary)[colnames(model_summary) == "50%"] <- "mdn"
         return(model_summary)
     } else { # List of stanfits
