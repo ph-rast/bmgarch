@@ -76,7 +76,13 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
     if( type == 'loo' ) {
         if( is.null( L ) ) L <- 0
         ll <- rstan::extract(object$model_fit, pars =  "log_lik")$log_lik
-        backcast_loo <- loo::loo( ll[,  (L + 1):N] )
+        LL <- ll[,  (L + 1):N]
+        ## obtain chain id vector for relative_eff
+        n_chains <- object$model_fit@sim$chains
+        n_samples <- object$model_fit@sim$iter - object$model_fit@sim$warmup
+        chain_id <- rep(seq_len(n_chains ),  each = n_samples )
+        r_eff <- loo::relative_eff(exp(LL), chain_id = chain_id)
+        backcast_loo <- loo::loo( LL, r_eff =  r_eff )
         outl$backcast_loo <- backcast_loo$estimates[,'Estimate']['elpd_loo']
         outl$type <- type
     } else if ( type == 'lfo' ) {
@@ -113,7 +119,8 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
                     df_oos <- object$RTS_full[c(past, oos), , drop = FALSE]
                     xC_oos <-  object$xC[c(past, oos), , drop = FALSE]
                     fit_past <- .refit(object, data = df_past, xC_data = xC_past )
-                    fc <- bmgarch::forecast(fit_past, ahead = ahead, xC = xC_oos[oos, ,drop = FALSE],
+                    fc <- bmgarch::forecast(object = fit_past, ahead = ahead,
+                                            xC = xC_oos[oos, ,drop = FALSE],
                                             newdata = df_oos[oos,,drop = FALSE])
                     loglik[, i + 1 ] <- fc$forecast$log_lik
                     approx_elpds_1sap[i + 1] <- .log_mean_exp(loglik[, i + 1])

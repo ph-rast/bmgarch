@@ -106,7 +106,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
                              newdata = NULL, CrI = c(.025, .975),
                              seed = NA, digits = 2, weights = NULL,
                              L = NA, method = 'stacking') {
-
+    
     ## Are we dealing with one object or a list of objects
     n_mods <- 1
     if("bmgarch_list" %in% class(object)) {
@@ -139,9 +139,14 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     ## if user provides weights from the model_weigths function
     ## proceed directly to forecasting, else, run model_weights
     ## and extract model weights here
+    ## Case 1: No model weights provided
+    ## Case 2: model weights from a model_weight object
+    ## Case 3: No model weights requested
     if(n_mods > 1 & is.null( weights ) ) {
         mw <- bmgarch::model_weights(bmgarch_objects = object, L = L)
-        weights <- mw$wts[] 
+        weights <- mw$wts[]
+    } else if( n_mods > 1 & !is.null( weights ) ) {
+        weights <- weights$wts[]
     } else if( n_mods == 1 ) {
         weights <- 1
         ## object[[1]] <- object
@@ -162,10 +167,10 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
                         compute_log_lik =  compute_log_lik)
 
         gqs_model <- switch(m$param,
-                            DCC = stanmodels$forecastDCC,
-                            CCC = stanmodels$forecastCCC,
-                            BEKK = stanmodels$forecastBEKK,
-                            pdBEKK = stanmodels$forecastBEKK,
+                            DCC = bmgarch:::stanmodels$forecastDCC,
+                            CCC = bmgarch:::stanmodels$forecastCCC,
+                            BEKK = bmgarch:::stanmodels$forecastBEKK,
+                            pdBEKK = bmgarch:::stanmodels$forecastBEKK,
                             NULL)
         if(is.null(gqs_model)) {
             stop("bmgarch object 'param' does not match a supported model. ",

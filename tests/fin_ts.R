@@ -179,19 +179,20 @@ library(bmgarch )
 
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
                parameterization = "CCC", standardize_data = TRUE,
-               iterations = 100)
+               iterations = 500)
 
 fit1 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )], 
                 parameterization = "DCC", standardize_data = TRUE, #meanstructure = 'arma',
-                iterations = 100)
+                iterations = 500)
 
-forecast(fit, ahead = 1 )
+fc <- forecast(fit, ahead = 1, newdata = stocks[101, c("toyota",  "nissan" )])
+fc$forecast$log_lik
 
-lfo2 <- loo(fit, mode = 'backward',  L = 85 )
-lfo2
+lfo <- loo(fit, mode = 'backward',  L = 50 )
+lfo
 
-bmgarch_objects <- list(fit, fit1 )
-mw <-  model_weights(bmgarch_objects = bmgarch_objects, L =  90)
+bmgarch_objects <- bmgarch_list(fit, fit1 )
+mw <-  model_weights(bmgarch_objects = bmgarch_objects, L =  80)
 mw
 
 bmgarch_objects[1]
@@ -199,8 +200,10 @@ bmgarch_objects[1]
 forecast( bmgarch_objects[[1]], ahead = 1)
 forecast( bmgarch_objects[[2]], ahead = 1)
 
-forecast( bmgarch_objects, ahead = 1)
-
+class(mw )
+           
+fc <- forecast( bmgarch_objects, ahead = 1, weights = mw )
+fc
 
 
 
@@ -215,10 +218,14 @@ forecast( bmgarch_objects, ahead = 1)
 }
 
 
+object <- bmgarch_list(fit, fit1 )
     
-depth( fit )
-n_mods <- depth( bmgarch_objects )
+.depth( fit )
+n_mods <- .depth( bmgarch_objects )
 n_mods
+
+object <- bmgarch_objects
+class( object )
 
 object <- fit
 object <- fit1 

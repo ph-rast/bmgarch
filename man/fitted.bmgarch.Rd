@@ -4,7 +4,7 @@
 \alias{fitted.bmgarch}
 \title{Fitted (backcasting) method for bmgarch objects.}
 \usage{
-\method{fitted}{bmgarch}(object, CrI = c(0.025, 0.975), digits = 2, ...)
+\method{fitted}{bmgarch}(object, CrI = c(0.025, 0.975), digits = 2, weights = NULL, ...)
 }
 \arguments{
 \item{object}{bmgarch object.}
