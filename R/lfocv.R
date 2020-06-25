@@ -122,7 +122,7 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
                     fc <- bmgarch::forecast(object = fit_past, ahead = ahead,
                                             xC = xC_oos[oos, ,drop = FALSE],
                                             newdata = df_oos[oos,,drop = FALSE])
-                    loglik[, i + 1 ] <- fc$forecast$log_lik
+                    loglik[, i + 1 ] <- fc$forecast$log_lik[[1]]
                     approx_elpds_1sap[i + 1] <- .log_mean_exp(loglik[, i + 1])
                     
                 } else {

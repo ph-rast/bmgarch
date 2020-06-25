@@ -249,7 +249,9 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
 
         ## Extract all log_lik simulations
     if(compute_log_lik == 1 ) {
-        log_lik <- rstan::extract( forecasted, pars = "log_lik" )$log_lik
+        log_lik <- lapply(object.f, function(x) {
+            rstan::extract(x, pars = "log_lik")$log_lik
+        })
         out$forecast$log_lik <- log_lik
     }
 
