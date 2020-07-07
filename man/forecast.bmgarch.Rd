@@ -14,7 +14,8 @@
   digits = 2,
   weights = NULL,
   L = NA,
-  method = "stacking"
+  method = "stacking",
+  inc_samples = FALSE
 )
 }
 \arguments{
@@ -32,7 +33,7 @@
 
 \item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
 
-\item{weight}{Takes weights from model_weight function. Defaults to 1 -- this parameter is not typically set by user.}
+\item{weights}{Takes weights from model_weight function. Defaults to 1 -- this parameter is not typically set by user.}
 }
 \value{
 forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data.
@@ -43,6 +44,7 @@ See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
   \item{var}{\code{[N, 7, TS]} array of variance forecasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{fc$forecast$var[3,,"tsA"]} is the 3-ahead variance forecast for time series "tsA".}
   \item{cor}{\code{[N, 7, TS(TS - 1)/2]} array of correlation forecasts, where N is the timeseries length, and \code{TS(TS - 1)/2} is the number of correlations. E.g., \code{fc$forecast$cor[3,, "tsB_tsA"]} is the 3-ahead forecast for the correlation between "tsB" and "tsA". Lower triangular correlations are saved.}
   \item{meta}{Meta-data specific to the forecast. I.e., TS_length (number ahead) and xC.}
+  \item{samples}{List}. If inc_samples is \code{TRUE}, then a list of arrays of MCMC samples for means, vars, and cors. Each array is [Iteration, Period, ..., ...].
 }
 }
 \description{

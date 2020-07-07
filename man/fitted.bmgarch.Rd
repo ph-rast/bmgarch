@@ -4,7 +4,14 @@
 \alias{fitted.bmgarch}
 \title{Fitted (backcasting) method for bmgarch objects.}
 \usage{
-\method{fitted}{bmgarch}(object, CrI = c(0.025, 0.975), digits = 2, weights = NULL, ...)
+\method{fitted}{bmgarch}(
+  object,
+  CrI = c(0.025, 0.975),
+  digits = 2,
+  weights = NULL,
+  inc_samples = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{bmgarch object.}
@@ -12,6 +19,10 @@
 \item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
 
 \item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
+
+\item{weights}{Takes weights from model_weight function. Defaults to 1 -- this parameter is not typically set by user.}
+
+\item{inc_samples}{Logical (Default: FALSE). Whether to return the MCMC samples for the fitted values.}
 
 \item{...}{Not used.}
 }
@@ -21,6 +32,7 @@ fitted.bmgarch object. List containing \code{meta}data and the \code{backcast}. 
   \item{mean}{\code{[N, 7, TS]} array of mean backcasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{bc$backcast$mean[3,,"tsA"]} is the mean backcast for the third observation in time series "tsA".}
   \item{var}{\code{[N, 7, TS]} array of variance backcasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{bc$backcast$var[3,,"tsA"]} is the variance backcast for the third observation in time series "tsA".}
   \item{cor}{\code{[N, 7, TS(TS - 1)/2]} array of correlation backcasts, where N is the timeseries length, and \code{TS(TS - 1)/2} is the number of correlations. E.g., \code{bc$backcast$cor[3,, "tsB_tsA"]} is the backcast for the correlation between "tsB" and "tsA" on the third observation. Lower triangular correlations are saved.}
+  \item{samples}{List}. If inc_samples is \code{TRUE}, then a list of arrays of MCMC samples for means, vars, and cors. Each array is [Iteration, Period, ..., ...].
 }
 }
 \description{
