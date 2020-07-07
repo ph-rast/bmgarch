@@ -68,21 +68,7 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
             stop("Weights must be same length as model_fit list.")
         }
 
-        ##################
-        # Extract method #
-        ##################
-        samps <- lapply(model_fit, rstan::extract, pars = params)
-        # Apply weights
-        for(i in seq_len(length(samps))) { # Each model
-            samps[[i]] <- lapply(samps[[i]], function(p) { # Each parameter
-                p * weights[i] # Weight them
-            })
-        }
-        # Reduce
-        samps_comb <- lapply(params, function(p) { # For each parameter
-            Reduce("+", lapply(samps, function(m) {m[[p]]})) # Sum samples together
-        })
-        names(samps_comb) <- params
+        samps_comb <- .weighted_samples(model_fit, params, weights)
 
         # Model summaries
         m <- Map(colMeans, samps_comb)
@@ -125,6 +111,25 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2) {
         out <- as.matrix(do.call(rbind, out))
         return(out)
     }
+}
+
+.weighted_samples <- function(model_fit, params, weights) {
+    ##################
+    # Extract method #
+    ##################
+    samps <- lapply(model_fit, rstan::extract, pars = params)
+    # Apply weights
+    for(i in seq_len(length(samps))) { # Each model
+        samps[[i]] <- lapply(samps[[i]], function(p) { # Each parameter
+            p * weights[i] # Weight them
+        })
+    }
+    # Reduce
+    samps_comb <- lapply(params, function(p) { # For each parameter
+        Reduce("+", lapply(samps, function(m) {m[[p]]})) # Sum samples together
+    })
+    names(samps_comb) <- params
+    return(samps_comb)
 }
 
 
