@@ -63,7 +63,7 @@
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' @param seed Integer (Optional). Specify seed for \code{\link[rstan]{sampling}}.
 ##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
-##' @param weight Takes weights from model_weight function. Defaults to 1 -- this parameter is not typically set by user.
+##' @param weights Takes weights from model_weight function. Defaults to 1 -- this parameter is not typically set by user.
 ##' @return forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data.
 ##' See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
 ##' \code{forecast} is a list of four components:
@@ -72,6 +72,7 @@
 ##'   \item{var}{\code{[N, 7, TS]} array of variance forecasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{fc$forecast$var[3,,"tsA"]} is the 3-ahead variance forecast for time series "tsA".}
 ##'   \item{cor}{\code{[N, 7, TS(TS - 1)/2]} array of correlation forecasts, where N is the timeseries length, and \code{TS(TS - 1)/2} is the number of correlations. E.g., \code{fc$forecast$cor[3,, "tsB_tsA"]} is the 3-ahead forecast for the correlation between "tsB" and "tsA". Lower triangular correlations are saved.}
 ##'   \item{meta}{Meta-data specific to the forecast. I.e., TS_length (number ahead) and xC.}
+##'   \item{samples}{List}. If inc_samples is \code{TRUE}, then a list of arrays of MCMC samples for means, vars, and cors. Each array is [Iteration, Period, ..., ...].
 ##' }
 ##' @author Stephen R. Martin
 ##' @importFrom forecast forecast
@@ -105,7 +106,7 @@
 forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
                              newdata = NULL, CrI = c(.025, .975),
                              seed = NA, digits = 2, weights = NULL,
-                             L = NA, method = 'stacking') {
+                             L = NA, method = 'stacking', inc_samples = FALSE) {
     
     ## Are we dealing with one object or a list of objects
     n_mods <- 1
@@ -247,6 +248,13 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     out$forecast$cor <- f.cor
     out$forecast$meta <- list(xC = xC, TS_length = ahead)
 
+    if(inc_samples) {
+        out$forecast$samples$mean <- .weighted_samples(object.f, "rts_p", weights)$rts_p[, -c(1:backcast),, drop = FALSE]
+        out$forecast$samples$var <- .weighted_samples(object.f, "H_p", weights)$H_p[,-c(1:backcast), , , drop = FALSE]
+        out$forecast$samples$cor <- .weighted_samples(object.f, "R_p", weights)$R_p[,-c(1:backcast), , , drop = FALSE]
+        ## out$forecast$samples$mean <- out$forecast$samples$mean[] # Todo, remove backcast
+    }
+
         ## Extract all log_lik simulations
     if(compute_log_lik == 1 ) {
         log_lik <- lapply(object.f, function(x) {
@@ -266,7 +274,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     out$meta$CrI <- CrI
     out$meta$weights <- weights
 
-    out$backcast <- fitted.bmgarch(object, CrI, digits = digits, weights = weights)$backcast
+    out$backcast <- fitted.bmgarch(object, CrI, digits = digits, weights = weights, inc_samples = inc_samples)$backcast
 
     class(out) <- "forecast.bmgarch"
     return(out)
@@ -278,12 +286,15 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
 ##' @param object bmgarch object.
 ##' @param CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.
 ##' @param digits Integer (Default: 2, optional). Number of digits to round to when printing.
+##' @param weights Takes weights from model_weight function. Defaults to 1 -- this parameter is not typically set by user.
+##' @param inc_samples Logical (Default: FALSE). Whether to return the MCMC samples for the fitted values.
 ##' @param ... Not used.
 ##' @return fitted.bmgarch object. List containing \code{meta}data and the \code{backcast}. Backcast is a list containing three elements:
 ##' \describe{
 ##'   \item{mean}{\code{[N, 7, TS]} array of mean backcasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{bc$backcast$mean[3,,"tsA"]} is the mean backcast for the third observation in time series "tsA".}
 ##'   \item{var}{\code{[N, 7, TS]} array of variance backcasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{bc$backcast$var[3,,"tsA"]} is the variance backcast for the third observation in time series "tsA".}
 ##'   \item{cor}{\code{[N, 7, TS(TS - 1)/2]} array of correlation backcasts, where N is the timeseries length, and \code{TS(TS - 1)/2} is the number of correlations. E.g., \code{bc$backcast$cor[3,, "tsB_tsA"]} is the backcast for the correlation between "tsB" and "tsA" on the third observation. Lower triangular correlations are saved.}
+##'   \item{samples}{List}. If inc_samples is \code{TRUE}, then a list of arrays of MCMC samples for means, vars, and cors. Each array is [Iteration, Period, ..., ...].
 ##' }
 ##' @author Stephen R. Martin
 ##' @importFrom stats fitted
@@ -306,7 +317,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
 ##' # Save fitted values as data frame
 ##' fit.bc.df <- as.data.frame(fit.bc)
 ##' }
-fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, weights = NULL, ...) {
+fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, weights = NULL, inc_samples = FALSE, ...) {
     n_mods <- 1
     if("bmgarch_list" %in% class(object)) {
         n_mods <- length(object)
@@ -361,6 +372,12 @@ fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, weights = NU
     out$backcast$mean <- b.mean
     out$backcast$var <- b.var
     out$backcast$cor <- b.cor
+
+    if(inc_samples) {
+        out$backcast$samples$mean <- .weighted_samples(fits, "mu", weights)$mu
+        out$backcast$samples$var <- .weighted_samples(fits, "H", weights)$H
+        out$backcast$samples$cor <- .weighted_samples(fits, "corH", weights)$corH
+    }
 
     metaNames <- c("param", "distribution", "num_dist", "nt", "TS_length", "TS_names", "RTS_full", "mgarchQ", "mgarchP", "xC", "meanstructure")
     meta <- with(object[[1]], mget(metaNames))
