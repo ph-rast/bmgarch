@@ -193,7 +193,7 @@ fit1 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
 
 summary(fit1)
 
-fc <- forecast(fit, ahead = 2, xC = cbind(stocks[101:102, c("honda")], stocks[101:102, c("honda")]) ,inc_samples = TRUE)
+fc <- forecast(fit, ahead = 2, xC = cbind(stocks[101:102, c("honda")], stocks[101:102, c("honda")]), inc_samples = TRUE)
 fc
 
 lfo <- loo(fit, mode = 'backward',  L = 80 )
