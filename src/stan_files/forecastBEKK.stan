@@ -49,9 +49,12 @@ parameters {
 generated quantities {
   // Define matrix for rts prediction
   vector[nt] rts_p[ahead + max(Q,P)];
+  vector[nt] rts_forecasted[ahead];
   
   cov_matrix[nt] H_p[ahead + max(Q,P)];
   corr_matrix[nt] R_p[ahead + max(Q,P)];
+  cov_matrix[nt] H_forecasted[ahead];
+  corr_matrix[nt] R_forecasted[ahead];
 
   matrix[nt,nt] rr_p[ahead + max(Q,P)];
   vector[nt] mu_p[ahead + max(Q,P)];
@@ -129,4 +132,7 @@ generated quantities {
     /*   } */
     /* } */
   }
+  mu_forecasted = mu_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  H_forecasted = H_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  R_forecasted = R_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
 }

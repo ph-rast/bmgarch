@@ -193,13 +193,13 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     })
 
     ## Init f.mean
-    f.mean <- .get_stan_summary(object.f, "rts_p", CrI, weights)
+    f.mean <- .get_stan_summary(object.f, "rts_forecasted", CrI, weights)
 
     ## f.var
-    f.var <- .get_stan_summary(object.f, "H_p", CrI, weights)
+    f.var <- .get_stan_summary(object.f, "H_forecasted", CrI, weights)
 
     ## Init f.cor
-    f.cor <- .get_stan_summary(object.f, "R_p", CrI, weights)
+    f.cor <- .get_stan_summary(object.f, "R_forecasted", CrI, weights)
 
     # Restructure to array
     backcast <- max(object[[1]]$mgarchP, object[[1]]$mgarchQ)
