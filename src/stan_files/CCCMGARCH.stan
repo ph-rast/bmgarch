@@ -104,13 +104,13 @@ model {
   // likelihood
   if ( distribution == 0 ) {
     for(t in 1:T){
-      //      rts[t,] ~ multi_normal(mu[t,], H[t,]);
-      target += multi_normal_lpdf( rts[t, ] | mu[t,], H[t,]);
+      rts[t,] ~ multi_normal(mu[t,], H[t,]);
+      //target += multi_normal_lpdf( rts[t, ] | mu[t,], H[t,]);
     }
   } else if ( distribution == 1 ) {
     for(t in 1:T){
-      //      rts[t,] ~ multi_student_t(nu, mu[t,], H[t,]);
-      target += multi_student_t_lpdf( rts[t, ] | nu, mu[t,], H[t,]);
+      rts[t,] ~ multi_student_t(nu, mu[t,], H[t,]);
+      //target += multi_student_t_lpdf( rts[t, ] | nu, mu[t,], H[t,]);
     }
   }
 }
