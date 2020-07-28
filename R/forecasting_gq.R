@@ -193,34 +193,34 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     })
 
     ## Init f.mean
-    f.mean <- .get_stan_summary(object.f, "rts_p", CrI, weights)
+    f.mean <- .get_stan_summary(object.f, "rts_forecasted", CrI, weights)
 
     ## f.var
-    f.var <- .get_stan_summary(object.f, "H_p", CrI, weights)
+    f.var <- .get_stan_summary(object.f, "H_forecasted", CrI, weights)
 
     ## Init f.cor
-    f.cor <- .get_stan_summary(object.f, "R_p", CrI, weights)
+    f.cor <- .get_stan_summary(object.f, "R_forecasted", CrI, weights)
 
     # Restructure to array
-    backcast <- max(object[[1]]$mgarchP, object[[1]]$mgarchQ)
+    ## backcast <- max(object[[1]]$mgarchP, object[[1]]$mgarchQ)
     nt <- object[[1]]$nt
-    cast_start <- (object[[1]]$TS_length - backcast + 1)
+    ## cast_start <- (object[[1]]$TS_length - backcast + 1)
     forecast_start <- (object[[1]]$TS_length + 1)
     forecast_end <- (object[[1]]$TS_length + ahead)
 
     ## f.mean
     stan_sum_cols <- colnames(f.mean)
-    f.mean <- array(f.mean, dim = c(nt, backcast + ahead, ncol(f.mean)))
+    f.mean <- array(f.mean, dim = c(nt, ahead, ncol(f.mean)))
     f.mean <- aperm(f.mean, c(2,3,1))
-    dimnames(f.mean) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = TS_names)
+    dimnames(f.mean) <- list(period = forecast_start:forecast_end, stan_sum_cols, TS = TS_names)
 
     ## f.var
     ### Pull out indices for [period, a, a]
-    f.var.indices <- grep("H_p\\[[[:digit:]]+,([[:digit:]]+),\\1]", rownames(f.var), value = TRUE)
+    f.var.indices <- grep("H_forecasted\\[[[:digit:]]+,([[:digit:]]+),\\1]", rownames(f.var), value = TRUE)
     f.var <- f.var[f.var.indices,]
-    f.var <- array(f.var, dim = c(nt, backcast + ahead, ncol(f.var)))
+    f.var <- array(f.var, dim = c(nt, ahead, ncol(f.var)))
     f.var <- aperm(f.var, c(2, 3, 1))
-    dimnames(f.var) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = TS_names)
+    dimnames(f.var) <- list(period = forecast_start:forecast_end, stan_sum_cols, TS = TS_names)
 
     ## f.cor
     # Lower-triangular indices
@@ -230,17 +230,17 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     # Indices as "a,b"
     f.cor.indices.L.char <- paste0(f.cor.indices.L[, 1], ",", f.cor.indices.L[,2])
     # Indicices as "[period,a,b]"
-    f.cor.indices.L.all <- paste0("R_p[",1:(backcast + ahead), ",", rep(f.cor.indices.L.char, each = (backcast + ahead)),"]")
+    f.cor.indices.L.all <- paste0("R_forecasted[",1:(ahead), ",", rep(f.cor.indices.L.char, each = (ahead)),"]")
     # Get only these elements.
     f.cor <- f.cor[f.cor.indices.L.all,]
-    f.cor <- array(f.cor, dim = c(backcast + ahead, length(f.cor.indices.L.char), ncol(f.cor)))
+    f.cor <- array(f.cor, dim = c(ahead, length(f.cor.indices.L.char), ncol(f.cor)))
     f.cor <- aperm(f.cor, c(1, 3, 2))
-    dimnames(f.cor) <- list(period = cast_start:forecast_end, stan_sum_cols, TS = f.cor.indices.L.labels)
+    dimnames(f.cor) <- list(period = forecast_start:forecast_end, stan_sum_cols, TS = f.cor.indices.L.labels)
 
     # Remove backcasts from forecasts.
-    f.mean <- f.mean[-c(1:backcast), , , drop = FALSE]
-    f.var <- f.var[-c(1:backcast), , , drop = FALSE]
-    f.cor <- f.cor[-c(1:backcast), , , drop = FALSE]
+    ## f.mean <- f.mean[-c(1:backcast), , , drop = FALSE]
+    ## f.var <- f.var[-c(1:backcast), , , drop = FALSE]
+    ## f.cor <- f.cor[-c(1:backcast), , , drop = FALSE]
    
     out <- list()
     out$forecast$mean <- f.mean
@@ -249,9 +249,9 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     out$forecast$meta <- list(xC = xC, TS_length = ahead)
 
     if(inc_samples) {
-        out$forecast$samples$mean <- .weighted_samples(object.f, "rts_p", weights)$rts_p[, -c(1:backcast),, drop = FALSE]
-        out$forecast$samples$var <- .weighted_samples(object.f, "H_p", weights)$H_p[,-c(1:backcast), , , drop = FALSE]
-        out$forecast$samples$cor <- .weighted_samples(object.f, "R_p", weights)$R_p[,-c(1:backcast), , , drop = FALSE]
+        out$forecast$samples$mean <- .weighted_samples(object.f, "rts_forecasted", weights)$rts_forecasted[, ,, drop = FALSE]
+        out$forecast$samples$var <- .weighted_samples(object.f, "H_forecasted", weights)$H_forecasted[,, , , drop = FALSE]
+        out$forecast$samples$cor <- .weighted_samples(object.f, "R_forecasted", weights)$R_forecasted[,, , , drop = FALSE]
         ## out$forecast$samples$mean <- out$forecast$samples$mean[] # Todo, remove backcast
     }
 

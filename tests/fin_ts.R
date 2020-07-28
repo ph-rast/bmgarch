@@ -48,13 +48,26 @@ sr2
 r2
 
 fit <- bmgarch(sr2,
-               iterations = 1000,
+               iterations = 20,
                P = 1, Q = 1,
                meanstructure = "arma",
                standardize_data = FALSE,
                parameterization = 'DCC',
                xH = NULL,
                adapt_delta=0.85)
+fit2 <- bmgarch(sr2,
+               iterations = 20,
+               P = 2, Q = 1,
+               meanstructure = "arma",
+               standardize_data = FALSE,
+               parameterization = 'DCC',
+               xH = NULL,
+               adapt_delta=0.85)
+
+bmList <- bmgarch_list(fit, fit2)
+wts <- model_weights(bmList, L = 90)
+fcOut <- forecast(bmList, ahead = 3, weights = wts)
+
 system("notify-send 'Done sampling' " )
 summary(fit )
 

@@ -44,13 +44,17 @@ generated quantities {
   // Params for prediction
   vector[nt] D_p[ahead + max(Q,P)];
   corr_matrix[nt] R_p[ahead + max(Q, P)] = rep_array(R, ahead + max(Q, P)); // R_p = R for all t.
+  corr_matrix[nt] R_forecasted[ahead] = rep_array(R, ahead);
 
   cov_matrix[nt] H_p[ahead + max(Q,P)];
+  cov_matrix[nt] H_forecasted[ahead];
   
   // Define Vector that contains max of Q or P lag plus the forecasted ahead
   vector[nt] mu_p[ahead + max(Q,P)];
+  vector[nt] mu_forecasted[ahead];
   // Define matrix for rts prediction
   vector[nt] rts_p[ahead + max(Q,P)];
+  vector[nt] rts_forecasted[ahead];
   vector[nt] rr_p[ahead + max(Q,P)];
 
   // log lik for LFO-CV
@@ -127,5 +131,10 @@ generated quantities {
     /*   } */
     /* } */
   }
+  rts_forecasted = rts_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  H_forecasted = H_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  R_forecasted = R_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  mu_forecasted = mu_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+#include /generated/forecast_log_lik.stan
 }
 
