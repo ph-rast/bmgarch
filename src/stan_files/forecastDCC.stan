@@ -53,6 +53,7 @@ generated quantities {
   corr_matrix[nt] R_forecasted[ahead]; // 
   vector[nt] rr_p[ahead + max(Q,P)];
   vector[nt] mu_p[ahead + max(Q,P)];
+  vector[nt] mu_forecasted[ahead];
   vector[nt] D_p[ahead + max(Q,P)];
   cov_matrix[nt] Qr_p[ahead + max(Q,P)];
   vector[nt] u_p[ahead + max(Q,P)];
@@ -152,4 +153,6 @@ generated quantities {
   rts_forecasted = rts_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
   H_forecasted = H_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
   R_forecasted = R_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  mu_forecasted = mu_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+#include /generated/forecast_log_lik.stan
 }

@@ -51,6 +51,7 @@ generated quantities {
   
   // Define Vector that contains max of Q or P lag plus the forecasted ahead
   vector[nt] mu_p[ahead + max(Q,P)];
+  vector[nt] mu_forecasted[ahead];
   // Define matrix for rts prediction
   vector[nt] rts_p[ahead + max(Q,P)];
   vector[nt] rts_forecasted[ahead];
@@ -133,5 +134,7 @@ generated quantities {
   rts_forecasted = rts_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
   H_forecasted = H_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
   R_forecasted = R_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  mu_forecasted = mu_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+#include /generated/forecast_log_lik.stan
 }
 

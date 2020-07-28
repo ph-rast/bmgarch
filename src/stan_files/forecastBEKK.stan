@@ -58,6 +58,7 @@ generated quantities {
 
   matrix[nt,nt] rr_p[ahead + max(Q,P)];
   vector[nt] mu_p[ahead + max(Q,P)];
+  vector[nt] mu_forecasted[ahead];
 
   matrix[nt+1, nt] beta = append_row( beta0, diag_matrix(beta1) );
 
@@ -135,4 +136,6 @@ generated quantities {
   rts_forecasted = rts_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
   H_forecasted = H_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
   R_forecasted = R_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  mu_forecasted = mu_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+#include /generated/forecast_log_lik.stan
 }
