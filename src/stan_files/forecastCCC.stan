@@ -130,7 +130,7 @@ generated quantities {
     /*   } */
     /* } */
   }
-  mu_forecasted = mu_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  rts_forecasted = rts_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
   H_forecasted = H_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
   R_forecasted = R_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
 }
