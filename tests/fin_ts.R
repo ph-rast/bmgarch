@@ -48,8 +48,8 @@ sr2
 r2
 
 fit <- bmgarch(sr2,
-               iterations = 20,
-               P = 4, Q = 4,
+               iterations = 500,
+               P = 2, Q = 3,
                meanstructure = "arma",
                standardize_data = FALSE,
                parameterization = 'DCC', # Fails on CCC(>3,3)
