@@ -52,7 +52,7 @@ fit <- bmgarch(sr2,
                P = 2, Q = 3,
                meanstructure = "arma",
                standardize_data = FALSE,
-               parameterization = 'DCC', # Fails on CCC(>3,3)
+               parameterization = 'CCC', # Fails on CCC(>3,3)
                xH = NULL,
                adapt_delta=0.85)
 
