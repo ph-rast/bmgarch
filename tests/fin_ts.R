@@ -49,18 +49,19 @@ r2
 
 fit <- bmgarch(sr2,
                iterations = 20,
-               P = 1, Q = 1,
+               P = 4, Q = 4,
                meanstructure = "arma",
                standardize_data = FALSE,
-               parameterization = 'DCC',
+               parameterization = 'DCC', # Fails on CCC(>3,3)
                xH = NULL,
                adapt_delta=0.85)
+
 fit2 <- bmgarch(sr2,
                iterations = 20,
-               P = 2, Q = 1,
+               P = 4, Q = 4,
                meanstructure = "arma",
                standardize_data = FALSE,
-               parameterization = 'DCC',
+               parameterization = 'pdBEKK',
                xH = NULL,
                adapt_delta=0.85)
 
