@@ -36,9 +36,9 @@ parameters {
   vector[nt] c_h; 
   // vector<lower=0, upper = 1 >[nt] a_h[Q];
   simplex[Q] a_h_simplex[nt];
-  vector<lower=0, upper = 1>[nt] a_h_limit;
+  vector<lower=0, upper = 1>[nt] a_h_sum;
   simplex[P] b_h_simplex[nt];
-  vector[nt] b_h_limit_s;
+  vector[nt] b_h_sum_s;
   // vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
 
   // GARCH constant correlation 
@@ -59,9 +59,9 @@ transformed parameters {
   real<lower = 0> vd[nt];
   real<lower = 0> ma_d[nt];
   real<lower = 0> ar_d[nt];
-  vector<lower=0, upper = 1>[nt] a_h[Q] = simplex_to_bh(a_h_simplex, a_h_limit);
+  vector<lower=0, upper = 1>[nt] a_h[Q] = simplex_to_bh(a_h_simplex, a_h_sum);
   vector[nt] UPs = upper_limits(a_h);
-  vector[nt] ULs = raw_limit_to_b_h_limit(b_h_limit_s, UPs);
+  vector[nt] ULs = raw_sum_to_b_h_sum(b_h_sum_s, UPs);
   vector<lower = 0, upper = 1>[nt] b_h[P] = simplex_to_bh(b_h_simplex, ULs);
   // Initialize t=1
   // Check "Order Sensitivity and Repeated Variables" in stan reference manual
@@ -103,7 +103,7 @@ model {
   // priors
   for(k in 1:nt) {
     ULs[k] ~ uniform(0, UPs[k]);
-    target += a_b_scale_jacobian(0, ULs[k], b_h_limit_s[k]);
+    target += a_b_scale_jacobian(0, ULs[k], b_h_sum_s[k]);
   }
   to_vector(beta) ~ normal(0, 1);
   to_vector(c_h) ~ normal(-2, 4);
