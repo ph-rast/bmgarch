@@ -105,25 +105,25 @@ model {
     ULs[k] ~ uniform(0, UPs[k]);
     target += a_b_scale_jacobian(0, ULs[k], b_h_sum_s[k]);
   }
-  to_vector(beta) ~ normal(0, 1);
-  to_vector(c_h) ~ normal(-2, 4);
+  to_vector(beta) ~ std_normal( );
+  to_vector(c_h) ~ std_normal( );
   if ( distribution == 1 )
     nu ~ normal( nt, 50 );
   to_vector(D1_init) ~ lognormal(0, 1);
-  to_vector(theta) ~ normal(0, 1);
-  to_vector(phi) ~ normal(0, 1);
+  to_vector(theta) ~ std_normal( );
+  to_vector(phi) ~ std_normal( );
   phi0 ~ multi_normal(rts_m, diag_matrix( rts_sd ) );
   R ~ lkj_corr( 1 );
   // likelihood
   if ( distribution == 0 ) {
     for(t in 1:T){
-      //      rts[t,] ~ multi_normal(mu[t,], H[t,]);
-      target += multi_normal_lpdf( rts[t, ] | mu[t,], H[t,]);
+      rts[t,] ~ multi_normal(mu[t,], H[t,]);
+      //target += multi_normal_lpdf( rts[t, ] | mu[t,], H[t,]);
     }
   } else if ( distribution == 1 ) {
     for(t in 1:T){
-      //      rts[t,] ~ multi_student_t(nu, mu[t,], H[t,]);
-      target += multi_student_t_lpdf( rts[t, ] | nu, mu[t,], H[t,]);
+      rts[t,] ~ multi_student_t(nu, mu[t,], H[t,]);
+      //target += multi_student_t_lpdf( rts[t, ] | nu, mu[t,], H[t,]);
     }
   }
 }
