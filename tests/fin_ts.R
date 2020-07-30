@@ -49,10 +49,10 @@ r2
 
 fit <- bmgarch(sr2,
                iterations = 500,
-               P = 2, Q = 3,
+               P = 1, Q = 1,
                meanstructure = "arma",
                standardize_data = FALSE,
-               parameterization = 'CCC', # Fails on CCC(>3,3)
+               parameterization = 'DCC', # Fails on CCC(>3,3)
                xH = NULL,
                adapt_delta=0.85)
 
@@ -64,6 +64,18 @@ fit2 <- bmgarch(sr2,
                parameterization = 'pdBEKK',
                xH = NULL,
                adapt_delta=0.85)
+
+fit.stocks.DCC <- bmgarch(stocks[1:100, c("toyota", "nissan", "honda")],
+                          P = 2, Q = 3,
+                          meanstructure = "arma",
+                          parameterization = "DCC",
+                          iterations = 500)
+
+fit.stocks.CCC <- bmgarch(stocks[1:100, c("toyota", "nissan", "honda")],
+                          P = 2, Q = 2,
+                          meanstructure = "arma",
+                          parameterization = "CCC",
+                          iterations = 500)
 
 bmList <- bmgarch_list(fit, fit2)
 wts <- model_weights(bmList, L = 90)
