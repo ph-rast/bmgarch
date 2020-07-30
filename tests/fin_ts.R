@@ -65,8 +65,23 @@ fit2 <- bmgarch(sr2,
                xH = NULL,
                adapt_delta=0.85)
 
+data(stocks)
+stocks[,3:5] <- scale(stocks[,3:5])
+
 fit.stocks.DCC <- bmgarch(stocks[1:100, c("toyota", "nissan", "honda")],
-                          P = 2, Q = 3,
+                          P = 4, Q = 5,
+                          meanstructure = "arma",
+                          parameterization = "DCC",
+                          iterations = 500)
+
+fit.stocks.DCC2 <- bmgarch(stocks[1:100, c("toyota", "nissan", "honda")],
+                          P = 4, Q = 1,
+                          meanstructure = "arma",
+                          parameterization = "DCC",
+                          iterations = 500)
+
+fit.stocks.DCC3 <- bmgarch(stocks[1:100, c("toyota", "nissan", "honda")],
+                          P = 1, Q = 4,
                           meanstructure = "arma",
                           parameterization = "DCC",
                           iterations = 500)
