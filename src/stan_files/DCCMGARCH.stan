@@ -1,6 +1,7 @@
 // DCC-Parameterization
 functions { 
 #include /functions/cov2cor.stan
+#include /functions/jacobian.stan
 }
 
 data {
@@ -36,8 +37,12 @@ parameters {
 
   // GARCH h parameters on variance metric
   vector[nt] c_h; // variance on log metric 
-  vector<lower = 0,  upper = 1 >[nt] a_h[Q];
-  vector<lower = 0,  upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
+  // vector<lower = 0,  upper = 1 >[nt] a_h[Q];
+  simplex[Q] a_h_simplex[nt];
+  vector<lower=0, upper = 1>[nt] a_h_sum;
+  simplex[P] b_h_simplex[nt]; // Simplex for b_h within each timeseries
+  vector[nt] b_h_sum_s; // Unconstrained b_h_sum values. b_h[i] = U[i] b_h_simplex[i]; U[i] ~ U(0, 1 - sum(a_h[i]))
+  // vector<lower = 0,  upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
   // GARCH q parameters 
   real<lower=0, upper = 1 > a_q; // 
   real<lower=0, upper = (1 - a_q) > b_q; //
@@ -65,6 +70,16 @@ transformed parameters {
   real<lower = 0> vd[nt];
   real<lower = 0> ma_d[nt];
   real<lower = 0> ar_d[nt];  
+  vector<lower=0, upper = 1>[nt] a_h[Q] = simplex_to_bh(a_h_simplex, a_h_sum);
+  vector[nt] UPs = upper_limits(a_h);
+  vector[nt] ULs = raw_sum_to_b_h_sum(b_h_sum_s, UPs);
+  vector<lower = 0, upper = 1>[nt] b_h[P] = simplex_to_bh(b_h_simplex, ULs);
+  // vector<lower = 0, upper = 1>[nt] b_h[P] = simplex_to_bh(b_h_simplex,
+  // 							  raw_limit_to_b_h_limit(b_h_limit_s,
+  // 										 upper_limits(a_h)
+  // 										 )
+  // 							  );
+  // print("b_h:", b_h);
 
   // Initialize t=1
   mu[1,] = phi0;
@@ -89,10 +104,12 @@ transformed parameters {
 	rr[t-q, d] = square( rts[t-q, d] - mu[t-q, d] );
 	ma_d[d] = ma_d[d] + a_h[q, d]*rr[t-q, d] ;
       }
+      // print("ma_d: ", "TS:", d, " Value:", ma_d[d], " T:", t);
       // GARCH AR component
       for (p in 1:min( t-1, P) ) {
 	ar_d[d] = ar_d[d] + b_h[p, d]*D[t-p, d]^2;
       }
+      // print("ar_d: ", "TS:", d, " Value:", ar_d[d], " T:", t);
 
       // Predictor on diag (given in xC)
       if ( xC_marker >= 1) {
@@ -100,10 +117,12 @@ transformed parameters {
       } else if ( xC_marker == 0) {
       	vd[d] = exp( c_h[d] )  + ma_d[d] + ar_d[d];
       }
+      // print("c_h: ", "TS: ", d, " Value:", c_h[d]);
 
       D[t, d] = sqrt( vd[d] );
     }
     u[t,] = diag_matrix(D[t,]) \ (rts[t,]- mu[t,]); // cf. comment about taking inverses in stan manual p. 482 re:Inverses - inv(D)*y = D \ a
+    // print("u: ", "Value: ", u[t], "T:", t);
     Qr[t,] = (1 - a_q - b_q) * S + a_q * (u[t-1,] * u[t-1,]') + b_q * Qr[t-1,]; // S and UU' define dimension of Qr
     Qr_sdi[t,] = 1 ./ sqrt(diagonal(Qr[t,])); // inverse of diagonal matrix of sd's of Qr
     //    R[t,] = quad_form_diag(Qr[t,], inv(sqrt(diagonal(Qr[t,]))) ); // Qr_sdi[t,] * Qr[t,] * Qr_sdi[t,];
@@ -112,12 +131,19 @@ transformed parameters {
   }
 }
 model {
+  // print("Upper Limits:", UPs);
+  // UL transform jacobian
+  for(k in 1:nt) {
+    ULs[k] ~ uniform(0, UPs[k]); // Truncation not needed.
+    target += a_b_scale_jacobian(0, ULs[k], b_h_sum_s[k]);
+  }
+
   // priors
   to_vector(beta) ~ std_normal();
   to_vector(c_h) ~ std_normal();
   // Prior for initial state
   Qr1_init ~ wishart(nt + 1.0, diag_matrix(rep_vector(1.0, nt)) );
-  to_vector(D1_init) ~ lognormal(0, 1);
+  to_vector(D1_init) ~ lognormal(-1, 1);
   to_vector(u1_init) ~ std_normal();
   // Prior on nu for student_t
   //if ( distribution == 1 )
