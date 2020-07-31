@@ -48,13 +48,26 @@ sr2
 r2
 
 fit <- bmgarch(sr2,
-               iterations = 1000,
+               iterations = 20,
                P = 1, Q = 1,
                meanstructure = "arma",
                standardize_data = FALSE,
                parameterization = 'DCC',
                xH = NULL,
                adapt_delta=0.85)
+fit2 <- bmgarch(sr2,
+               iterations = 20,
+               P = 2, Q = 1,
+               meanstructure = "arma",
+               standardize_data = FALSE,
+               parameterization = 'DCC',
+               xH = NULL,
+               adapt_delta=0.85)
+
+bmList <- bmgarch_list(fit, fit2)
+wts <- model_weights(bmList, L = 90)
+fcOut <- forecast(bmList, ahead = 3, weights = wts)
+
 system("notify-send 'Done sampling' " )
 summary(fit )
 
@@ -176,12 +189,48 @@ mcmc_parcoord(as.array(fit$model_fit, pars = c("A","B","Cnst","beta0","beta1","p
 
 
 library(bmgarch )
-data(stocks )
 
-stocks[]
+fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+               xC = stocks[1:100, c("honda")],
+               meanstructure = "arma",
+               parameterization = "CCC", standardize_data = TRUE,
+               iterations = 100)
 
-fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],  parameterization = "CCC", standardize_data = TRUE)
-summary( fit )
+summary(fit)
 
-forecast( fit,  ahead = 5 )
+fit1 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )], 
+                xC = stocks[1:100, c("honda")],
+                meanstructure = "arma",
+                parameterization = "DCC", standardize_data = TRUE, #meanstructure = 'arma',
+                iterations = 100)
 
+summary(fit1)
+
+fc <- forecast(fit, ahead = 2, xC = cbind(stocks[101:102, c("honda")], stocks[101:102, c("honda")]), inc_samples = TRUE)
+fc
+
+lfo <- loo(fit, mode = 'backward',  L = 80 )
+lfo
+
+
+
+## obtain model weights for two models
+bmgarch_objects <- bmgarch_list(fit, fit1 )
+mw <-  model_weights(bmgarch_objects = bmgarch_objects, L =  80)
+mw
+
+
+m1 <- loo::loo( mw$ll_list[[1]], mw$r_eff_list[[1]])
+m2 <- loo::loo( mw$ll_list[[2]], mw$r_eff_list[[2]])
+loo::loo_compare(m1,  m2 )
+
+
+forecast( bmgarch_objects[[1]], ahead = 1)
+forecast( bmgarch_objects[[2]], ahead = 1)
+
+          
+fc <- forecast( bmgarch_objects, ahead = 1, weights = NULL, xC = cbind(stocks[101, c("honda")], stocks[101, c("honda")]), L =  80)
+fc
+
+
+fc$meta$weights

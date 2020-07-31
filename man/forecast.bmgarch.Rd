@@ -8,9 +8,14 @@
   object,
   ahead = 1,
   xC = NULL,
+  newdata = NULL,
   CrI = c(0.025, 0.975),
   seed = NA,
-  digits = 2
+  digits = 2,
+  weights = NULL,
+  L = NA,
+  method = "stacking",
+  inc_samples = FALSE
 )
 }
 \arguments{
@@ -20,11 +25,15 @@
 
 \item{xC}{Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).}
 
+\item{newdata}{Future datapoints for LFO-CV computation}
+
 \item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
 
 \item{seed}{Integer (Optional). Specify seed for \code{\link[rstan]{sampling}}.}
 
 \item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
+
+\item{weights}{Takes weights from model_weight function. Defaults to 1 -- this parameter is not typically set by user.}
 }
 \value{
 forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data.
@@ -35,6 +44,7 @@ See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
   \item{var}{\code{[N, 7, TS]} array of variance forecasts, where N is the timeseries length, and TS is the number of time series. E.g., \code{fc$forecast$var[3,,"tsA"]} is the 3-ahead variance forecast for time series "tsA".}
   \item{cor}{\code{[N, 7, TS(TS - 1)/2]} array of correlation forecasts, where N is the timeseries length, and \code{TS(TS - 1)/2} is the number of correlations. E.g., \code{fc$forecast$cor[3,, "tsB_tsA"]} is the 3-ahead forecast for the correlation between "tsB" and "tsA". Lower triangular correlations are saved.}
   \item{meta}{Meta-data specific to the forecast. I.e., TS_length (number ahead) and xC.}
+  \item{samples}{List}. If inc_samples is \code{TRUE}, then a list of arrays of MCMC samples for means, vars, and cors. Each array is [Iteration, Period, ..., ...].
 }
 }
 \description{

@@ -4,11 +4,18 @@ functions {
 
 data {
 #include /data/gq_data.stan
-  vector[nt] xC_p[ahead];  // time-varying predictor for conditional H 
 }
 
 transformed data {
-#include /transformed_data/xh_marker.stan  
+  matrix[ahead + max(Q,P), nt] xC_c;
+#include /transformed_data/xh_marker.stan
+  // Concatenate xC with xC_p 
+  for(i in 1:max(Q,P) ) {
+    xC_c[i] = xC[T - (max(Q,P) - 1)]';
+  }
+  for(i in 1:ahead) {
+    xC_c[i + max(Q,P)] = xC_p[i]';
+  }
 }
 
 
@@ -42,13 +49,22 @@ parameters {
 generated quantities {
   // Define matrix for rts prediction
   vector[nt] rts_p[ahead + max(Q,P)];
+  vector[nt] rts_forecasted[ahead];
+  
   cov_matrix[nt] H_p[ahead + max(Q,P)];
   corr_matrix[nt] R_p[ahead + max(Q,P)];
+  cov_matrix[nt] H_forecasted[ahead];
+  corr_matrix[nt] R_forecasted[ahead];
 
   matrix[nt,nt] rr_p[ahead + max(Q,P)];
   vector[nt] mu_p[ahead + max(Q,P)];
+  vector[nt] mu_forecasted[ahead];
 
   matrix[nt+1, nt] beta = append_row( beta0, diag_matrix(beta1) );
+
+  // log lik for LFO-CV
+  // only compute log_lik if it is actually requested
+  real log_lik[compute_log_lik ==1 ? ahead:0];
   
   // Placeholders
   matrix[nt, nt] A_part_p;
@@ -60,15 +76,16 @@ generated quantities {
   mu_p[ 1:(ahead + max(Q,P)), ] = mu[ 1:(ahead + max(Q,P)), ];
   rr_p[ 1:(ahead + max(Q,P)), ] = rr[ 1:(ahead + max(Q,P)), ];
   
-   R_p[ 1:(ahead + max(Q,P)), ] = corH[ 1:(ahead + max(Q,P)), ];
+  R_p[ 1:(ahead + max(Q,P)), ] = corH[ 1:(ahead + max(Q,P)), ];
   
   // Obtain needed elements from mu and fill into mu_p
-  rts_p[1:max(Q, P), ] = rts[ (T-(max(Q,P)-1) ):T, ];
-  H_p[  1:max(Q, P), ] =  H[ (T-(max(Q,P)-1) ):T, ];
-  mu_p[ 1:max(Q, P), ] = mu[ (T-(max(Q,P)-1) ):T, ];
+  rts_p[1:max(Q, P), ] = rts[ (T-( max(Q,P)-1 ) ):T, ];
+  H_p[  1:max(Q, P), ] =  H[ (T-( max(Q,P)-1 ) ):T, ];
+  mu_p[ 1:max(Q, P), ] = mu[ (T-( max(Q,P)-1 ) ):T, ];
   // rr is of length T-1
-  rr_p[ 1:max(Q, P), ] = rr[ (T-1-(max(Q,P)-1) ):(T-1), ];
-  R_p[  1:max(Q, P), ] =  corH[ (T - (max(Q,P)-1) ):T, ];
+  rr_p[ 1:max(Q, P), ] = rr[ (T-1-( max(Q,P)-1 ) ):(T-1), ];
+  R_p[  1:max(Q, P), ] =  corH[ (T - ( max(Q,P)-1 ) ):T, ];
+
   
   // Forecast
   for (t in (max(Q, P) + 1 ):( max(Q, P) + ahead ) ){
@@ -93,15 +110,32 @@ generated quantities {
     if( xC_marker == 0 ) {
       H_p[t,] = quad_form_diag(C_R, exp( beta0 ) ) + A_part_p +  B_part_p;
     } else if( xC_marker >= 1) {
-      H_p[t,] = quad_form_diag(C_R,exp( append_col( 1.0, xC_p[t]' ) * beta )) +
+      H_p[t,] = quad_form_diag(C_R,exp( append_col( 1.0, xC_c[ t, ] ) * beta )) +
 	A_part_p +  B_part_p;
     }
     R_p[t, ] = cov2cor(H_p[t,]);
-    
-    if ( distribution == 0 ) {
-      rts_p[t,] = multi_normal_rng( mu_p[t,], H_p[t,]);
-    } else if ( distribution == 1 ) {
-      rts_p[t,] = multi_student_t_rng( nu, mu_p[t,], H_p[t,]);
-    }
+
+    /* sampling distributions */
+#include /generated/forecast_sampling.stan
+    /* if ( distribution == 0 ) { */
+    /*   rts_p[t,] = multi_normal_rng( mu_p[t,], H_p[t,]); */
+    /*   if( compute_log_lik ) { */
+    /* 	for( i in 1:ahead ){ */
+    /* 	  log_lik[i] = multi_normal_lpdf( future_rts[i] |  mu_p[t,], H_p[t,] ); */
+    /* 	} */
+    /*   } */
+    /* } else if ( distribution == 1 ) { */
+    /*   rts_p[t,] = multi_student_t_rng( nu, mu_p[t,], H_p[t,]); */
+    /*   if( compute_log_lik ) { */
+    /* 	for( i in 1:ahead ){ */
+    /* 	  log_lik[i] = multi_student_t_lpdf( future_rts[i] | nu, mu_p[t,], H_p[t,] ); */
+    /* 	} */
+    /*   } */
+    /* } */
   }
+  rts_forecasted = rts_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  H_forecasted = H_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  R_forecasted = R_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  mu_forecasted = mu_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+#include /generated/forecast_log_lik.stan
 }

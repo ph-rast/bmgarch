@@ -18,9 +18,9 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     if ( is.null( colnames( data ) ) ) colnames( data ) = paste0('t', 1:ncol( data ) )
 
     ## Model for meanstructure
-    if( meanstructure == "constant") {
+    if( meanstructure == "constant" | meanstructure == 0 ) {
         meanstructure <- 0
-    } else if ( meanstructure == "arma" ){
+    } else if ( meanstructure == "arma" | meanstructure == 1 ){
         meanstructure <- 1
     } else {
         stop("meanstructure must be either 'constant' or 'arma'.")
@@ -84,6 +84,7 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##' @param meanstructure Character (Default: "constant"). Defines model for means. Either 'constant'  or 'arma'. Currently arma(1,1) only.
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[rstan]{stan}}.
 ##' @return \code{bmgarch} object.
+##' @importFrom Rdpack reprompt
 ##' @author Philippe Rast, Stephen R. Martin
 ##' @export
 ##' @examples
@@ -182,7 +183,8 @@ bmgarch <- function(data,
                        mgarchQ = stan_data$Q,
                        mgarchP = stan_data$P,
                        xC = stan_data$xC,
-                       meanstructure = stan_data$meanstructure)
+                       meanstructure = stan_data$meanstructure,
+                       std_data = standardize_data)
     class(return_fit) <- "bmgarch"
     return(return_fit)
 }

@@ -84,7 +84,9 @@ plot.forecast.bmgarch <- function(x, type = "mean", askNewPage = TRUE, last_t = 
     if(!(type %in% c("mean","var","cor"))) {
         stop("'type' must be 'mean', 'var', or 'cor'.")
     }
-    if(type == "cor" & x$meta$param == "CCC") {
+    condCor <- any(sapply(x$meta_list, function(x) {x$param != "CCC"}))
+    ## if(type == "cor" & x$meta$param == "CCC") {
+    if(type == "cor" & !condCor) {
         stop("CCC does not model correlations over time.")
     }
     df <- df[df$param == type, ]
