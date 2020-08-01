@@ -232,7 +232,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     # Indicices as "[period,a,b]"
     f.cor.indices.L.all <- paste0("R_forecasted[",1:(ahead), ",", rep(f.cor.indices.L.char, each = (ahead)),"]")
     # Get only these elements.
-    f.cor <- f.cor[f.cor.indices.L.all,]
+    f.cor <- f.cor[f.cor.indices.L.all,, drop = FALSE]
     f.cor <- array(f.cor, dim = c(ahead, length(f.cor.indices.L.char), ncol(f.cor)))
     f.cor <- aperm(f.cor, c(1, 3, 2))
     dimnames(f.cor) <- list(period = forecast_start:forecast_end, stan_sum_cols, TS = f.cor.indices.L.labels)
