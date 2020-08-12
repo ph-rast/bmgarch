@@ -65,35 +65,48 @@ fit2 <- bmgarch(sr2,
                xH = NULL,
                adapt_delta=0.85)
 
+library(bmgarch )
 data(stocks)
-stocks[,3:5] <- scale(stocks[,3:5])
 
-fit.stocks.DCC <- bmgarch(stocks[1:100, c("toyota", "nissan", "honda")],
-                          P = 4, Q = 5,
-                          meanstructure = "arma",
+fit.stocks.DCC <- bmgarch(stocks[1:100, c("toyota", "nissan")],
+                          P = 1, Q = 1,
+#                          meanstructure = "arma",
                           parameterization = "DCC",
-                          iterations = 500)
+                          iterations = 100,
+                          standardize_data = TRUE)
 
-fit.stocks.DCC2 <- bmgarch(stocks[1:100, c("toyota", "nissan", "honda")],
-                          P = 4, Q = 1,
-                          meanstructure = "arma",
-                          parameterization = "DCC",
-                          iterations = 500)
-
-fit.stocks.DCC3 <- bmgarch(stocks[1:100, c("toyota", "nissan", "honda")],
-                          P = 1, Q = 4,
-                          meanstructure = "arma",
-                          parameterization = "DCC",
-                          iterations = 500)
-
-fit.stocks.CCC <- bmgarch(stocks[1:100, c("toyota", "nissan", "honda")],
+fit.stocks.DCC2 <- bmgarch(stocks[1:100, c("toyota", "nissan")],
                           P = 2, Q = 2,
-                          meanstructure = "arma",
-                          parameterization = "CCC",
-                          iterations = 500)
+#                          meanstructure = "arma",
+                          parameterization = "DCC",
+                          iterations = 100,
+                          standardize_data = TRUE)
 
-bmList <- bmgarch_list(fit, fit2)
-wts <- model_weights(bmList, L = 90)
+fit.stocks.DCC3 <- bmgarch(stocks[1:100, c("toyota", "nissan")],
+                          P = 1, Q = 4,
+ #                         meanstructure = "arma",
+                          parameterization = "DCC",
+                          iterations = 100,
+                          standardize_data = TRUE)
+
+fit.stocks.CCC <- bmgarch(stocks[1:100, c("toyota", "nissan")],
+                          P = 1, Q = 1,
+                          #meanstructure = "arma",
+                          parameterization = "CCC",
+                          iterations = 100,
+                          standardize_data = TRUE)
+
+bmList <- bmgarch_list(fit.stocks.DCC, fit.stocks.CCC, fit.stocks.DCC3, fit.stocks.CCC)
+
+
+wts <- model_weights(bmList, L = 80)
+wts
+
+
+
+fit.stocks.DCC
+forecast(fit.stocks.DCC,  ahead =  3 )
+
 fcOut <- forecast(bmList, ahead = 3, weights = wts)
 
 system("notify-send 'Done sampling' " )
@@ -219,7 +232,7 @@ mcmc_parcoord(as.array(fit$model_fit, pars = c("A","B","Cnst","beta0","beta1","p
 library(bmgarch )
 
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
-               xC = stocks[1:100, c("honda")],
+#               xC = stocks[1:100, c("honda")],
                meanstructure = "arma",
                parameterization = "CCC", standardize_data = TRUE,
                iterations = 100)
@@ -227,24 +240,32 @@ fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
 summary(fit)
 
 fit1 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )], 
-                xC = stocks[1:100, c("honda")],
+ #               xC = stocks[1:100, c("honda")],
                 meanstructure = "arma",
                 parameterization = "DCC", standardize_data = TRUE, #meanstructure = 'arma',
                 iterations = 100)
 
 summary(fit1)
 
-fc <- forecast(fit, ahead = 2, xC = cbind(stocks[101:102, c("honda")], stocks[101:102, c("honda")]), inc_samples = TRUE)
-fc
+fc <- forecast(fit, ahead = 1, xC = cbind(stocks[101, c("honda")], stocks[101, c("honda")]),
+               inc_samples = TRUE, newdata = stocks[101, c("toyota",  "nissan" )])
+fc$forecast$log_lik
 
-lfo <- loo(fit, mode = 'backward',  L = 80 )
+lfo <- loo(fit, mode = 'forward',  L = 80 )
 lfo
+lfo$out
+lfo$exact_elpds_1sap
 
+lfob <- loo(fit, mode = 'backward',  L = 80 )
+lfob
+lfob$out
 
+lfoe <- loo(fit, mode = 'exact',  L = 80 )
+lfoe
 
 ## obtain model weights for two models
 bmgarch_objects <- bmgarch_list(fit, fit1 )
-mw <-  model_weights(bmgarch_objects = bmgarch_objects, L =  80)
+mw <-  model_weights(bmgarch_objects = bmgarch_objects, L =  80, mode = "forward")
 mw
 
 

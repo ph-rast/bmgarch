@@ -133,6 +133,9 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
             out <- approx_elpds_1sap
             
         } else if ( mode == "forward" ) {
+            warn <- function() warning("'forward' method not fully implemented")
+            if( mode == 'forward' ) warn( )
+            
             k_thres <- 0.7
 
             out <- rep( NA, N )
@@ -148,53 +151,63 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
             xC_start <- object$xC[1:L, , drop = FALSE]
             fit_start <- .refit(object, data = df_start, xC_data = xC_start )
 
-            oos
             ## Exact ELPD: Computed from log_lik of forecast function
-            fc <- bmgarch::forecast(fit_start, ahead = ahead, xC = xC_dat[ oos, , drop = FALSE], newdata = df_dat[ oos, ,drop = FALSE])
+            fc <- bmgarch::forecast(fit_start, ahead = ahead,
+                                    xC = xC_dat[ oos, , drop = FALSE],
+                                    newdata = df_dat[ oos, ,drop = FALSE])
 
             ## Exact log_lik
-            loglik[, oos ] <- fc$forecast$log_lik
+            loglik[, oos ] <- fc$forecast$log_lik[[1]]
             exact_elpds_1sap[ L ] <- .log_mean_exp( loglik[, oos ] )
-            out[ L ] <- exact_elpds_1sap[L]    
+            out[ L ] <- exact_elpds_1sap[L]
+            ## Also write content to approx_elpds as the summary for
+            ## "forward" is obtained over all approx_elpds's
+            approx_elpds_1sap[ L ] <- exact_elpds_1sap[L]
             i_refit <- L + 1
-            
-            for (i in (L + 1):(N-ahead) ) {
-                
-                logratio <- .sum_log_ratios(loglik, i_refit:i )#(L+1):(i+1))
-                psis_obj <- suppressWarnings(loo::psis(logratio))
-                k <- loo::pareto_k_values(psis_obj)
-                ks <- c(ks, k)
-                print( ks )
-                if( k > k_thres ) {
-                    refits <- c(refits, i)
 
-                    df_start <- object$RTS_full[1:i, , drop = FALSE]
-                    xC_start <- object$xC[1:i, , drop = FALSE]
-
-                    fit_start <- .refit(object, data = df_start, xC_data = xC_start )
-                    ahead <- 1
-                    fc <- bmgarch::forecast(fit_start, ahead = ahead, xC = xC_dat[ i+1, , drop = FALSE], newdata = df_dat[ i+1, ,drop = FALSE])
-
-                    ## Exact log_lik
-                    loglik[, i+1 ] <- fc$forecast$log_lik
+            if( L < N - ahead ) {
+                for (i in (L + 1):(N-ahead) ) {
                     
-                    exact_elpds_1sap[ i ] <- .log_mean_exp( loglik[, i+1 ] )
-                    
-                    logratio <- .sum_log_ratios(loglik, i+1 )#(L+1):(i+1))
-                    out[ i ] <- exact_elpds_1sap[ i ]
+                    logratio <- .sum_log_ratios(loglik, i_refit:i )#(L+1):(i+1))
                     psis_obj <- suppressWarnings(loo::psis(logratio))
                     k <- loo::pareto_k_values(psis_obj)
-                    i_refit <- i+1
-                                        #k <- 0
-                } else {
-                    lw <- weights(psis_obj, normalize = TRUE)[, 1]
-                    ahead <- ( i+1 )-( i_refit-1 )
-                    fc <- bmgarch::forecast(fit_start, ahead = ahead, xC = xC_dat[ ( i_refit ):(i+1), , drop = FALSE], newdata = df_dat[  ( i_refit ):(i+1), ,drop = FALSE])
+                    ks <- c(ks, k)
+                    print( ks )
+                    if( k > k_thres ) {
+                        refits <- c(refits, i)
 
-                    loglik[, i+1 ] <- fc$forecast$log_lik[, ahead]
-                    approx_elpds_1sap[ i ] <-  .log_sum_exp(lw + loglik[, i+1 ])
-                    out[i] <- approx_elpds_1sap[ i ] 
-                }          
+                        df_start <- object$RTS_full[1:i, , drop = FALSE]
+                        xC_start <- object$xC[1:i, , drop = FALSE]
+
+                        fit_start <- .refit(object, data = df_start, xC_data = xC_start )
+                        ahead <- 1
+                        fc <- bmgarch::forecast(fit_start, ahead = ahead,
+                                                xC = xC_dat[ i+1, , drop = FALSE],
+                                                newdata = df_dat[ i+1, ,drop = FALSE])
+
+                        ## Exact log_lik
+                        loglik[, i+1 ] <- fc$forecast$log_lik[[1]]
+                        
+                        exact_elpds_1sap[ i ] <- .log_mean_exp( loglik[, i+1 ] )
+                        
+                        logratio <- .sum_log_ratios(loglik, i+1 )#(L+1):(i+1))
+                        out[ i ] <- exact_elpds_1sap[ i ]
+                        psis_obj <- suppressWarnings(loo::psis(logratio))
+                        k <- loo::pareto_k_values(psis_obj)
+                        i_refit <- i+1
+                                        #k <- 0
+                    } else {
+                        lw <- weights(psis_obj, normalize = TRUE)[, 1]
+                        ahead <- ( i+1 )-( i_refit-1 )
+                        fc <- bmgarch::forecast(fit_start, ahead = ahead,
+                                                xC = xC_dat[ ( i_refit ):(i+1), , drop = FALSE],
+                                                newdata = df_dat[  ( i_refit ):(i+1), ,drop = FALSE])
+
+                        loglik[, i+1 ] <- fc$forecast$log_lik[[1]][, ahead]
+                        approx_elpds_1sap[ i ] <-  .log_sum_exp(lw + loglik[, i+1 ])
+                        out[i] <- approx_elpds_1sap[ i ] 
+                    }          
+                }
             }
         } else if (mode == "exact" ) {
             k_thres <- 0
@@ -206,7 +219,7 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
             for(i in L:( N-1 ) ) {
                 fit_start <- .refit(object, data = df_dat[1:i, , drop = FALSE], xC_data = xC_dat[1:i, , drop = FALSE] )
                 fc <- bmgarch::forecast(fit_start, ahead = ahead, xC = xC_dat[ i+1, , drop = FALSE], newdata = df_dat[ i+1, ,drop = FALSE])
-                loglik[, i+1 ] <-  fc$forecast$log_lik
+                loglik[, i+1 ] <-  fc$forecast$log_lik[[1]]
             }
             loglik_exact <- loglik[, (L+1):N]
             exact_elpds_1sap <- apply(loglik_exact, 2, .log_mean_exp )
@@ -215,8 +228,6 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
             stop("'mode' needs to be either 'forward', 'backward' or 'exact'." )
         }
 
-        warn <- function() warning("'forward' method not fully implemented")
-        if( mode == 'forward' ) warn( )
         
         refit_info <- cat("Using threshold ", k_thres, 
                           ", model was refit ", length(refits), 
