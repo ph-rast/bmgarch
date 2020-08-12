@@ -24,13 +24,14 @@
 ##' @return Model weights
 ##' @author philippe
 ##' @export
-model_weights <- function(bmgarch_objects = NULL,  lfo_objects = NULL, L = NULL, method = "stacking") {   
+model_weights <- function(bmgarch_objects = NULL,  lfo_objects = NULL, L = NULL,
+                          method = "stacking", mode = 'backward') {   
 
     if( !is.null(bmgarch_objects ) & !is.null(lfo_objects )) stop( "Supply only 'bmgarch_objects' or 'lfo_objects', not both" )
     
     if( !is.null(bmgarch_objects ) ) {
     ## Approximates LFO; Ie. results in refitting models.
-    ll_list <- lapply(bmgarch_objects, FUN = .ll_lfo, L = L)
+    ll_list <- lapply(bmgarch_objects, FUN = .ll_lfo, L = L, mode =  mode)
     } else if(!is.null(lfo_objects) ) {
         stop("todo" )
     } else {
