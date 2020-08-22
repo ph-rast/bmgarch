@@ -4,7 +4,7 @@
 \alias{plot.bmgarch}
 \title{Plot method for bmgarch objects.}
 \usage{
-\method{plot}{bmgarch}(x, type = "mean", askNewPage = TRUE, CrI = c(0.025, 0.975))
+\method{plot}{bmgarch}(x, type = "mean", askNewPage = TRUE, CrI = c(0.025, 0.975), ...)
 }
 \arguments{
 \item{x}{bmgarch object.}
@@ -14,6 +14,8 @@
 \item{askNewPage}{askNewPage Logical (Default: True). Whether to ask for new plotting page.}
 
 \item{CrI}{CrI Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
+
+\item{...}{Not used}
 }
 \value{
 List of ggplot objects (one per time series).

@@ -35,11 +35,11 @@ The development version can be installed from [GitHub](https://github.com/) with
 ``` r
 devtools::install_github("ph-rast/bmgarch")
 ```
-## Example
+## Example 1: Behavioral Data
 
 In this example, we use the pdBEKK(1,1) model for the variances, and an intercept-only model for the means.
 
-```{r example, error = FALSE, warning = FALSE, message = FALSE}
+```{r label="example 1", error = FALSE, warning = FALSE, message = FALSE}
 library(bmgarch)
 
 data(panas)
@@ -51,7 +51,7 @@ fit <- bmgarch(panas,
                iterations = 1000,
                P = 1, Q = 1,
                distribution = "Student_t",
-               meanstructure = "constant")
+               meanstructure = "arma")
 
 ```
 
@@ -71,4 +71,99 @@ fit.fc
 plot(fit.fc, askNewPage = FALSE, type = "var")
 
 plot(fit.fc, askNewPage = FALSE, type = "cor")
+```
+
+## Example 2: Stocks
+
+Here we use the first 100 days of Stata's stocks data on daily lagged returns of three Japanese automakers, Toyota, Nissan, and Honda. 
+
+```{r label="example 2", error = FALSE, warning = FALSE, message = FALSE}
+library(bmgarch)
+
+data(stocks)
+head(stocks)
+```
+Ease computation by first standardizing the time series
+```{r error = FALSE, warning = FALSE, message = FALSE}
+stocks.z <- scale(stocks[,c("toyota", "nissan", "honda")])
+head(stocks.z )
+
+# Fit CCC(1, 1) with constant on the mean structure.
+fit1 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
+                parameterization = "CCC",
+                iterations = 100,
+                P = 1, Q = 1,
+                distribution = "Student_t",
+                meanstructure = "constant")
+
+```
+
+### Parameter Estimates
+```{r}
+summary( fit1 )
+```
+
+### Forecasted Values
+Forecast volatility 10 days ahead
+```{r}
+fc <- forecast(fit1, ahead = 10 )
+fc
+```
+```{r}
+plot(fc,askNewPage = FALSE, type = 'var' )
+```
+
+Add two additional models, one with CCC(2,2) and a DCC(1,1)
+
+```{r error = FALSE, warning = FALSE, message = FALSE}
+# Fit CCC(1, 1) with constant on the mean structure.
+fit2 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
+                parameterization = "CCC",
+                iterations = 100,
+                P = 2, Q = 2,
+                distribution = "Student_t",
+                meanstructure = "constant")
+
+fit3 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
+                parameterization = "DCC",
+                iterations = 100,
+                P = 1, Q = 1,
+                distribution = "Student_t",
+                meanstructure = "arma")
+
+```
+
+The DCC(1,1) model also incorportes an ARMA(1,1) meanstructure. The output will have the according information:
+```{r}
+summary( fit3 )
+fc <- forecast(fit3, ahead =  10)
+plot( fc,askNewPage = FALSE, type =  'mean' ) 
+```
+
+
+### Ensemble Models
+Obtain model weights with either the stacking or the pseudo BMA method. These methods are inherited from the `loo` package.
+
+```{r ModelWeights}
+## use bmgarch_list function to collect bmgarch objects
+modfits <- bmgarch_list(fit1, fit2, fit3)
+```
+
+### Compute Model Weights
+Compute model weights with the stacking method and the the approximate leave-future-out cross validation (LFO CV).
+`L` defines the minimal length of the time series before we start engaging in cross-validation. Note that the standard is to use the approximate `backward` method to CV as itresults in fewest refits. Exact CV is also available with `exact` but not encouraged as it results in refitting all CV models. 
+```{r error = FALSE, warning = FALSE, message = FALSE}
+mw <- model_weights(modfits, L = 50, method = 'stacking' )
+
+## Return model weights:
+mw
+```
+
+### Weighted Forecasting
+Use model weights to obtain weighted forecasts. Here we will forecast 10 days ahead.
+```{r}
+w_fc <- forecast(modfits, ahead = 10, weights = mw )
+
+w_fc
+plot(w_fc, askNewPage = FALSE, type =  'var' )
 ```

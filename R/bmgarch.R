@@ -70,7 +70,7 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 
 ##' Draw samples from a specified multivariate GARCH model, given multivariate time-series.
 ##'
-##' Three paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK.
+##' Four paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK \insertCite{Engle1995}{bmgarch} as well as a BEKK  model with positivity constraints on the diagonals of the ARCH and GARCH parameters "pdBEKK" \insertCite{Rast2020}{bmgarch}.
 ##' @title Estimate Bayesian Multivariate GARCH
 ##' @param data Time-series or matrix object. A time-series or matrix object containing observations at the same interval.
 ##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
@@ -86,12 +86,18 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##' @return \code{bmgarch} object.
 ##' @importFrom Rdpack reprompt
 ##' @author Philippe Rast, Stephen R. Martin
+##' @references
+##'    \insertAllCited()
 ##' @export
 ##' @examples
 ##' \dontrun{
 ##' data(panas)
-##' # Fit pdBEKK(1,1) mgarch model with a ARMA(1,1) meanstructure, and student-t residual distribution
-##' fit <- bmgarch(panas, parameterization = "pdBEKK", P = 1, Q = 1, meanstructure = "arma", distribution = "Student_t")
+##' # Fit BEKK(1,1) mgarch model with a ARMA(1,1) meanstructure,
+##' # and student-t residual distribution
+##' fit <- bmgarch(panas, parameterization = "BEKK",
+##'                P = 1, Q = 1,
+##'                meanstructure = "arma",
+##'                distribution = "Student_t")
 ##'
 ##' # Summarize the parameters
 ##' summary(fit)

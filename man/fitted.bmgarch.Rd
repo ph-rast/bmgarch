@@ -60,6 +60,3 @@ plot(fit, type = "var")
 fit.bc.df <- as.data.frame(fit.bc)
 }
 }
-\author{
-Stephen R. Martin
-}

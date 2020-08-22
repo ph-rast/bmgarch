@@ -56,7 +56,8 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
 ##' @param mode backward elpd_lfo approximation, or exact elpd-lfo; 
 ##' Takes 'backward', and 'exact'. 'exact' fits N-L models and may
 ##' take a \emph{very} long time to complete. \code{forward} works too but is not
-##' complete yet. 
+##' complete yet.
+##' @param ... Not used
 ##' @return Approximate LFO-CV value and log-likelihood values across (L+1):N
 ##' timepoints
 ##' @author philippe
@@ -65,7 +66,7 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
 ##' @importFrom loo loo
 ##' @export loo
 ##' @export
-loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
+loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward", ...) {
     m <- 1 ## currently on only lfo-1-ahead
     ahead <- m
     N <- object$TS_length
@@ -251,11 +252,12 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
 }
 
 ##' @title print method for lfocv
-##' @param x 
+##' @param x lfo object
+##' @param ... Not used.
 ##' @return Invisible lfocv object
 ##' @author philippe
 ##' @export
-print.loo.bmgarch <- function( x ) {
+print.loo.bmgarch <- function( x, ... ) {
     if( x$type == 'loo' ) {
         cat('elpd_loo ', x$backcast_loo)
     } else if( x$type == 'lfo' ) {

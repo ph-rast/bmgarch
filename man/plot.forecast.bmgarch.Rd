@@ -4,7 +4,7 @@
 \alias{plot.forecast.bmgarch}
 \title{Plot method for forecast.bmgarch objects.}
 \usage{
-\method{plot}{forecast.bmgarch}(x, type = "mean", askNewPage = TRUE, last_t = 100)
+\method{plot}{forecast.bmgarch}(x, type = "mean", askNewPage = TRUE, last_t = 100, ...)
 }
 \arguments{
 \item{x}{forecast.bmgarch object. See \code{\link{forecast.bmgarch}}.}
@@ -14,6 +14,8 @@
 \item{askNewPage}{Logical (Default: True). Whether to ask for new plotting page.}
 
 \item{last_t}{Integer (Default: 100). Only show \code{last_t} observations in plot.}
+
+\item{...}{Not used}
 }
 \value{
 List of ggplot objects (one per time series).

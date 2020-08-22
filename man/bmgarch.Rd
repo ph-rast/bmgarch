@@ -48,13 +48,17 @@ bmgarch(
 Draw samples from a specified multivariate GARCH model, given multivariate time-series.
 }
 \details{
-Three paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK.
+Four paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK \insertCite{Engle1995}{bmgarch} as well as a BEKK  model with positivity constraints on the diagonals of the ARCH and GARCH parameters "pdBEKK" \insertCite{Rast2020}{bmgarch}.
 }
 \examples{
 \dontrun{
 data(panas)
-# Fit pdBEKK(1,1) mgarch model with a ARMA(1,1) meanstructure, and student-t residual distribution
-fit <- bmgarch(panas, parameterization = "pdBEKK", P = 1, Q = 1, meanstructure = "arma", distribution = "Student_t")
+# Fit BEKK(1,1) mgarch model with a ARMA(1,1) meanstructure,
+# and student-t residual distribution
+fit <- bmgarch(panas, parameterization = "BEKK",
+               P = 1, Q = 1,
+               meanstructure = "arma",
+               distribution = "Student_t")
 
 # Summarize the parameters
 summary(fit)
@@ -81,6 +85,9 @@ fit.bc <- fitted(fit)
 # Save estimated and forecasted data as a data.frame
 df.fc <- as.data.frame(fit.fc)
 }
+}
+\references{
+\insertAllCited()
 }
 \author{
 Philippe Rast, Stephen R. Martin

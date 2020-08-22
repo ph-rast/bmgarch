@@ -23,6 +23,7 @@ Imports:
     ggplot2,
     MASS,
     forecast,
+    loo,
     Rdpack
 LinkingTo: 
     BH (>= 1.69.0-1),

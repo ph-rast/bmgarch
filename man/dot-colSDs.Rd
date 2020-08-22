@@ -15,7 +15,4 @@ SD's at the columns level witin list
 \description{
 Obtain SD's over columns in lists
 }
-\author{
-philippe
-}
 \keyword{internal}

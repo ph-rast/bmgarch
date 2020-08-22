@@ -3,6 +3,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^local$
+^testsd$
 ^.covrignore$
 ^README\.Rmd$
 ^man/figures$
+^todo.org$

@@ -19,7 +19,4 @@ Figure out whther object is a list of models or just one model
 Check for nesting structure; If depth == 1, one object else list of models
 from: \url{https://stackoverflow.com/questions/13432863/determine-level-of-nesting-in-r}
 }
-\author{
-philippe
-}
 \keyword{internal}

@@ -13,16 +13,20 @@
                       chain_id = rep(1:n_chains,  each = iter-warmup ))
 }
 
-##' Model averaging via stacking of predictive distribution.
-##' content for \description{Desc} (no empty lines) ..
-##' .. content for \details{Det} ..
+##' Compute model weights for a list of candidate models based on leave-future-out
+##' cross validation (lfocv) expected log-predictive predictive density (elpd).
+##' elpd can be approximated via the 'backward' mode described in \insertCite{Buerkner2019;textual}{bmgarch} or via exact cross-validation.    
+##' The obtained weights can be passed to the forecast function to obtain weighted forecasts.
+##' \code{bmgarch_objects} takes either \code{bmgarch_object} or \code{lfo_object} lists.
 ##' @title Model weights
-##' @param bmgarch_objects 
-##' @param lfo_objects 
-##' @param L 
-##' @param method Ensemble methods, 'stacking' (default) or 'pseudobma' 
+##' @param bmgarch_objects list of bmgarch model objects in \code{bmgarch_object}  
+##' @param lfo_objects list of lfo_objects, in 'lfo_object'
+##' @param L Minimal length of time series before engaging in lfocv 
+##' @param method Ensemble methods, 'stacking' (default) or 'pseudobma'
+##' @param mode Either 'backward' (default) or 'exact'
 ##' @return Model weights
-##' @author philippe
+##' @references
+##'      \insertAllCited{}
 ##' @export
 model_weights <- function(bmgarch_objects = NULL,  lfo_objects = NULL, L = NULL,
                           method = "stacking", mode = 'backward') {   
@@ -55,11 +59,12 @@ model_weights <- function(bmgarch_objects = NULL,  lfo_objects = NULL, L = NULL,
 
 
 ##' @title Print method for model_weights
-##' @param x 
+##' @param x Model weights object
+##' @param ... Not used.
 ##' @return model_weights objects with weights, list of log-likelihoods, and r_eff_list 
 ##' @author philippe
 ##' @export
-print.model_weights <- function(x ) {
+print.model_weights <- function(x, ...) {
     print(x$wts)
     return(invisible(x) )
 }

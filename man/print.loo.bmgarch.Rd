@@ -4,10 +4,12 @@
 \alias{print.loo.bmgarch}
 \title{print method for lfocv}
 \usage{
-\method{print}{loo.bmgarch}(x)
+\method{print}{loo.bmgarch}(x, ...)
 }
 \arguments{
-\item{x}{}
+\item{x}{lfo object}
+
+\item{...}{Not used.}
 }
 \value{
 Invisible lfocv object

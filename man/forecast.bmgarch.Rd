@@ -15,7 +15,8 @@
   weights = NULL,
   L = NA,
   method = "stacking",
-  inc_samples = FALSE
+  inc_samples = FALSE,
+  ...
 )
 }
 \arguments{
@@ -34,6 +35,14 @@
 \item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
 
 \item{weights}{Takes weights from model_weight function. Defaults to 1 -- this parameter is not typically set by user.}
+
+\item{L}{Minimal length of time series before engaging in lfocv}
+
+\item{method}{Ensemble methods, 'stacking' (default) or 'pseudobma'}
+
+\item{inc_samples}{Logical (Default: FALSE). Whether to return the MCMC samples for the fitted values.}
+
+\item{...}{Not used}
 }
 \value{
 forecast.bmgarch object. List containing \code{forecast}, \code{backcast}, and \code{meta}data.
@@ -75,7 +84,4 @@ fit.fc.df <- as.data.frame(fit.fc)
 # Save only forecasted values as data frame.
 fit.fc.df <- as.data.frame(fit.fc, backcast = FALSE)
 }
-}
-\author{
-Stephen R. Martin
 }

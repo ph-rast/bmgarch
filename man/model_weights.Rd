@@ -8,26 +8,31 @@ model_weights(
   bmgarch_objects = NULL,
   lfo_objects = NULL,
   L = NULL,
-  method = "stacking"
+  method = "stacking",
+  mode = "backward"
 )
 }
 \arguments{
-\item{bmgarch_objects}{}
+\item{bmgarch_objects}{list of bmgarch model objects in \code{bmgarch_object}}
 
-\item{lfo_objects}{}
+\item{lfo_objects}{list of lfo_objects, in 'lfo_object'}
 
-\item{L}{}
+\item{L}{Minimal length of time series before engaging in lfocv}
 
 \item{method}{Ensemble methods, 'stacking' (default) or 'pseudobma'}
+
+\item{mode}{Either 'backward' (default) or 'exact'}
 }
 \value{
 Model weights
 }
 \description{
-Model averaging via stacking of predictive distribution.
-content for \description{Desc} (no empty lines) ..
-.. content for \details{Det} ..
+Compute model weights for a list of candidate models based on leave-future-out
+cross validation (lfocv) expected log-predictive predictive density (elpd).
+elpd can be approximated via the 'backward' mode described in \insertCite{Buerkner2019;textual}{bmgarch} or via exact cross-validation.    
+The obtained weights can be passed to the forecast function to obtain weighted forecasts.
+\code{bmgarch_objects} takes either \code{bmgarch_object} or \code{lfo_object} lists.
 }
-\author{
-philippe
+\references{
+\insertAllCited{}
 }

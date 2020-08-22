@@ -4,7 +4,7 @@
 \alias{summary.bmgarch}
 \title{Summary method for bmgarch objects.}
 \usage{
-\method{summary}{bmgarch}(object, CrI = c(0.025, 0.975), digits = 2)
+\method{summary}{bmgarch}(object, CrI = c(0.025, 0.975), digits = 2, ...)
 }
 \arguments{
 \item{object}{bmgarch object.}
@@ -12,6 +12,8 @@
 \item{CrI}{Numeric vector (Default: \code{c(.025, .975)}). Lower and upper bound of predictive credible interval.}
 
 \item{digits}{Integer (Default: 2, optional). Number of digits to round to when printing.}
+
+\item{...}{Not used.}
 }
 \value{
 summary.bmgarch object. A named list containing "meta" and "model_summary". \code{model_summary} contains summary table for all model parameters.
