@@ -49,12 +49,6 @@ intercept-only model for the means.
                    P = 1, Q = 1,
                    distribution = "Student_t",
                    meanstructure = "arma")
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'pdBEKKMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'pdBEKKMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'pdBEKKMGARCH' NOW.
 
 ### Parameter estimates
 
@@ -228,12 +222,6 @@ Ease computation by first standardizing the time series
                     P = 1, Q = 1,
                     distribution = "Student_t",
                     meanstructure = "constant")
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
 
 ### Parameter Estimates
 
@@ -352,12 +340,6 @@ Add two additional models, one with CCC(2,2) and a DCC(1,1)
                     P = 2, Q = 2,
                     distribution = "Student_t",
                     meanstructure = "constant")
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
 
     fit3 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
                     parameterization = "DCC",
@@ -365,12 +347,6 @@ Add two additional models, one with CCC(2,2) and a DCC(1,1)
                     P = 1, Q = 1,
                     distribution = "Student_t",
                     meanstructure = "arma")
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
 
 The DCC(1,1) model also incorportes an ARMA(1,1) meanstructure. The
 output will have the according information:
@@ -477,116 +453,6 @@ as itresults in fewest refits. Exact CV is also available with `exact`
 but not encouraged as it results in refitting all CV models.
 
     mw <- model_weights(modfits, L = 50, method = 'stacking' )
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> Using threshold  0.6 , model was refit  3  times, at observations 72 63 57 
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> Using threshold  0.6 , model was refit  4  times, at observations 80 72 64 58 
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
     #> Using threshold  0.6 , model was refit  11  times, at observations 83 81 73 72 71 66 63 60 57 52 51
 
     ## Return model weights:

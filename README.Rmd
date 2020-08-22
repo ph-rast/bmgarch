@@ -179,5 +179,4 @@ library( patchwork )
 ( plt$honda  + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) /
 ( plt$toyota + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) /
 ( plt$nissan + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) 
-
 ```
