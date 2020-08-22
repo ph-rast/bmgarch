@@ -157,7 +157,7 @@ modfits <- bmgarch_list(fit1, fit2, fit3)
 Compute model weights with the stacking method and the the approximate leave-future-out cross validation (LFO CV).
 `L` defines the minimal length of the time series before we start engaging in cross-validation. Note that the standard is to use the approximate `backward` method to CV as itresults in fewest refits. Exact CV is also available with `exact` but not encouraged as it results in refitting all CV models. 
 
-```{r error = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
+```{r error = FALSE, warning = FALSE, message = FALSE}
 mw <- model_weights(modfits, L = 50, method = 'stacking' )
 ```
 ```{r}
@@ -171,7 +171,13 @@ Use model weights to obtain weighted forecasts. Here we will forecast 5 days ahe
 w_fc <- forecast(modfits, ahead = 5, weights = mw )
 w_fc
 ```
-Plot the weighted forecast:
+Plot the weighted forecast. Save plots into a ggplot object and post-process
 ```{r weightedForecastPlot}
-plot(w_fc, askNewPage = FALSE, type =  'var' )
+plt <- plot(w_fc, askNewPage = FALSE, type =  'var' )
+
+library( patchwork )
+( plt$honda  + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) /
+( plt$toyota + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) /
+( plt$nissan + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) 
+
 ```
