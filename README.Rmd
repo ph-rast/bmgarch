@@ -5,6 +5,7 @@ output:
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- knit with render("README.Rmd", output_format = "md_document") -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -109,7 +110,7 @@ Forecast volatility 10 days ahead
 fc <- forecast(fit1, ahead = 10 )
 fc
 ```
-```{r}
+```{r stockForecastPlot}
 plot(fc,askNewPage = FALSE, type = 'var' )
 ```
 
@@ -134,9 +135,12 @@ fit3 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
 ```
 
 The DCC(1,1) model also incorportes an ARMA(1,1) meanstructure. The output will have the according information:
+
 ```{r}
 summary( fit3 )
 fc <- forecast(fit3, ahead =  10)
+```
+```{r fit3ForecastPlot}
 plot( fc,askNewPage = FALSE, type =  'mean' ) 
 ```
 
@@ -152,18 +156,22 @@ modfits <- bmgarch_list(fit1, fit2, fit3)
 ### Compute Model Weights
 Compute model weights with the stacking method and the the approximate leave-future-out cross validation (LFO CV).
 `L` defines the minimal length of the time series before we start engaging in cross-validation. Note that the standard is to use the approximate `backward` method to CV as itresults in fewest refits. Exact CV is also available with `exact` but not encouraged as it results in refitting all CV models. 
-```{r error = FALSE, warning = FALSE, message = FALSE}
-mw <- model_weights(modfits, L = 50, method = 'stacking' )
 
+```{r error = FALSE, warning = FALSE, message = FALSE, echo = FALSE}
+mw <- model_weights(modfits, L = 50, method = 'stacking' )
+```
+```{r}
 ## Return model weights:
 mw
 ```
 
 ### Weighted Forecasting
-Use model weights to obtain weighted forecasts. Here we will forecast 10 days ahead.
+Use model weights to obtain weighted forecasts. Here we will forecast 5 days ahead.
 ```{r}
-w_fc <- forecast(modfits, ahead = 10, weights = mw )
-
+w_fc <- forecast(modfits, ahead = 5, weights = mw )
 w_fc
+```
+Plot the weighted forecast:
+```{r weightedForecastPlot}
 plot(w_fc, askNewPage = FALSE, type =  'var' )
 ```
