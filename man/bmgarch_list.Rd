@@ -15,6 +15,3 @@ List of bmgarch objects. Class: bmgarch_list and bmgarch.
 \description{
 Collect bmgarch objects into list.
 }
-\author{
-Stephen R. Martin
-}

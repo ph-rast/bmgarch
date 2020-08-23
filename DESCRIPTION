@@ -11,14 +11,14 @@ Authors@R: c( person(given = "Philippe",
            role = c("aut"),
            email = "stephenSRMmartin@gmail.com",
 	   comment = c(ORCID = "0000-0001-8085-2390")))
-Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. The fitted models are rstan objects and can be examined with rstan functions.  
+Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Generate (weighted) forecasts for means, variances (volatility) and correlations. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. The fitted models are rstan objects and can be examined with rstan functions.  
 License: GPL (>=3)
 Depends: 
     methods,
     R (>= 3.4.0),
     Rcpp (>= 1.0.1)
 Imports: 
-    rstan (>= 2.18.2),
+    rstan (>= 2.21.2),
     rstantools (>= 1.5.1),
     ggplot2,
     MASS,
@@ -29,8 +29,8 @@ LinkingTo:
     BH (>= 1.69.0-1),
     Rcpp (>= 1.0.1),
     RcppEigen (>= 0.3.3.5.0),
-    rstan (>= 2.18.2),
-    StanHeaders (>= 2.18.1)
+    rstan (>= 2.21.2),
+    StanHeaders (>= 2.21.2)
 RdMacros: Rdpack
 Encoding: UTF-8
 LazyData: true
