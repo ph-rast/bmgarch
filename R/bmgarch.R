@@ -68,12 +68,12 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     return(return_standat)
 }
 
-##' Draw samples from a specified multivariate GARCH model, given multivariate time-series.
+##' Draw samples from a specified multivariate GARCH model, given multivariate time-series. Currently supports CCC, DCC, BEKK, and pdBEKK.
 ##'
 ##' Four paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK \insertCite{Engle1995}{bmgarch} as well as a BEKK  model with positivity constraints on the diagonals of the ARCH and GARCH parameters "pdBEKK" \insertCite{Rast2020}{bmgarch}.
 ##' @title Estimate Bayesian Multivariate GARCH
 ##' @param data Time-series or matrix object. A time-series or matrix object containing observations at the same interval.
-##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
+##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c, used in a log-linear model on the constant variance terms \insertCite{Rast2020}{bmgarch}. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
 ##' @param parameterization Character (Default: "CCC"). The type of of parameterization. Must be one of "CCC", "DCC", "BEKK", or "pdBEKK".
 ##' @param P Integer. Dimension of GARCH component in MGARCH(P,Q).
 ##' @param Q Integer. Dimension of ARCH component in MGARCH(P,Q).

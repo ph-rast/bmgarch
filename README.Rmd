@@ -5,7 +5,7 @@ output:
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<!-- knit with render("README.Rmd", output_format = "md_document") -->
+<!-- knit with knitr::render("README.Rmd", output_format = "md_document") -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -15,6 +15,9 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
+<!-- badges: start -->
+[![Travis build status](https://travis-ci.com/ph-rast/bmgarch.svg?branch=master)](https://travis-ci.com/ph-rast/bmgarch)
+<!-- badges: end -->
 
 # bmgarch
 
