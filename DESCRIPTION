@@ -15,7 +15,7 @@ Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesi
 License: GPL (>=3)
 Depends: 
     methods,
-    R (>= 3.4.0),
+    R (>= 3.5.0),
     Rcpp (>= 1.0.1)
 Imports: 
     rstan (>= 2.21.2),
@@ -29,8 +29,8 @@ LinkingTo:
     BH (>= 1.69.0-1),
     Rcpp (>= 1.0.1),
     RcppEigen (>= 0.3.3.5.0),
-    rstan (>= 2.21.2),
-    StanHeaders (>= 2.21.2)
+    rstan (>= 2.18.2),
+    StanHeaders (>= 2.18.1)
 RdMacros: Rdpack
 Encoding: UTF-8
 LazyData: true
