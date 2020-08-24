@@ -1,54 +1,32 @@
-##' Figure out whther object is a list of models or just one model
-##' Check for nesting structure; If depth == 1, one object else list of models
-##' from: \url{https://stackoverflow.com/questions/13432863/determine-level-of-nesting-in-r}
-##' @title Obtain nesting depth of list
-##' @param this 
-##' @param thisdepth 
-##' @return Depth
-##' @keywords internal
-.depth <- function(this,thisdepth=0){
-  if(!is.list(this)){
-    return(thisdepth)
-  }else{
-    return(max(unlist(lapply(this,.depth,thisdepth=thisdepth+1))))    
-  }
-}
-##' Obtain SD's over columns in lists
-##' @title Column SD's
-##' @param x 
-##' @return SD's at the columns level witin list
-##' @keywords internal 
-.colSDs <- function(x) {
-    lapply(x, function(x) {
-        dims <- dim(x)
-        apply(x, 2:length(dims), sd)
-    })
-}
-
-##' Obtain quantiles over columns in lists
-##' @title Quantiles within lists
-##' @param x 
-##' @param probs Quantile(s). Inherits from \code{forecast} which defaults to \code{c(.025, .975)}.
-##' @return Quantiles at the column level within lists
-##' @author philippe
-##' @keywords internal
-.colQTs <- function(x, probs = CrI) {
-    lapply(x, function(x) {
-        dims <- dim(x)
-        apply(x, 2:length(dims), quantile, probs)
-    })
-}
-
-##' @title Sort list object 
-##' @param x 
-##' @return sorted list as vector
-##' @author philippe
-##' @keywords internal
-.sort <- function(x ) {
-    c(apply( x, 1, FUN = function(x) {
-        c(x )
-    }))
-}
+## ##' Figure out whther object is a list of models or just one model
+## ##' Check for nesting structure; If depth == 1, one object else list of models
+## ##' from: \url{https://stackoverflow.com/questions/13432863/determine-level-of-nesting-in-r}
+## ##' @title Obtain nesting depth of list
+## ##' @param this 
+## ##' @param thisdepth 
+## ##' @return Depth
+## ##' @keywords internal
+## .depth <- function(this,thisdepth=0){
+##   if(!is.list(this)){
+##     return(thisdepth)
+##   }else{
+##     return(max(unlist(lapply(this,.depth,thisdepth=thisdepth+1))))    
+##   }
+## }
+## ##' Obtain SD's over columns in lists
+## ##' @title Column SD's
+## ##' @param x 
+## ##' @return SD's at the columns level witin list
+## ##' @title Sort list object 
+## ##' @param x 
+## ##' @return sorted list as vector
+## ##' @author philippe
+## ##' @keywords internal
+## .sort <- function(x ) {
+##     c(apply( x, 1, FUN = function(x) {
+##         c(x )
+##     }))
+## }
 
 
 
@@ -76,9 +54,10 @@
 ##'   \item{meta}{Meta-data specific to the forecast. I.e., TS_length (number ahead) and xC.}
 ##'   \item{samples}{List}. If inc_samples is \code{TRUE}, then a list of arrays of MCMC samples for means, vars, and cors. Each array is [Iteration, Period, ..., ...].
 ##' }
+##' @aliases forecast
 ##' @importFrom forecast forecast
+##' @export 
 ##' @export forecast
-##' @export
 ##' @examples
 ##' \dontrun{
 ##' data(panas)

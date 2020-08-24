@@ -1,3 +1,26 @@
+##' @keywords internal
+##' @importFrom stats sd
+.colSDs <- function(x) {
+    lapply(x, function(x) {
+        dims <- dim(x)
+        apply(x, 2:length(dims), sd)
+    })
+}
+
+##' Obtain quantiles over columns in lists
+##' @title Quantiles within lists
+##' @param x 
+##' @param probs Quantile(s). Inherits from \code{forecast} which defaults to \code{c(.025, .975)}.
+##' @return Quantiles at the column level within lists
+##' @author philippe
+##' @keywords internal
+.colQTs <- function(x, probs ) {
+    lapply(x, function(x) {
+        dims <- dim(x)
+        apply(x, 2:length(dims), quantile, probs)
+    })
+}
+
 ##' Computes posterior summaries for all parameters of interest for bmgarch objects.
 ##'
 ##' @title Summary method for bmgarch objects.

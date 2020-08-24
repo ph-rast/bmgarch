@@ -11,6 +11,8 @@
 ##' @importFrom grDevices devAskNewPage
 ##' @export
 plot.bmgarch <- function(x, type = "mean", askNewPage = TRUE, CrI = c(.025, .975), ...) {
+    ## Bind period, L, U locally to plot.bmgarch to avoid CMD R check  note
+    period <- L <- U <- NULL
     x.fitted <- fitted(x, CrI = CrI, digits = 4)
     x.observed <- x$RTS_full
     nt <- x$nt
@@ -71,6 +73,8 @@ plot.bmgarch <- function(x, type = "mean", askNewPage = TRUE, CrI = c(.025, .975
 ##' @importFrom grDevices devAskNewPage
 ##' @export
 plot.forecast.bmgarch <- function(x, type = "mean", askNewPage = TRUE, last_t = 100, ...) {
+    ## Bind period, L, U locally to plot.bmgarch to avoid CMD R check  note
+    period <- L <- U <- NULL
     nt <- x$meta$nt
     TS_names <- lapply(x$forecast, function(x) {dimnames(x)[[3]]})
     x.observed <- as.data.frame(x$meta$RTS_full)

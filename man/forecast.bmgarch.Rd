@@ -2,6 +2,7 @@
 % Please edit documentation in R/forecasting_gq.R
 \name{forecast.bmgarch}
 \alias{forecast.bmgarch}
+\alias{forecast}
 \title{Forecast method for bmgarch objects.}
 \usage{
 \method{forecast}{bmgarch}(

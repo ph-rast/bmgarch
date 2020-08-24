@@ -63,9 +63,11 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
 ##' @author philippe
 ##' @references
 ##' \insertAllCited{}
+##' @aliases loo
 ##' @importFrom loo loo
+##' @importFrom stats sd weights
+##' @export 
 ##' @export loo
-##' @export
 loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward", ...) {
     m <- 1 ## currently on only lfo-1-ahead
     ahead <- m

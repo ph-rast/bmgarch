@@ -3,7 +3,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^local$
-^testsd$
+^tests$
 ^.covrignore$
 ^README\.Rmd$
 ^man/figures$

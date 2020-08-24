@@ -2,6 +2,7 @@
 % Please edit documentation in R/lfocv.R
 \name{loo.bmgarch}
 \alias{loo.bmgarch}
+\alias{loo}
 \title{Leave-Future-Out Cross Validation (LFO-CV)}
 \usage{
 \method{loo}{bmgarch}(object, type = "lfo", L = NULL, mode = "backward", ...)
