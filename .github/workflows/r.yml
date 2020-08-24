@@ -19,9 +19,12 @@ jobs:
     runs-on: macOS-latest
     strategy:
       matrix:
-        r-version: [3.5, 3.6]
+        r-version: [3.6]
 
     steps:
+      - name: Install libV8
+        if: runner.os == 'Linux'
+        run: sudo apt-get -y install libv8-dev
       - uses: actions/checkout@v2
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@ffe45a39586f073cc2e9af79c4ba563b657dc6e3
