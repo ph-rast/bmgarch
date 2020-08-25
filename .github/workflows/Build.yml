@@ -36,7 +36,11 @@ jobs:
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
           sudo apt-get update -q
           sudo apt-get -y install libv8-dev libcurl4-openssl-dev
-        
+      
+      - name: Set time zone for windows
+        if: runner.os == 'Windows'
+        run: tzutil /s "Pacific Standard Time"
+      
       - uses: actions/checkout@v2
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@ffe45a39586f073cc2e9af79c4ba563b657dc6e3
