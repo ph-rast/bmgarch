@@ -148,10 +148,10 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
                         compute_log_lik =  compute_log_lik)
 
         gqs_model <- switch(m$param,
-                            DCC = bmgarch:::stanmodels$forecastDCC,
-                            CCC = bmgarch:::stanmodels$forecastCCC,
-                            BEKK = bmgarch:::stanmodels$forecastBEKK,
-                            pdBEKK = bmgarch:::stanmodels$forecastBEKK,
+                            DCC = stanmodels$forecastDCC,
+                            CCC = stanmodels$forecastCCC,
+                            BEKK =stanmodels$forecastBEKK,
+                            pdBEKK = stanmodels$forecastBEKK,
                             NULL)
         if(is.null(gqs_model)) {
             stop("bmgarch object 'param' does not match a supported model. ",
@@ -517,7 +517,7 @@ print.fitted.bmgarch <- function(x, ...) {
 ##' @return Data frame.
 ##' @author Stephen R. Martin
 ##' @export
-as.data.frame.forecast.bmgarch <- function(x, backcast = TRUE, ...) {
+as.data.frame.forecast.bmgarch <- function(x, ..., backcast = TRUE ) {
 
     # Forecast
     dfList <- list()

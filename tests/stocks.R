@@ -17,10 +17,17 @@ fit1 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
 
 summary(fit1)
 
-fc <- forecast(fit, ahead = 1, xC = cbind(stocks[101, c("honda")], stocks[101, c("honda")]),
-               inc_samples = TRUE, newdata = stocks[101, c("toyota",  "nissan" )])
+fc <- forecast(fit, ahead = 10, xC = cbind(stocks[101:110, c("honda")], stocks[101:110, c("honda")]),
+               inc_samples = TRUE, newdata = stocks[101:110, c("toyota",  "nissan" )])
 
+fc
 fc$forecast$log_lik
+
+fc <- forecast(fit1, ahead = 10 )
+
+fc
+
+plot(fc )
 
 lfob <- loo(fit, mode = 'backward',  L = 80 )
 lfob

@@ -1,5 +1,5 @@
 Package: bmgarch
-Title: Bayesian Multivariate GARCH
+Title: Bayesian Multivariate GARCH Models
 Version: 0.0.0.9000
 Authors@R: c( person(given = "Philippe",
            family = "Rast",
@@ -39,3 +39,4 @@ SystemRequirements: GNU make
 RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 2.1.0)
+BugReports: https://github.com/ph-rast/bmgarch/issues

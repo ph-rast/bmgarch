@@ -48,7 +48,7 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
 ##' importance sampling
 ##' described in \insertCite{Buerkner2019}{bmgarch}.
 ##' @title Leave-Future-Out Cross Validation (LFO-CV)
-##' @param object Fitted bmgarch model. \code{lfocv} inherits all attributes
+##' @param x Fitted bmgarch model. \code{lfocv} inherits all attributes
 ##' from the bmgarch object
 ##' @param type Takes \code{lfo} (default) or \code{loo}. LFO-CV is recommended
 ##' for time-seris but LOO-CV may be obtained to assess the structural part of the model.  
@@ -68,7 +68,8 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
 ##' @importFrom stats sd weights
 ##' @export 
 ##' @export loo
-loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward", ...) {
+loo.bmgarch <- function(x, ..., type = 'lfo', L = NULL, mode = "backward") {
+    object <- x
     m <- 1 ## currently on only lfo-1-ahead
     ahead <- m
     N <- object$TS_length

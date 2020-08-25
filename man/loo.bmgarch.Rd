@@ -5,11 +5,13 @@
 \alias{loo}
 \title{Leave-Future-Out Cross Validation (LFO-CV)}
 \usage{
-\method{loo}{bmgarch}(object, type = "lfo", L = NULL, mode = "backward", ...)
+\method{loo}{bmgarch}(x, ..., type = "lfo", L = NULL, mode = "backward")
 }
 \arguments{
-\item{object}{Fitted bmgarch model. \code{lfocv} inherits all attributes
+\item{x}{Fitted bmgarch model. \code{lfocv} inherits all attributes
 from the bmgarch object}
+
+\item{...}{Not used}
 
 \item{type}{Takes \code{lfo} (default) or \code{loo}. LFO-CV is recommended
 for time-seris but LOO-CV may be obtained to assess the structural part of the model.}
@@ -20,8 +22,6 @@ for time-seris but LOO-CV may be obtained to assess the structural part of the m
 Takes 'backward', and 'exact'. 'exact' fits N-L models and may
 take a \emph{very} long time to complete. \code{forward} works too but is not
 complete yet.}
-
-\item{...}{Not used}
 }
 \value{
 Approximate LFO-CV value and log-likelihood values across (L+1):N
