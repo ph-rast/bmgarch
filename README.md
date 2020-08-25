@@ -377,7 +377,7 @@ Add two additional models, one with CCC(2,2) and a DCC(1,1)
     #> 
     #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
 
-The DCC(1,1) model also incorportes an ARMA(1,1) meanstructure. The
+The DCC(1,1) model also incorporates an ARMA(1,1) meanstructure. The
 output will have the according information:
 
     summary( fit3 )
@@ -478,7 +478,7 @@ Compute model weights with the stacking method and the the approximate
 leave-future-out cross validation (LFO CV). `L` defines the minimal
 length of the time series before we start engaging in cross-validation.
 Note that the standard is to use the approximate `backward` method to CV
-as itresults in fewest refits. Exact CV is also available with `exact`
+as it results in fewest refits. Exact CV is also available with `exact`
 but not encouraged as it results in refitting all CV models.
 
     mw <- model_weights(modfits, L = 50, method = 'stacking' )

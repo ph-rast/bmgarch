@@ -14,7 +14,7 @@ from the bmgarch object}
 \item{...}{Not used}
 
 \item{type}{Takes \code{lfo} (default) or \code{loo}. LFO-CV is recommended
-for time-seris but LOO-CV may be obtained to assess the structural part of the model.}
+for time-series but LOO-CV may be obtained to assess the structural part of the model.}
 
 \item{L}{Minimal length of times series before computing LFO}
 

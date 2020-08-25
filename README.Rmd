@@ -137,7 +137,7 @@ fit3 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
 
 ```
 
-The DCC(1,1) model also incorportes an ARMA(1,1) meanstructure. The output will have the according information:
+The DCC(1,1) model also incorporates an ARMA(1,1) meanstructure. The output will have the according information:
 
 ```{r}
 summary( fit3 )
@@ -158,7 +158,7 @@ modfits <- bmgarch_list(fit1, fit2, fit3)
 
 ### Compute Model Weights
 Compute model weights with the stacking method and the the approximate leave-future-out cross validation (LFO CV).
-`L` defines the minimal length of the time series before we start engaging in cross-validation. Note that the standard is to use the approximate `backward` method to CV as itresults in fewest refits. Exact CV is also available with `exact` but not encouraged as it results in refitting all CV models. 
+`L` defines the minimal length of the time series before we start engaging in cross-validation. Note that the standard is to use the approximate `backward` method to CV as it results in fewest refits. Exact CV is also available with `exact` but not encouraged as it results in refitting all CV models. 
 
 ```{r error = FALSE, warning = FALSE, message = FALSE}
 mw <- model_weights(modfits, L = 50, method = 'stacking' )

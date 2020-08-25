@@ -51,7 +51,7 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
 ##' @param x Fitted bmgarch model. \code{lfocv} inherits all attributes
 ##' from the bmgarch object
 ##' @param type Takes \code{lfo} (default) or \code{loo}. LFO-CV is recommended
-##' for time-seris but LOO-CV may be obtained to assess the structural part of the model.  
+##' for time-series but LOO-CV may be obtained to assess the structural part of the model.  
 ##' @param L Minimal length of times series before computing LFO 
 ##' @param mode backward elpd_lfo approximation, or exact elpd-lfo; 
 ##' Takes 'backward', and 'exact'. 'exact' fits N-L models and may

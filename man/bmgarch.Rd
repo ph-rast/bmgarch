@@ -48,7 +48,7 @@ bmgarch(
 Draw samples from a specified multivariate GARCH model, given multivariate time-series. Currently supports CCC, DCC, BEKK, and pdBEKK.
 }
 \details{
-Four paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK \insertCite{Engle1995}{bmgarch} as well as a BEKK  model with positivity constraints on the diagonals of the ARCH and GARCH parameters "pdBEKK" \insertCite{Rast2020}{bmgarch}.
+Four paramerizations are implemented. The constant conditional correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK \insertCite{Engle1995}{bmgarch} as well as a BEKK  model with positivity constraints on the diagonals of the ARCH and GARCH parameters "pdBEKK" \insertCite{Rast2020}{bmgarch}.
 }
 \examples{
 \dontrun{
