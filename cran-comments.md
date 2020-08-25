@@ -1,6 +1,8 @@
 ## Test environments
 * local ubuntu 18.10 install, R 4.0.2
 * ubuntu 16.04.6 LTS (on travis-ci), R Under development (unstable) (2020-08-23 r79071)
+* MacOS-latest and Windows-latest (on github acttions-ci) 
+* win_devel
 
 ## R CMD check restults 
 
