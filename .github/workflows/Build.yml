@@ -6,7 +6,7 @@
 # See https://github.com/r-lib/actions/tree/master/examples#readme for
 # additional example workflows available for the R community.
 
-name: R
+name: Build in R
 
 on:
   push:
@@ -16,15 +16,24 @@ on:
 
 jobs:
   build:
-    runs-on: macOS-latest
+#    runs-on: macOS-latest
+    runs-on: ${{ matrix.config.os }}
+    
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
     strategy:
       matrix:
-        r-version: [3.6]
+        config:
+        - { os: windows-latest, r: 'devel'}
+        - { os: macOS-latest, r: 'devel'}
+        - { os: ubuntu-16.04,   r: '3.6',   vdiffr: false, xref: true,  cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest" }
+      #  r-version: [3.6]
 
     steps:
-      - name: Install libV8
+      - name: Install system dependencies on Linux
         if: runner.os == 'Linux'
         run: sudo apt-get -y install libv8-dev
+        
       - uses: actions/checkout@v2
       - name: Set up R ${{ matrix.r-version }}
         uses: r-lib/actions/setup-r@ffe45a39586f073cc2e9af79c4ba563b657dc6e3
