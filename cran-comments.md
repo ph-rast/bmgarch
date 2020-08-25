@@ -14,7 +14,8 @@
 	  
   Compiled code bmgarch.so is 8.1 Mb large
 
-
+* checking for GNU extensions in Makefiles ... NOTE
+  GNU make is a SystemRequirements.
 
   GNU make is a build time requirement for Ubuntu
 
