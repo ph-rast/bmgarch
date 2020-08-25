@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Install system dependencies on Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get -y install libv8-dev
+        run: sudo apt-get -y install libv8-dev libcurl4-openssl-dev
         
       - uses: actions/checkout@v2
       - name: Set up R ${{ matrix.r-version }}
