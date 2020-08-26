@@ -47,6 +47,7 @@ after_script:
 
 after_success:
   - travis_wait 40 tar -C .. -xf $PKG_TARBALL
+  - Rscript -e 'library(covr); codecov()'
 
 after_failure:
 - cat yaml.Rcheck/00*
