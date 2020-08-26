@@ -133,7 +133,7 @@ generated quantities {
   }
   rts_forecasted = rts_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
   H_forecasted = H_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
-  R_forecasted = R_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
+  // R_forecasted = R_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
   mu_forecasted = mu_p[max(Q, P) + 1 : (max(Q, P) + ahead)];
 #include /generated/forecast_log_lik.stan
 }
