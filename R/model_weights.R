@@ -17,10 +17,9 @@
 ##' cross validation (lfocv) expected log-predictive predictive density (elpd).
 ##' elpd can be approximated via the 'backward' mode described in \insertCite{Buerkner2019;textual}{bmgarch} or via exact cross-validation.    
 ##' The obtained weights can be passed to the forecast function to obtain weighted forecasts.
-##' \code{bmgarch_objects} takes either \code{bmgarch_object} or \code{lfo_object} lists.
+##' \code{bmgarch_objects} takes a \code{bmgarch_object} lists.
 ##' @title Model weights
 ##' @param bmgarch_objects list of bmgarch model objects in \code{bmgarch_object}  
-##' @param lfo_objects list of lfo_objects, in 'lfo_object'
 ##' @param L Minimal length of time series before engaging in lfocv 
 ##' @param method Ensemble methods, 'stacking' (default) or 'pseudobma'
 ##' @param mode Either 'backward' (default) or 'exact'
@@ -28,19 +27,27 @@
 ##' @references
 ##'      \insertAllCited{}
 ##' @export
-model_weights <- function(bmgarch_objects = NULL,  lfo_objects = NULL, L = NULL,
+model_weights <- function(bmgarch_objects = NULL,  #lfo_objects = NULL,
+                          L = NULL,
                           method = "stacking", mode = 'backward') {   
 
-    if( !is.null(bmgarch_objects ) & !is.null(lfo_objects )) stop( "Supply only 'bmgarch_objects' or 'lfo_objects', not both" )
+   # if( !is.null(bmgarch_objects ) & !is.null(lfo_objects )) stop( "Supply only 'bmgarch_objects' or 'lfo_objects', not both" )
+    if( is.null(bmgarch_objects ) ) stop( "Supply 'bmgarch_objects'" )
     
     if( !is.null(bmgarch_objects ) ) {
     ## Approximates LFO; Ie. results in refitting models.
     ll_list <- lapply(bmgarch_objects, FUN = .ll_lfo, L = L, mode =  mode)
-    } else if(!is.null(lfo_objects) ) {
-        stop("todo" )
-    } else {
-        stop("Supply model list for either bmgarch_objects or lfo_objects")
-    }
+    }# else if(!is.null(lfo_objects) ) {
+        ##if( is.list(lfo_objects ) ) {
+        ##    ll_list <- lapply(lfo_objects, FUN = function(x) x$loglik )
+        ##}
+        ## Need warmup, n_chains and iter form fitted models
+        ## if this is to be used, we need to add this to lfo_objects
+      # stop("Not yet implemnted" )
+   # } else {
+    #    stop("Supply model list for either bmgarch_objects or lfo_objects")
+    #}
+
     ## Here, insert lfo_objects
     ## obtain iter, warmup and n_chains from first model
     r_eff_list <- lapply( ll_list, FUN = .rel_eff, bmgarch_objects[[1]] )
