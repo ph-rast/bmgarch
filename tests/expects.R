@@ -13,15 +13,14 @@ test_that("lfo without refits", {
     expect_is(lfob, "loo.bmgarch" )
 })
 
-
 test_that("bmgarch model list" , {
     mlist <- bmgarch_list( fit, fit2 )
     expect_is( mlist,"bmgarch_list")
 })
-
 
 test_that("model weights",  {
     mlist <- bmgarch_list( fit, fit2 )
     mw <- suppressWarnings( model_weights( mlist, L = 98 ) )
     expect_is( mw, "model_weights")
 })
+

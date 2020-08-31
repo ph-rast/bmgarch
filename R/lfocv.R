@@ -60,12 +60,24 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
 ##' @param ... Not used
 ##' @return Approximate LFO-CV value and log-likelihood values across (L+1):N
 ##' timepoints
-##' @author philippe
 ##' @references
 ##' \insertAllCited{}
 ##' @aliases loo
 ##' @importFrom loo loo
 ##' @importFrom stats sd weights
+##' @examples
+##' \dontrun{
+##' data(stocks)
+##' # Fit a DCC model 
+##' fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+##'                parameterization = "DCC", standardize_data = TRUE,
+##'                iterations = 500)
+##'
+##' # Compute expected log-predictive density (elpd) using the backward mode
+##' # L is the upper boundary of the time-series before we engage in LFO-CV
+##' lfob <- loo(fit, mode = 'backward',  L = 50 )
+##' print(lfob)
+##' }
 ##' @export 
 ##' @export loo
 loo.bmgarch <- function(x, ..., type = 'lfo', L = NULL, mode = "backward") {

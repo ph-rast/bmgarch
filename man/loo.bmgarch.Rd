@@ -34,9 +34,20 @@ forward or backward approximation strategies based on Pareto smoothed
 importance sampling
 described in \insertCite{Buerkner2019}{bmgarch}.
 }
+\examples{
+\dontrun{
+data(stocks)
+# Fit a DCC model 
+fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+               parameterization = "DCC", standardize_data = TRUE,
+               iterations = 500)
+
+# Compute expected log-predictive density (elpd) using the backward mode
+# L is the upper boundary of the time-series before we engage in LFO-CV
+lfob <- loo(fit, mode = 'backward',  L = 50 )
+print(lfob)
+}
+}
 \references{
 \insertAllCited{}
-}
-\author{
-philippe
 }

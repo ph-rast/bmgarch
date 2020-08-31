@@ -14,5 +14,5 @@ fit2 <- suppressWarnings( bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
                                         standardize_data = TRUE,
                                         iterations = 10))
 
-source(file =  "../expects.R" )
+source(file =  "../expects.R", local = TRUE )
 

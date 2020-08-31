@@ -14,16 +14,45 @@
 }
 
 ##' Compute model weights for a list of candidate models based on leave-future-out
-##' cross validation (lfocv) expected log-predictive predictive density (elpd).
+##' cross validation (lfocv) expected log-predictive density (elpd).
 ##' elpd can be approximated via the 'backward' mode described in \insertCite{Buerkner2019;textual}{bmgarch} or via exact cross-validation.    
 ##' The obtained weights can be passed to the forecast function to obtain weighted forecasts.
-##' \code{bmgarch_objects} takes a \code{bmgarch_object} lists.
+##' \code{bmgarch_objects} takes a \code{bmgarch_object} lists. 
 ##' @title Model weights
 ##' @param bmgarch_objects list of bmgarch model objects in \code{bmgarch_object}  
 ##' @param L Minimal length of time series before engaging in lfocv 
 ##' @param method Ensemble methods, 'stacking' (default) or 'pseudobma'
 ##' @param mode Either 'backward' (default) or 'exact'
 ##' @return Model weights
+##' @details
+##' `model_weights()` is a wrapper around the leave-future-out 'lfo' type in `loo.bmgarch()`.
+##' The weights can be either obtained from an approximate or exact leave-future-out cross-validation
+##' to compute expected log predictive density (ELPD).
+##'
+##' We can either obtain stacking weights or pseudo-BMA+ weigths as described in \insertCite{Yao2018}{bmgarch}.
+##' @examples
+##' \dontrun{
+##' data(stocks)
+##' # Fit at least two models on a subset of the stocks data
+##' # to compute model weights
+##' fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+##'                parameterization = "DCC", standardize_data = TRUE,
+##'                iterations = 500)
+##'
+##' fit2 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+##'                 P = 2, Q =  2,
+##'                parameterization = "DCC", standardize_data = TRUE,
+##'                iterations = 500)
+##' # create a bmgarch_list object
+##' blist <- bmgarch_list(fit, fit2 )
+##'
+##' # Compute model weights with the default stacking metod
+##' # L is the upper boundary of the time-series before we engage in LFO-CV
+##' mw <- model_weights( blist, L =  50, method = 'stacking', order = 'backwards' )
+##'
+##' # Print model weights in the ordert of the bmgarch_list()
+##' print(mw)
+##' }
 ##' @references
 ##'      \insertAllCited{}
 ##' @export

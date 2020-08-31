@@ -68,9 +68,12 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     return(return_standat)
 }
 
-##' Draw samples from a specified multivariate GARCH model, given multivariate time-series. Currently supports CCC, DCC, BEKK, and pdBEKK.
+##' Draw samples from a specified multivariate GARCH model using 'Stan', given multivariate time-series. Currently supports CCC, DCC, BEKK, and pdBEKK model parameterizations.
 ##'
-##' Four paramerizations are implemented. The constant conditional correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK \insertCite{Engle1995}{bmgarch} as well as a BEKK  model with positivity constraints on the diagonals of the ARCH and GARCH parameters "pdBEKK" \insertCite{Rast2020}{bmgarch}.
+##' Four types of paramerizations are implemented. The constant conditional correlation (CCC) and the dynamic conditional correlation \insertCite{@DCC; Engle2002,Engle2001a}{bmgarch}, as well as  BEKK \insertCite{Engle1995}{bmgarch} and a BEKK model with positivity constraints on the diagonals of the ARCH and GARCH parameters "pdBEKK" \insertCite{Rast2020}{bmgarch}.
+##'
+##' The fitted models are 'rstan' objects and all posterior parameter estimates can be obtained and can be examined with either the 'rstan' toolbox, plotted and printed using generic functions  or passed to 'bmgarch' functions to 'forecast' or compute 'model_weights' or compute fit statistics based on leave-future-out cross-validation. 
+##' 
 ##' @title Estimate Bayesian Multivariate GARCH
 ##' @param data Time-series or matrix object. A time-series or matrix object containing observations at the same interval.
 ##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c, used in a log-linear model on the constant variance terms \insertCite{Rast2020}{bmgarch}. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
@@ -123,6 +126,13 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##'
 ##' # Save estimated and forecasted data as a data.frame
 ##' df.fc <- as.data.frame(fit.fc)
+##'
+##' # Access rstan's model fit object
+##' mf <- fit$model_fit
+##'
+##' # Return diagnostics and a plot of the first 10 parameters
+##' rstan::check_hmc_diagnostics(mf)
+##' rstan::plot(mf)
 ##' }
 bmgarch <- function(data,
                    xC = NULL,

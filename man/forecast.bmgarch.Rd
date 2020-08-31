@@ -58,7 +58,7 @@ See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
 }
 }
 \description{
-Estimates forecasted means, variances, and correlations from a fitted bmgarch model.
+Estimates (weighted) forecasted means, variances, and correlations from a fitted bmgarch model.
 }
 \examples{
 \dontrun{
@@ -84,5 +84,17 @@ fit.fc.df <- as.data.frame(fit.fc)
 
 # Save only forecasted values as data frame.
 fit.fc.df <- as.data.frame(fit.fc, backcast = FALSE)
+
+# Add another model, compute model weights and perform a model weighted forecast
+
+# Fit a DCC(1,1) model
+fit1 <- bmgarch(panas, parameterization = "DCC", P = 1, Q = 1, meanstructure = "constant")
+
+# Compute model stacking weights based on the last 19 time points (with L = 80)
+blist <- bmgarch_list( fit1, fit )
+mw <- model_weights(blist, L = 80)
+
+# Weighted forecasts:
+w.fc <- forecast(object = blist, ahead = 8, weights = mw)
 }
 }
