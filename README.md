@@ -3,7 +3,7 @@
 <!-- badges: start -->
 [![Travis build
 status](https://travis-ci.com/ph-rast/bmgarch.svg?branch=master)](https://travis-ci.com/ph-rast/bmgarch)
-\[![R-CMD-check](https://github.com/ph-rast/bmgarch/workflows/R-CMD-check/badge.svg)\]
+![R-CMD-check](https://github.com/ph-rast/bmgarch/workflows/R-CMD-check/badge.svg)
 <!-- badges: end -->
 
 bmgarch
