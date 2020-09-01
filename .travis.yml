@@ -28,13 +28,9 @@ before_install:
   - sudo apt-get update -q
   - sudo apt-get -y install libv8-dev
   - mkdir -p ~/.R/
-#  - echo "CXX = `R CMD config CXX`" >> ~/.R/Makevars
-#  - echo "CXXFLAGS = `R CMD config CXXFLAGS` -pedantic -g0 -flto -stdlib=libc++" >> ~/.R/Makevars
-#  - echo "LDFLAGS += -flto -stdlib=libc++" >> ~/.R/Makevars
-#  - export CLANG_EXTRA_ARG=""
-#  - if [[ $CXX = "clang++" ]] ;  then export CLANG_EXTRA_ARG=" -Qunused-arguments -fcolor-diagnostics " ; fi
-#  - sed -i.bak "s/ g++/ ${CXX}${CLANG_EXTRA_ARG}/" ~/.R/Makevars
-#  - sed -i.bak "s/O[0-3]/O$CXX_OLEVEL/" ~/.R/Makevars
+
+r_packages:
+  - covr
 
 script: 
   - |
@@ -47,6 +43,7 @@ after_script:
 
 after_success:
   - travis_wait 40 tar -C .. -xf $PKG_TARBALL
+  - travis_wait 40 Rscript -e 'library(covr); codecov()'
 
 after_failure:
 - cat yaml.Rcheck/00*
