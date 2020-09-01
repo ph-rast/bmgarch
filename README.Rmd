@@ -40,6 +40,9 @@ The development version can be installed from [GitHub](https://github.com/) with
 ``` r
 devtools::install_github("ph-rast/bmgarch")
 ```
+
+We present two examples, one with behavioral data and one with stocks from three major Japanese automakers. 
+
 ## Example 1: Behavioral Data
 
 In this example, we use the pdBEKK(1,1) model for the variances, and an intercept-only model for the means.
@@ -96,7 +99,7 @@ head(stocks.z )
 # Fit CCC(1, 1) with constant on the mean structure.
 fit1 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
                 parameterization = "CCC",
-                iterations = 100,
+                iterations = 1000,
                 P = 1, Q = 1,
                 distribution = "Student_t",
                 meanstructure = "constant")
@@ -118,20 +121,23 @@ fc
 plot(fc,askNewPage = FALSE, type = 'var' )
 ```
 
+### Ensemble Methods
+Here we illustrate how to obtain model weights across three models. These weights will be used to compute weighted forecasts, thus, taking into account that we do not have a single best model.
+
 Add two additional models, one with CCC(2,2) and a DCC(1,1)
 
 ```{r error = FALSE, warning = FALSE, message = FALSE}
 # Fit CCC(1, 1) with constant on the mean structure.
 fit2 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
                 parameterization = "CCC",
-                iterations = 100,
+                iterations = 1000,
                 P = 2, Q = 2,
                 distribution = "Student_t",
                 meanstructure = "constant")
 
 fit3 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
                 parameterization = "DCC",
-                iterations = 100,
+                iterations = 1000,
                 P = 1, Q = 1,
                 distribution = "Student_t",
                 meanstructure = "arma")
@@ -149,20 +155,20 @@ plot( fc,askNewPage = FALSE, type =  'mean' )
 ```
 
 
-### Ensemble Models
+### Compute Model Weights
 Obtain model weights with either the stacking or the pseudo BMA method. These methods are inherited from the `loo` package.
 
+First, gather models to a `bmgarch_list`.
 ```{r ModelWeights}
 ## use bmgarch_list function to collect bmgarch objects
 modfits <- bmgarch_list(fit1, fit2, fit3)
 ```
 
-### Compute Model Weights
-Compute model weights with the stacking method and the the approximate leave-future-out cross validation (LFO CV).
-`L` defines the minimal length of the time series before we start engaging in cross-validation. Note that the standard is to use the approximate `backward` method to CV as it results in fewest refits. Exact CV is also available with `exact` but not encouraged as it results in refitting all CV models. 
+Compute model weights with the stacking method (default) and the the approximate (default) leave-future-out cross validation (LFO CV).
+`L` defines the minimal length of the time series before we start engaging in cross-validation. Eg., for a time series with length 100, `L = 50` reserves values 51--100 as the cross-validation sample. Note that the standard is to use the approximate `backward` method to CV as it results in fewest refits. Exact CV is also available with `exact` but not encouraged as it results in refitting all CV models. 
 
 ```{r error = FALSE, warning = FALSE, message = FALSE}
-mw <- model_weights(modfits, L = 50, method = 'stacking' )
+mw <- model_weights(modfits, L = 50, method = 'stacking')
 ```
 ```{r}
 ## Return model weights:
@@ -183,4 +189,31 @@ library( patchwork )
 ( plt$honda  + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) /
 ( plt$toyota + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) /
 ( plt$nissan + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) 
+```
+
+### Predictors for Constant Variance (C)
+We can add predictors for the constant variance term, c or C, in the MGARCH model with the option `xC = `
+The predictors need to be of the same dimension as the time-series object. For example, with three time-series of lenght 100, the predictor needs to be entered as a 100 by 3 matrix as well.
+
+As an example, we will add `nissan` as the predictor for C in a bivariate MGARCH:
+```{r error = FALSE, warning = FALSE, message = FALSE}
+# Fit CCC(1, 1) with constant on the mean structure.
+fitx <- bmgarch(stocks.z[1:100, c("toyota", "honda")],
+                xC = stocks.z[1:100, c("nissan", "nissan")],
+                parameterization = "CCC",
+                iterations = 1000,
+                P = 2, Q = 2,
+                distribution = "Student_t",
+                meanstructure = "constant")
+```
+
+The preidictors for C are on a log scale in section `Exogenous predictor`
+```{r}
+summary(fitx)
+```
+
+We can generate forecasts given the known values of the predictor. Note that the dimension of the predictor needs to match the number of timepoints that we predict ahead and the number of variables, 5 by 2, in this example:
+```{r}
+fc2x <- forecast(fitx, ahead = 5, xC = stocks.z[101:105, c("nissan", "nissan")])
+fc2x
 ```

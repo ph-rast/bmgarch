@@ -8,49 +8,32 @@ on:
 
 name: test-coverage
 
-env:
-  cache-version: v1
-  r-version: 4.0
-
 jobs:
   test-coverage:
-    runs-on: macOS-latest
-    steps:
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      matrix:
+        config:
+        - { os: macOS-latest, r: 'devel'}
+
+    steps:      
       - uses: actions/checkout@v2
+#      - uses: r-lib/actions/setup-r@master
+#      - uses: r-lib/actions/setup-pandoc@master
+
+      - name: Set up R ${{ matrix.r-version }}
+        uses: r-lib/actions/setup-r@ffe45a39586f073cc2e9af79c4ba563b657dc6e3
         with:
-          r-version: ${{ env.r-version }}
-
-      - uses: r-lib/actions/setup-r@master
-
-      - uses: r-lib/actions/setup-pandoc@master
-
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-        shell: Rscript {0}
-
-      - name: Cache R packages
-        uses: actions/cache@v1
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ env.cache-version }}-macOS-r-${{ env.r-version }}-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ env.cache-version }}-macOS-r-${{ env.r-version }}-
-
-      - name: Install system dependencies on macOS
-        run: |
-          # XQuartz is needed by vdiffr
-          brew cask install xquartz
-
+          r-version: ${{ matrix.r-version }}
       - name: Install dependencies
         run: |
           install.packages(c("remotes"))
-          remotes::install_deps(dependencies = TRUE, type = "binary")
+          remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("covr")
         shell: Rscript {0}
-
+        
       - name: Test coverage
-        run: |
-          remotes::install_github("r-lib/covr")
-          covr::codecov()
+        run: covr::codecov()
         shell: Rscript {0}

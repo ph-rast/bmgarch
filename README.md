@@ -30,6 +30,9 @@ The development version can be installed from
 
     devtools::install_github("ph-rast/bmgarch")
 
+We present two examples, one with behavioral data and one with stocks
+from three major Japanese automakers.
+
 Example 1: Behavioral Data
 --------------------------
 
@@ -73,66 +76,66 @@ intercept-only model for the means.
     #> ---
     #> Iterations:  1000
     #> Chains:  4
-    #> Date:  Mon Aug 31 15:55:31 2020
-    #> Elapsed time (min):  12.08
+    #> Date:  Tue Sep  1 14:35:55 2020
+    #> Elapsed time (min):  17.6
     #> 
     #> ---
     #> Constant correlation, R (diag[C]*R*diag[C]):
     #> 
     #>         mean   sd  mdn  2.5% 97.5%   n_eff Rhat
-    #> R_Ng-Ps 0.02 0.49 0.02 -0.92  0.93 1271.22    1
+    #> R_Ng-Ps 0.04 0.44 0.09 -0.89  0.89 1070.54    1
     #> 
     #> 
     #> Constant variances (diag[C]):
     #> 
     #>        mean   sd  mdn 2.5% 97.5%  n_eff Rhat
-    #> var_Ps 0.70 0.89 0.32 0.01  3.21 273.81 1.01
-    #> var_Ng 1.21 0.44 1.26 0.18  1.93 346.41 1.01
+    #> var_Ps 0.81 0.78 0.56 0.02  2.92  23.84 1.08
+    #> var_Ng 1.28 0.35 1.37 0.38  1.92 176.82 1.03
     #> 
     #> 
     #> MGARCH(1,1) estimates for A:
     #> 
     #>         mean   sd  mdn  2.5% 97.5%   n_eff Rhat
-    #> A_Ps-Ps 0.34 0.10 0.34  0.15  0.54 1447.48    1
-    #> A_Ng-Ps 0.06 0.08 0.06 -0.09  0.21 1733.92    1
-    #> A_Ps-Ng 0.05 0.15 0.05 -0.27  0.35 1328.46    1
-    #> A_Ng-Ng 0.39 0.12 0.40  0.14  0.63 1295.68    1
+    #> A_Ps-Ps 0.35 0.09 0.36  0.15  0.53 1046.96 1.01
+    #> A_Ng-Ps 0.04 0.08 0.03 -0.08  0.20    8.36 1.16
+    #> A_Ps-Ng 0.06 0.12 0.10 -0.23  0.30  953.32 1.02
+    #> A_Ng-Ng 0.46 0.15 0.45  0.16  0.66    3.53 1.50
     #> 
     #> 
     #> MGARCH(1,1) estimates for B:
     #> 
     #>          mean   sd   mdn  2.5% 97.5%  n_eff Rhat
-    #> B_Ps-Ps  0.73 0.24  0.83  0.08  0.94 271.16 1.01
-    #> B_Ng-Ps -0.08 0.18 -0.09 -0.48  0.45 265.64 1.01
-    #> B_Ps-Ng  0.28 0.38  0.27 -0.67  1.11 416.28 1.01
-    #> B_Ng-Ng  0.35 0.21  0.34  0.03  0.78 759.18 1.01
+    #> B_Ps-Ps  0.70 0.21  0.77  0.12  0.94  65.07 1.07
+    #> B_Ng-Ps -0.06 0.14 -0.04 -0.39  0.30 346.98 1.03
+    #> B_Ps-Ng  0.34 0.38  0.38 -0.66  1.02  30.59 1.09
+    #> B_Ng-Ng  0.30 0.19  0.24  0.03  0.72  11.71 1.13
     #> 
     #> 
     #> ARMA(1,1) estimates on the location:
     #> 
-    #>                  mean   sd   mdn  2.5% 97.5%   n_eff Rhat
-    #> (Intercept)_Pos -0.02 0.16 -0.01 -0.35  0.31 1136.93 1.00
-    #> (Intercept)_Neg  0.07 0.13  0.06 -0.17  0.34 1072.79 1.00
-    #> Phi_Pos-Pos     -0.03 0.36 -0.02 -0.77  0.67  871.57 1.00
-    #> Phi_Pos-Neg     -0.12 0.47 -0.12 -0.91  0.76  647.82 1.00
-    #> Phi_Neg-Pos     -0.14 0.33 -0.15 -0.77  0.55  673.81 1.00
-    #> Phi_Neg-Neg      0.04 0.45  0.04 -0.80  0.84  409.75 1.01
-    #> Theta_Pos-Pos   -0.06 0.38 -0.07 -0.79  0.71  834.22 1.00
-    #> Theta_Pos-Neg    0.02 0.47  0.05 -0.87  0.82  673.04 1.00
-    #> Theta_Neg-Pos    0.16 0.33  0.18 -0.53  0.80  688.72 1.00
-    #> Theta_Neg-Neg   -0.05 0.46 -0.05 -0.90  0.80  389.00 1.01
+    #>                  mean   sd   mdn  2.5% 97.5%  n_eff Rhat
+    #> (Intercept)_Pos  0.03 0.17  0.04 -0.35  0.29   7.93 1.18
+    #> (Intercept)_Neg  0.11 0.11  0.13 -0.12  0.33  14.19 1.10
+    #> Phi_Pos-Pos      0.08 0.38  0.11 -0.74  0.61   5.62 1.27
+    #> Phi_Pos-Neg     -0.24 0.49 -0.35 -0.90  0.77   7.89 1.22
+    #> Phi_Neg-Pos     -0.18 0.31 -0.27 -0.80  0.55 350.52 1.02
+    #> Phi_Neg-Neg      0.09 0.39  0.22 -0.73  0.81 248.27 1.03
+    #> Theta_Pos-Pos   -0.17 0.40 -0.21 -0.73  0.68   5.50 1.28
+    #> Theta_Pos-Neg    0.18 0.54  0.25 -0.89  0.82   5.57 1.31
+    #> Theta_Neg-Pos    0.23 0.32  0.32 -0.54  0.83  64.86 1.06
+    #> Theta_Neg-Neg   -0.13 0.42 -0.27 -0.85  0.74  23.04 1.08
     #> 
     #> 
     #> Df constant student_t (nu):
     #> 
     #>    mean      sd     mdn    2.5%   97.5%   n_eff    Rhat 
-    #>   53.46   28.47   48.79   14.81  122.21 2107.95    1.00 
+    #>   49.31   25.53   42.75   13.84  112.55 1101.46    1.01 
     #> 
     #> 
     #> Log density posterior estimate:
     #> 
     #>    mean      sd     mdn    2.5%   97.5%   n_eff    Rhat 
-    #> -802.89    5.08 -802.35 -813.83 -794.33  242.46    1.02
+    #> -800.77    5.75 -800.37 -813.18 -791.70    4.56    1.37
 
 ### Forecasted values
 
@@ -145,48 +148,48 @@ intercept-only model for the means.
     #> Pos :
     #>       
     #> period  mean   sd   mdn  2.5% 97.5%   n_eff Rhat
-    #>    201 -0.36 2.96 -0.40 -6.28  5.44 1981.88    1
-    #>    202 -0.20 2.79 -0.24 -5.44  5.41 1990.97    1
-    #>    203 -0.10 2.69 -0.12 -5.48  5.03 1953.46    1
-    #>    204 -0.12 2.65 -0.15 -5.40  4.85 1800.47    1
-    #>    205 -0.01 2.59  0.01 -5.21  5.12 2000.92    1
+    #>    201 -0.83 2.87 -0.85 -6.40  4.73  848.12 1.01
+    #>    202 -0.53 2.75 -0.60 -5.63  4.70  613.11 1.02
+    #>    203 -0.33 2.61 -0.31 -5.49  4.79  919.44 1.01
+    #>    204 -0.31 2.57 -0.26 -5.39  4.79 1276.71 1.01
+    #>    205 -0.13 2.58 -0.12 -5.27  4.91 1778.57 1.00
     #> Neg :
     #>       
     #> period mean   sd  mdn  2.5% 97.5%   n_eff Rhat
-    #>    201 0.38 1.50 0.40 -2.49  3.27 1679.38    1
-    #>    202 0.21 1.60 0.21 -2.95  3.34 1972.70    1
-    #>    203 0.20 1.58 0.22 -3.03  3.16 1908.89    1
-    #>    204 0.18 1.54 0.21 -2.86  3.25 1952.91    1
-    #>    205 0.12 1.58 0.09 -2.87  3.26 2000.27    1
+    #>    201 0.65 1.55 0.67 -2.44  3.60   57.49 1.04
+    #>    202 0.46 1.62 0.43 -2.79  3.77  522.73 1.01
+    #>    203 0.32 1.65 0.36 -2.89  3.49  728.16 1.01
+    #>    204 0.31 1.65 0.26 -2.91  3.44 1805.40 1.00
+    #>    205 0.25 1.57 0.25 -2.92  3.31 1546.44 1.00
     #> ---
     #> [Variance] Forecast for 5 ahead:
     #> 
     #> Pos :
     #>       
     #> period mean   sd  mdn 2.5% 97.5%   n_eff Rhat
-    #>    201 7.87 2.53 7.69 3.94 13.35  593.13    1
-    #>    202 7.28 3.39 6.74 3.45 14.92  905.31    1
-    #>    203 6.83 3.59 6.02 3.25 15.54 1265.66    1
-    #>    204 6.52 3.94 5.43 2.97 16.41 1710.85    1
-    #>    205 6.31 4.09 5.07 2.84 17.48 1748.84    1
+    #>    201 7.32 2.59 6.46 3.99 13.49   36.97 1.06
+    #>    202 6.47 3.40 5.71 3.15 14.41   28.52 1.07
+    #>    203 6.23 4.40 5.16 2.98 14.78  101.40 1.03
+    #>    204 6.08 4.33 4.94 2.93 15.13  443.08 1.02
+    #>    205 6.06 4.48 4.81 2.87 15.42 1085.44 1.01
     #> Neg :
     #>       
     #> period mean   sd  mdn 2.5% 97.5%   n_eff Rhat
-    #>    201 1.96 0.41 1.90 1.35  2.95 1312.02    1
-    #>    202 2.25 0.88 2.05 1.37  4.29 1581.62    1
-    #>    203 2.33 1.16 2.06 1.40  4.77 1930.01    1
-    #>    204 2.32 1.38 2.05 1.40  4.76 1659.10    1
-    #>    205 2.32 1.50 2.05 1.38  4.92 1529.97    1
+    #>    201 1.92 0.37 1.86 1.36  2.74 1108.64    1
+    #>    202 2.24 1.00 2.00 1.41  4.58 1677.01    1
+    #>    203 2.32 1.17 2.01 1.42  5.31 1992.77    1
+    #>    204 2.38 1.61 2.01 1.42  5.66 1906.44    1
+    #>    205 2.37 1.75 1.99 1.40  5.29 1951.10    1
     #> [Correlation] Forecast for 5 ahead:
     #> 
     #> Neg_Pos :
     #>       
-    #> period  mean   sd   mdn  2.5% 97.5%   n_eff Rhat
-    #>    201 -0.07 0.17 -0.07 -0.41  0.23  860.80    1
-    #>    202 -0.07 0.21 -0.07 -0.47  0.39 1008.41    1
-    #>    203 -0.06 0.21 -0.06 -0.47  0.40  927.80    1
-    #>    204 -0.05 0.20 -0.05 -0.46  0.39 1427.12    1
-    #>    205 -0.03 0.20 -0.03 -0.42  0.41 1690.83    1
+    #> period  mean   sd   mdn  2.5% 97.5%  n_eff Rhat
+    #>    201 -0.11 0.17 -0.12 -0.39  0.23  42.66 1.04
+    #>    202 -0.05 0.21 -0.05 -0.47  0.38 368.15 1.02
+    #>    203 -0.02 0.22 -0.01 -0.46  0.44  41.02 1.06
+    #>    204  0.01 0.22  0.01 -0.44  0.49  31.00 1.07
+    #>    205  0.01 0.22  0.02 -0.43  0.47  37.05 1.06
 
     plot(fit.fc, askNewPage = FALSE, type = "var")
 
@@ -230,7 +233,7 @@ Ease computation by first standardizing the time series
     # Fit CCC(1, 1) with constant on the mean structure.
     fit1 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
                     parameterization = "CCC",
-                    iterations = 100,
+                    iterations = 1000,
                     P = 1, Q = 1,
                     distribution = "Student_t",
                     meanstructure = "constant")
@@ -250,51 +253,51 @@ Ease computation by first standardizing the time series
     #> 
     #> Distribution:  Student_t
     #> ---
-    #> Iterations:  100
+    #> Iterations:  1000
     #> Chains:  4
-    #> Date:  Mon Aug 31 15:56:06 2020
-    #> Elapsed time (min):  0.31
+    #> Date:  Tue Sep  1 14:37:10 2020
+    #> Elapsed time (min):  0.96
     #> 
     #> GARCH(1,1)  estimates for conditional variance:
     #> 
-    #>            mean   sd  mdn 2.5% 97.5%  n_eff Rhat
-    #> a_h_1,ty   0.09 0.08 0.08 0.00  0.30 350.87 0.98
-    #> a_h_1,ns   0.08 0.07 0.06 0.01  0.24 434.39 1.00
-    #> a_h_1,hn   0.10 0.07 0.08 0.01  0.30 312.91 0.98
-    #> b_h_1,ty   0.45 0.19 0.47 0.11  0.75 326.16 0.98
-    #> b_h_1,ns   0.39 0.18 0.38 0.08  0.71 253.79 0.99
-    #> b_h_1,hn   0.41 0.20 0.42 0.09  0.79 460.21 1.00
-    #> c_h_var_ty 0.29 0.14 0.27 0.10  0.60 282.89 0.99
-    #> c_h_var_ns 0.36 0.13 0.35 0.13  0.61 260.51 0.99
-    #> c_h_var_hn 0.44 0.18 0.42 0.15  0.80 460.21 0.99
+    #>            mean   sd  mdn 2.5% 97.5%   n_eff Rhat
+    #> a_h_1,ty   0.10 0.09 0.08 0.00  0.36 2378.97    1
+    #> a_h_1,ns   0.08 0.07 0.07 0.00  0.27 2259.80    1
+    #> a_h_1,hn   0.11 0.09 0.09 0.00  0.33 2183.70    1
+    #> b_h_1,ty   0.45 0.18 0.47 0.10  0.77 1466.95    1
+    #> b_h_1,ns   0.38 0.20 0.36 0.06  0.77 1176.61    1
+    #> b_h_1,hn   0.39 0.17 0.38 0.08  0.73 1288.51    1
+    #> c_h_var_ty 0.28 0.12 0.27 0.09  0.55 1283.87    1
+    #> c_h_var_ns 0.35 0.13 0.35 0.12  0.63 1136.18    1
+    #> c_h_var_hn 0.44 0.16 0.43 0.17  0.77 1250.73    1
     #> 
     #> 
     #> Constant correlation (R) coefficients:
     #> 
-    #>         mean   sd  mdn 2.5% 97.5%  n_eff Rhat
-    #> R_ns-ty 0.65 0.07 0.66 0.52  0.76 222.76 0.99
-    #> R_hn-ty 0.73 0.05 0.74 0.62  0.82 241.75 1.00
-    #> R_hn-ns 0.65 0.07 0.65 0.52  0.77 240.58 1.01
+    #>         mean   sd  mdn 2.5% 97.5%   n_eff Rhat
+    #> R_ns-ty 0.65 0.06 0.65 0.51  0.75 1625.27    1
+    #> R_hn-ty 0.73 0.05 0.74 0.62  0.82 2032.82    1
+    #> R_hn-ns 0.64 0.06 0.64 0.50  0.75 2287.38    1
     #> 
     #> 
     #> Intercept estimates on the location:
     #> 
-    #>                     mean   sd   mdn  2.5% 97.5%  n_eff Rhat
-    #> (Intercept)_toyota -0.09 0.08 -0.09 -0.23  0.06 192.52 0.99
-    #> (Intercept)_nissan  0.01 0.09  0.01 -0.17  0.16 184.45 1.01
-    #> (Intercept)_honda  -0.02 0.09 -0.02 -0.19  0.14 246.46 0.99
+    #>                     mean   sd   mdn  2.5% 97.5%   n_eff Rhat
+    #> (Intercept)_toyota -0.09 0.08 -0.09 -0.24  0.07 1351.67    1
+    #> (Intercept)_nissan -0.01 0.08  0.00 -0.17  0.15 1496.11    1
+    #> (Intercept)_honda  -0.02 0.09 -0.02 -0.19  0.16 1361.46    1
     #> 
     #> 
     #> Df constant student_t (nu):
     #> 
-    #>   mean     sd    mdn   2.5%  97.5%  n_eff   Rhat 
-    #>  33.12  24.70  24.97   7.69  90.08 191.42   0.99 
+    #>    mean      sd     mdn    2.5%   97.5%   n_eff    Rhat 
+    #>   33.03   24.97   25.52    7.05   99.36 1809.21    1.00 
     #> 
     #> 
     #> Log density posterior estimate:
     #> 
     #>    mean      sd     mdn    2.5%   97.5%   n_eff    Rhat 
-    #> -178.38    5.14 -177.77 -189.49 -170.28   63.13    1.06
+    #> -178.50    5.17 -178.15 -189.69 -169.34  728.33    1.01
 
 ### Forecasted Values
 
@@ -307,54 +310,60 @@ Forecast volatility 10 days ahead
     #> 
     #> toyota :
     #>       
-    #> period mean   sd  mdn 2.5% 97.5%  n_eff Rhat
-    #>    101 0.54 0.13 0.53 0.33  0.83 255.87 1.00
-    #>    102 0.58 0.15 0.55 0.33  0.92 247.08 1.00
-    #>    103 0.59 0.17 0.56 0.32  0.99 265.83 1.00
-    #>    104 0.62 0.19 0.58 0.34  1.07 216.73 1.00
-    #>    105 0.64 0.20 0.59 0.34  1.13 185.42 1.00
-    #>    106 0.65 0.25 0.61 0.37  1.20 177.90 1.00
-    #>    107 0.66 0.27 0.62 0.35  1.19 181.30 1.00
-    #>    108 0.67 0.26 0.61 0.39  1.43 186.23 1.00
-    #>    109 0.66 0.34 0.60 0.37  1.28 196.14 1.00
-    #>    110 0.66 0.24 0.61 0.35  1.28 204.17 0.99
+    #> period mean   sd  mdn 2.5% 97.5%   n_eff Rhat
+    #>    101 0.53 0.11 0.53 0.33  0.77 1805.69    1
+    #>    102 0.58 0.16 0.56 0.34  0.98 1703.07    1
+    #>    103 0.61 0.26 0.58 0.35  1.05 1680.22    1
+    #>    104 0.63 0.25 0.59 0.36  1.17 1780.38    1
+    #>    105 0.65 0.27 0.59 0.37  1.26 2153.90    1
+    #>    106 0.65 0.25 0.60 0.37  1.21 1961.94    1
+    #>    107 0.65 0.28 0.60 0.37  1.29 2052.69    1
+    #>    108 0.66 0.30 0.60 0.38  1.30 2002.68    1
+    #>    109 0.66 0.30 0.60 0.38  1.34 2007.72    1
+    #>    110 0.66 0.30 0.60 0.38  1.41 2101.81    1
     #> nissan :
     #>       
-    #> period mean   sd  mdn 2.5% 97.5%  n_eff Rhat
-    #>    101 0.63 0.12 0.62 0.44  0.86 205.81    1
-    #>    102 0.65 0.15 0.63 0.44  0.95 199.69    1
-    #>    103 0.67 0.20 0.64 0.45  1.08 200.51    1
-    #>    104 0.69 0.21 0.64 0.45  1.23 217.70    1
-    #>    105 0.68 0.24 0.64 0.45  1.14 229.15    1
-    #>    106 0.70 0.23 0.65 0.44  1.29 197.44    1
-    #>    107 0.70 0.20 0.65 0.43  1.11 196.33    1
-    #>    108 0.71 0.28 0.65 0.42  1.45 173.90    1
-    #>    109 0.69 0.23 0.64 0.43  1.21 175.49    1
-    #>    110 0.70 0.27 0.63 0.44  1.27 185.52    1
+    #> period mean   sd  mdn 2.5% 97.5%   n_eff Rhat
+    #>    101 0.61 0.10 0.60 0.42  0.84 1660.92    1
+    #>    102 0.64 0.17 0.61 0.43  0.98 1615.46    1
+    #>    103 0.66 0.20 0.63 0.43  1.07 1725.27    1
+    #>    104 0.67 0.22 0.63 0.44  1.10 1940.99    1
+    #>    105 0.68 0.69 0.63 0.43  1.12 2000.14    1
+    #>    106 0.73 2.68 0.63 0.43  1.15 2000.16    1
+    #>    107 0.69 0.73 0.63 0.43  1.17 1949.52    1
+    #>    108 0.68 0.31 0.63 0.43  1.20 1681.40    1
+    #>    109 0.68 0.33 0.64 0.43  1.16 1823.36    1
+    #>    110 0.68 0.45 0.63 0.43  1.18 1900.79    1
     #> honda :
     #>       
-    #> period mean   sd  mdn 2.5% 97.5%  n_eff Rhat
-    #>    101 0.78 0.16 0.77 0.49  1.11 188.60 1.01
-    #>    102 0.83 0.19 0.80 0.48  1.26 195.55 1.01
-    #>    103 0.88 0.29 0.83 0.51  1.73 204.49 1.00
-    #>    104 0.93 0.44 0.83 0.54  1.81 212.01 1.00
-    #>    105 0.95 0.54 0.83 0.51  2.06 173.92 1.00
-    #>    106 0.94 0.36 0.86 0.55  1.80 163.24 1.00
-    #>    107 0.91 0.31 0.83 0.54  1.59 155.55 1.01
-    #>    108 0.93 0.32 0.85 0.52  1.86 168.75 1.00
-    #>    109 0.94 0.43 0.85 0.49  1.79 106.17 1.01
-    #>    110 0.95 0.45 0.85 0.51  1.75 146.40 1.00
+    #> period mean   sd  mdn 2.5% 97.5%   n_eff Rhat
+    #>    101 0.76 0.14 0.75 0.53  1.07 1567.26    1
+    #>    102 0.83 0.23 0.79 0.53  1.44 1778.68    1
+    #>    103 0.87 0.35 0.82 0.53  1.59 2039.45    1
+    #>    104 0.89 0.32 0.83 0.55  1.72 2027.82    1
+    #>    105 0.90 0.39 0.83 0.54  1.72 1953.13    1
+    #>    106 0.91 0.44 0.83 0.55  1.72 1979.25    1
+    #>    107 0.91 0.41 0.84 0.56  1.70 1887.18    1
+    #>    108 0.91 0.39 0.83 0.55  1.78 1896.24    1
+    #>    109 0.91 0.42 0.83 0.55  1.83 2094.37    1
+    #>    110 0.92 0.42 0.84 0.55  1.71 1968.70    1
 
     plot(fc,askNewPage = FALSE, type = 'var' )
 
 <img src="man/figures/README-stockForecastPlot-1.png" width="100%" /><img src="man/figures/README-stockForecastPlot-2.png" width="100%" /><img src="man/figures/README-stockForecastPlot-3.png" width="100%" />
+
+### Ensemble Methods
+
+Here we illustrate how to obtain model weights across three models.
+These weights will be used to compute weighted forecasts, thus, taking
+into account that we do not have a single best model.
 
 Add two additional models, one with CCC(2,2) and a DCC(1,1)
 
     # Fit CCC(1, 1) with constant on the mean structure.
     fit2 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
                     parameterization = "CCC",
-                    iterations = 100,
+                    iterations = 1000,
                     P = 2, Q = 2,
                     distribution = "Student_t",
                     meanstructure = "constant")
@@ -367,7 +376,7 @@ Add two additional models, one with CCC(2,2) and a DCC(1,1)
 
     fit3 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
                     parameterization = "DCC",
-                    iterations = 100,
+                    iterations = 1000,
                     P = 1, Q = 1,
                     distribution = "Student_t",
                     meanstructure = "arma")
@@ -389,144 +398,110 @@ output will have the according information:
     #> 
     #> Distribution:  Student_t
     #> ---
-    #> Iterations:  100
+    #> Iterations:  1000
     #> Chains:  4
-    #> Date:  Mon Aug 31 15:58:40 2020
-    #> Elapsed time (min):  1.67
+    #> Date:  Tue Sep  1 14:55:03 2020
+    #> Elapsed time (min):  15.97
     #> 
     #> GARCH(1,1)  estimates for conditional variance on D:
     #> 
-    #>            mean   sd  mdn 2.5% 97.5%  n_eff Rhat
-    #> a_h_1,ty   0.15 0.12 0.13 0.01  0.49 198.52 0.99
-    #> a_h_1,ns   0.10 0.09 0.08 0.01  0.31 124.50 1.04
-    #> a_h_1,hn   0.13 0.09 0.12 0.01  0.34 202.12 1.00
-    #> b_h_1,ty   0.44 0.16 0.44 0.13  0.73 142.13 1.00
-    #> b_h_1,ns   0.43 0.21 0.43 0.06  0.83 116.07 1.04
-    #> b_h_1,hn   0.45 0.19 0.46 0.06  0.79 112.35 1.00
-    #> c_h_var_ty 0.28 0.11 0.26 0.12  0.50 102.68 1.02
-    #> c_h_var_ns 0.31 0.14 0.31 0.08  0.59 125.56 1.02
-    #> c_h_var_hn 0.38 0.16 0.38 0.13  0.71 158.45 1.00
+    #>            mean   sd  mdn 2.5% 97.5% n_eff Rhat
+    #> a_h_1,ty   0.09 0.09 0.04 0.03  0.36  5.14 1.31
+    #> a_h_1,ns   0.07 0.05 0.06 0.01  0.21  4.58 1.35
+    #> a_h_1,hn   0.14 0.15 0.04 0.01  0.36  2.33 2.67
+    #> b_h_1,ty   0.50 0.11 0.51 0.22  0.65  4.94 1.35
+    #> b_h_1,ns   0.35 0.17 0.33 0.15  0.72  3.37 1.59
+    #> b_h_1,hn   0.44 0.23 0.49 0.11  0.71  2.39 2.48
+    #> c_h_var_ty 0.27 0.07 0.26 0.14  0.45  7.42 1.21
+    #> c_h_var_ns 0.35 0.11 0.40 0.15  0.53  3.18 1.69
+    #> c_h_var_hn 0.34 0.10 0.36 0.18  0.56  5.01 1.32
     #> 
     #> 
     #> GARCH(1,1) estimates for conditional variance on Q:
     #> 
-    #>     mean   sd  mdn 2.5% 97.5%  n_eff Rhat
-    #> a_q 0.21 0.10 0.20 0.05  0.45 103.03 1.04
-    #> b_q 0.22 0.14 0.22 0.00  0.50 177.47 1.00
+    #>     mean   sd  mdn 2.5% 97.5% n_eff Rhat
+    #> a_q 0.20 0.07 0.22 0.09  0.34  4.13 1.43
+    #> b_q 0.16 0.12 0.12 0.04  0.43  3.27 1.63
     #> 
     #> 
     #> Unconditional correlation 'S' in Q:
     #> 
-    #>         mean   sd  mdn 2.5% 97.5%  n_eff Rhat
-    #> S_ns-ty 0.60 0.08 0.60 0.41  0.75 162.92 1.02
-    #> S_hn-ty 0.72 0.07 0.74 0.59  0.83 244.05 0.99
-    #> S_hn-ns 0.62 0.08 0.63 0.44  0.75 194.86 1.00
+    #>         mean   sd  mdn 2.5% 97.5% n_eff Rhat
+    #> S_ns-ty 0.63 0.05 0.63 0.49  0.73 13.47 1.17
+    #> S_hn-ty 0.71 0.05 0.69 0.63  0.81  4.60 1.35
+    #> S_hn-ns 0.67 0.06 0.70 0.52  0.74  4.43 1.38
     #> 
     #> 
     #> ARMA(1,1) estimates on the location:
     #> 
-    #>                      mean   sd   mdn  2.5% 97.5%  n_eff Rhat
-    #> (Intercept)_toyota  -0.07 0.09 -0.07 -0.23  0.13 171.45 1.03
-    #> (Intercept)_nissan   0.02 0.09  0.01 -0.14  0.19 179.83 1.00
-    #> (Intercept)_honda   -0.01 0.13  0.00 -0.24  0.28 175.79 0.99
-    #> Phi_toyota-toyota    0.05 0.33  0.08 -0.58  0.56  82.34 1.04
-    #> Phi_toyota-nissan    0.01 0.39  0.05 -0.77  0.72  90.75 1.05
-    #> Phi_toyota-honda     0.17 0.35  0.17 -0.50  0.82 120.01 1.00
-    #> Phi_nissan-toyota    0.29 0.39  0.36 -0.50  0.91 118.88 0.99
-    #> Phi_nissan-nissan   -0.15 0.36 -0.23 -0.73  0.73  90.65 1.06
-    #> Phi_nissan-honda     0.20 0.35  0.19 -0.43  0.88  77.06 1.05
-    #> Phi_honda-toyota    -0.23 0.38 -0.25 -0.85  0.48  99.63 1.02
-    #> Phi_honda-nissan     0.13 0.38  0.16 -0.63  0.81  61.08 1.07
-    #> Phi_honda-honda     -0.13 0.29 -0.12 -0.69  0.47  79.87 1.03
-    #> Theta_toyota-toyota -0.17 0.35 -0.21 -0.77  0.47  65.66 1.05
-    #> Theta_toyota-nissan  0.16 0.38  0.12 -0.51  0.89  97.26 1.04
-    #> Theta_toyota-honda  -0.14 0.34 -0.14 -0.78  0.53 113.93 1.02
-    #> Theta_nissan-toyota -0.32 0.39 -0.35 -0.88  0.57 125.39 0.99
-    #> Theta_nissan-nissan  0.18 0.33  0.22 -0.60  0.69  96.06 1.05
-    #> Theta_nissan-honda  -0.23 0.36 -0.19 -0.89  0.46  89.66 1.04
-    #> Theta_honda-toyota  -0.06 0.40 -0.01 -0.87  0.63  75.56 1.04
-    #> Theta_honda-nissan   0.02 0.40 -0.02 -0.74  0.81  47.01 1.09
-    #> Theta_honda-honda    0.25 0.33  0.24 -0.36  0.82  65.84 1.04
+    #>                      mean   sd   mdn  2.5% 97.5% n_eff Rhat
+    #> (Intercept)_toyota  -0.02 0.14 -0.02 -0.20  0.18  2.17 3.54
+    #> (Intercept)_nissan   0.13 0.08  0.18 -0.09  0.20  2.62 2.04
+    #> (Intercept)_honda    0.02 0.12  0.03 -0.14  0.17  2.59 2.16
+    #> Phi_toyota-toyota    0.04 0.42  0.20 -0.58  0.54  2.26 2.97
+    #> Phi_toyota-nissan   -0.16 0.51 -0.52 -0.65  0.56  2.29 2.81
+    #> Phi_toyota-honda    -0.15 0.53 -0.40 -0.74  0.58  2.25 3.03
+    #> Phi_nissan-toyota    0.36 0.35  0.50 -0.33  0.83  3.04 1.81
+    #> Phi_nissan-nissan   -0.37 0.26 -0.45 -0.62  0.37  4.20 1.42
+    #> Phi_nissan-honda    -0.06 0.32 -0.08 -0.53  0.60  3.15 1.70
+    #> Phi_honda-toyota    -0.24 0.27 -0.36 -0.69  0.33  4.13 1.43
+    #> Phi_honda-nissan     0.12 0.29  0.25 -0.38  0.70  3.87 1.48
+    #> Phi_honda-honda     -0.34 0.37 -0.56 -0.70  0.29  2.47 2.31
+    #> Theta_toyota-toyota -0.19 0.45 -0.21 -0.82  0.37  2.31 2.77
+    #> Theta_toyota-nissan  0.27 0.50  0.63 -0.42  0.81  2.30 2.81
+    #> Theta_toyota-honda   0.26 0.63  0.70 -0.56  0.89  2.16 3.73
+    #> Theta_nissan-toyota -0.43 0.49 -0.75 -0.91  0.30  2.41 2.51
+    #> Theta_nissan-nissan  0.39 0.23  0.43 -0.34  0.59  5.22 1.32
+    #> Theta_nissan-honda   0.07 0.37  0.03 -0.63  0.65  2.71 2.00
+    #> Theta_honda-toyota  -0.04 0.41  0.03 -0.64  0.47  2.52 2.21
+    #> Theta_honda-nissan  -0.02 0.31  0.13 -0.65  0.54  4.00 1.46
+    #> Theta_honda-honda    0.52 0.45  0.87 -0.21  0.99  2.36 2.60
     #> 
     #> 
     #> Df constant student_t (nu):
     #> 
     #>   mean     sd    mdn   2.5%  97.5%  n_eff   Rhat 
-    #>  45.07  26.55  37.22  12.88 118.37 460.21   0.98 
+    #>  52.04  20.12  48.68  14.04 100.98   5.67   1.30 
     #> 
     #> 
     #> Log density posterior estimate:
     #> 
     #>    mean      sd     mdn    2.5%   97.5%   n_eff    Rhat 
-    #> -176.00    5.91 -175.56 -187.25 -166.31   82.26    1.02
+    #> -170.53    5.19 -170.09 -183.93 -161.78    3.11    1.76
     fc <- forecast(fit3, ahead =  10)
 
     plot( fc,askNewPage = FALSE, type =  'mean' ) 
 
 <img src="man/figures/README-fit3ForecastPlot-1.png" width="100%" /><img src="man/figures/README-fit3ForecastPlot-2.png" width="100%" /><img src="man/figures/README-fit3ForecastPlot-3.png" width="100%" />
 
-### Ensemble Models
+### Compute Model Weights
 
 Obtain model weights with either the stacking or the pseudo BMA method.
 These methods are inherited from the `loo` package.
 
+First, gather models to a `bmgarch_list`.
+
     ## use bmgarch_list function to collect bmgarch objects
-    modfits <- bmgarch_list(fit1, fit2, fit3)
+    modfits <- suppressMessages( bmgarch_list(fit1, fit2, fit3) )
 
-### Compute Model Weights
+Compute model weights with the stacking method (default) and the the
+approximate (default) leave-future-out cross validation (LFO CV). `L`
+defines the minimal length of the time series before we start engaging
+in cross-validation. Eg., for a time series with length 100, `L = 50`
+reserves values 51--100 as the cross-validation sample. Note that the
+standard is to use the approximate `backward` method to CV as it results
+in fewest refits. Exact CV is also available with `exact` but not
+encouraged as it results in refitting all CV models.
 
-Compute model weights with the stacking method and the the approximate
-leave-future-out cross validation (LFO CV). `L` defines the minimal
-length of the time series before we start engaging in cross-validation.
-Note that the standard is to use the approximate `backward` method to CV
-as it results in fewest refits. Exact CV is also available with `exact`
-but not encouraged as it results in refitting all CV models.
-
-    mw <- model_weights(modfits, L = 50, method = 'stacking' )
+    mw <- suppressMessages( model_weights(modfits, L = 80, method = 'stacking' ) )
     #> 
     #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
     #> 
     #> COMPILING MODEL 'CCCMGARCH' NOW.
     #> 
     #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> Using threshold  0.6 , model was refit  4  times, at observations 84 73 61 55 
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'CCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
-    #> Using threshold  0.6 , model was refit  3  times, at observations 81 71 55 
+    #> Using threshold  0.6 , model was refit  1  times, at observations 80 
+    #> Using threshold  0.6 , model was refit  0  times, at observations 
     #> 
     #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
     #> 
@@ -545,61 +520,7 @@ but not encouraged as it results in refitting all CV models.
     #> COMPILING MODEL 'DCCMGARCH' NOW.
     #> 
     #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> COMPILING MODEL 'DCCMGARCH' NOW.
-    #> 
-    #> STARTING SAMPLER FOR MODEL 'DCCMGARCH' NOW.
-    #> Using threshold  0.6 , model was refit  12  times, at observations 96 90 85 84 74 71 64 60 58 53 51 50
+    #> Using threshold  0.6 , model was refit  3  times, at observations 96 87 84
 
     ## Return model weights:
     mw
@@ -625,80 +546,80 @@ days ahead.
     #> toyota :
     #>       
     #> period  mean   sd   mdn  2.5% 97.5% n_eff Rhat
-    #>    101  0.01 0.74  0.05 -1.55  1.28    NA   NA
-    #>    102 -0.12 0.75 -0.18 -1.44  1.38    NA   NA
-    #>    103 -0.08 0.83 -0.07 -1.44  1.51    NA   NA
-    #>    104 -0.23 0.84 -0.29 -2.02  1.32    NA   NA
-    #>    105 -0.09 0.78 -0.06 -1.60  1.41    NA   NA
+    #>    101 -0.09 0.75 -0.08 -1.54  1.39    NA   NA
+    #>    102 -0.09 0.78 -0.11 -1.59  1.42    NA   NA
+    #>    103 -0.08 0.80 -0.09 -1.66  1.44    NA   NA
+    #>    104 -0.09 0.80 -0.09 -1.69  1.48    NA   NA
+    #>    105 -0.11 0.82 -0.10 -1.81  1.51    NA   NA
     #> nissan :
     #>       
     #> period  mean   sd   mdn  2.5% 97.5% n_eff Rhat
-    #>    101  0.01 0.82  0.05 -1.71  1.41    NA   NA
-    #>    102 -0.08 0.82 -0.12 -1.72  1.54    NA   NA
-    #>    103 -0.05 0.86  0.03 -1.74  1.38    NA   NA
-    #>    104 -0.14 0.89 -0.24 -1.81  1.70    NA   NA
-    #>    105 -0.06 0.78 -0.03 -1.59  1.48    NA   NA
+    #>    101  0.03 0.84  0.03 -1.60  1.65    NA   NA
+    #>    102  0.03 0.87  0.00 -1.64  1.83    NA   NA
+    #>    103 -0.01 0.88  0.01 -1.81  1.70    NA   NA
+    #>    104  0.00 0.89 -0.01 -1.80  1.71    NA   NA
+    #>    105 -0.02 0.89 -0.03 -1.75  1.70    NA   NA
     #> honda :
     #>       
     #> period  mean   sd   mdn  2.5% 97.5% n_eff Rhat
-    #>    101  0.11 0.82  0.18 -1.48  1.58    NA   NA
-    #>    102 -0.07 0.83 -0.06 -1.70  1.80    NA   NA
-    #>    103  0.01 0.97 -0.06 -1.90  1.75    NA   NA
-    #>    104 -0.14 1.00 -0.08 -2.36  2.00    NA   NA
-    #>    105 -0.06 0.89 -0.13 -1.60  1.71    NA   NA
+    #>    101 -0.01 0.93 -0.02 -1.89  1.85    NA   NA
+    #>    102 -0.04 0.98 -0.05 -1.99  1.87    NA   NA
+    #>    103  0.00 1.00  0.01 -1.97  1.95    NA   NA
+    #>    104 -0.05 1.00 -0.05 -2.03  2.00    NA   NA
+    #>    105 -0.03 0.98  0.00 -1.99  1.84    NA   NA
     #> ---
     #> [Variance] Forecast for 5 ahead:
     #> 
     #> toyota :
     #>       
     #> period mean   sd  mdn 2.5% 97.5% n_eff Rhat
-    #>    101 0.54 0.11 0.53 0.32  0.78    NA   NA
-    #>    102 0.56 0.12 0.54 0.34  0.81    NA   NA
-    #>    103 0.59 0.19 0.58 0.37  0.89    NA   NA
-    #>    104 0.62 0.18 0.60 0.36  1.07    NA   NA
-    #>    105 0.64 0.20 0.61 0.38  1.14    NA   NA
+    #>    101 0.52 0.11 0.51 0.33  0.76    NA   NA
+    #>    102 0.54 0.16 0.53 0.33  0.82    NA   NA
+    #>    103 0.58 0.17 0.55 0.34  0.97    NA   NA
+    #>    104 0.60 0.20 0.57 0.34  1.03    NA   NA
+    #>    105 0.61 0.21 0.58 0.35  1.14    NA   NA
     #> nissan :
     #>       
     #> period mean   sd  mdn 2.5% 97.5% n_eff Rhat
-    #>    101 0.64 0.11 0.62 0.46  0.90    NA   NA
-    #>    102 0.65 0.14 0.63 0.44  0.97    NA   NA
-    #>    103 0.68 0.24 0.64 0.45  1.03    NA   NA
-    #>    104 0.67 0.18 0.65 0.45  1.14    NA   NA
-    #>    105 0.70 0.25 0.65 0.45  1.19    NA   NA
+    #>    101 0.63 0.12 0.62 0.44  0.90    NA   NA
+    #>    102 0.64 0.15 0.62 0.43  0.98    NA   NA
+    #>    103 0.67 0.24 0.63 0.43  1.11    NA   NA
+    #>    104 0.68 0.25 0.64 0.43  1.15    NA   NA
+    #>    105 0.68 0.22 0.64 0.43  1.18    NA   NA
     #> honda :
     #>       
     #> period mean   sd  mdn 2.5% 97.5% n_eff Rhat
-    #>    101 0.80 0.15 0.78 0.55  1.12    NA   NA
-    #>    102 0.78 0.18 0.76 0.50  1.20    NA   NA
-    #>    103 0.84 0.23 0.80 0.52  1.44    NA   NA
-    #>    104 0.87 0.31 0.80 0.52  1.52    NA   NA
-    #>    105 0.91 0.37 0.85 0.50  2.18    NA   NA
+    #>    101 0.77 0.14 0.76 0.54  1.07    NA   NA
+    #>    102 0.78 0.18 0.76 0.50  1.19    NA   NA
+    #>    103 0.86 0.40 0.80 0.52  1.56    NA   NA
+    #>    104 0.88 0.40 0.82 0.51  1.66    NA   NA
+    #>    105 0.92 0.48 0.83 0.52  1.85    NA   NA
     #> [Correlation] Forecast for 5 ahead:
     #> 
     #> nissan_toyota :
     #>       
     #> period mean   sd  mdn 2.5% 97.5% n_eff Rhat
-    #>    101 0.65 0.06 0.66 0.51  0.76    NA   NA
-    #>    102 0.65 0.06 0.66 0.51  0.76    NA   NA
-    #>    103 0.65 0.06 0.66 0.51  0.76    NA   NA
-    #>    104 0.65 0.06 0.66 0.51  0.76    NA   NA
-    #>    105 0.65 0.06 0.66 0.51  0.76    NA   NA
+    #>    101 0.64 0.06 0.65  0.5  0.75    NA   NA
+    #>    102 0.64 0.06 0.65  0.5  0.75    NA   NA
+    #>    103 0.64 0.06 0.65  0.5  0.75    NA   NA
+    #>    104 0.64 0.06 0.65  0.5  0.75    NA   NA
+    #>    105 0.64 0.06 0.65  0.5  0.75    NA   NA
     #> honda_toyota :
     #>       
     #> period mean   sd  mdn 2.5% 97.5% n_eff Rhat
-    #>    101 0.74 0.05 0.74 0.63  0.82    NA   NA
-    #>    102 0.74 0.05 0.74 0.63  0.82    NA   NA
-    #>    103 0.74 0.05 0.74 0.63  0.82    NA   NA
-    #>    104 0.74 0.05 0.74 0.63  0.82    NA   NA
-    #>    105 0.74 0.05 0.74 0.63  0.82    NA   NA
+    #>    101 0.73 0.05 0.73 0.62  0.82    NA   NA
+    #>    102 0.73 0.05 0.73 0.62  0.82    NA   NA
+    #>    103 0.73 0.05 0.73 0.62  0.82    NA   NA
+    #>    104 0.73 0.05 0.73 0.62  0.82    NA   NA
+    #>    105 0.73 0.05 0.73 0.62  0.82    NA   NA
     #> honda_nissan :
     #>       
     #> period mean   sd  mdn 2.5% 97.5% n_eff Rhat
-    #>    101 0.65 0.06 0.66 0.52  0.75    NA   NA
-    #>    102 0.65 0.06 0.66 0.52  0.75    NA   NA
-    #>    103 0.65 0.06 0.66 0.52  0.75    NA   NA
-    #>    104 0.65 0.06 0.66 0.52  0.75    NA   NA
-    #>    105 0.65 0.06 0.66 0.52  0.75    NA   NA
+    #>    101 0.64 0.07 0.64  0.5  0.76    NA   NA
+    #>    102 0.64 0.07 0.64  0.5  0.76    NA   NA
+    #>    103 0.64 0.07 0.64  0.5  0.76    NA   NA
+    #>    104 0.64 0.07 0.64  0.5  0.76    NA   NA
+    #>    105 0.64 0.07 0.64  0.5  0.76    NA   NA
 
 Plot the weighted forecast. Save plots into a ggplot object and
 post-process
@@ -717,3 +638,119 @@ post-process
     #> Coordinate system already present. Adding new coordinate system, which will replace the existing one.
 
 <img src="man/figures/README-weightedForecastPlot-4.png" width="100%" />
+
+### Predictors for Constant Variance (C)
+
+We can add predictors for the constant variance term, c or C, in the
+MGARCH model with the option `xC =` The predictors need to be of the
+same dimension as the time-series object. For example, with three
+time-series of lenght 100, the predictor needs to be entered as a 100 by
+3 matrix as well.
+
+As an example, we will add `nissan` as the predictor for C in a
+bivariate MGARCH:
+
+    # Fit CCC(1, 1) with constant on the mean structure.
+    fitx <- bmgarch(stocks.z[1:100, c("toyota", "honda")],
+                    xC = stocks.z[1:100, c("nissan", "nissan")],
+                    parameterization = "CCC",
+                    iterations = 1000,
+                    P = 2, Q = 2,
+                    distribution = "Student_t",
+                    meanstructure = "constant")
+    #> 
+    #> CHECKING DATA AND PREPROCESSING FOR MODEL 'CCCMGARCH' NOW.
+    #> 
+    #> COMPILING MODEL 'CCCMGARCH' NOW.
+    #> 
+    #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
+
+The preidictors for C are on a log scale in section
+`Exogenous predictor`
+
+    summary(fitx)
+    #> Model: CCC-MGARCH
+    #> Basic Specification: H_t = D_t R D_t
+    #>  diag(D_t) = sqrt(h_[ii,t]) = c_h + a_h*y^2_[t-1] + b_h*h_[ii, t-1
+    #> 
+    #> Distribution:  Student_t
+    #> ---
+    #> Iterations:  1000
+    #> Chains:  4
+    #> Date:  Tue Sep  1 15:39:48 2020
+    #> Elapsed time (min):  0.66
+    #> 
+    #> GARCH(2,2)  estimates for conditional variance:
+    #> 
+    #>            mean   sd  mdn 2.5% 97.5%   n_eff Rhat
+    #> a_h_1,ty   0.09 0.09 0.06 0.00  0.33 1652.43    1
+    #> a_h_1,hn   0.08 0.08 0.06 0.00  0.30 2214.30    1
+    #> a_h_2,ty   0.09 0.09 0.07 0.00  0.31 2200.42    1
+    #> a_h_2,hn   0.12 0.12 0.08 0.00  0.44 1930.74    1
+    #> b_h_1,ty   0.21 0.17 0.17 0.01  0.60 2010.68    1
+    #> b_h_1,hn   0.18 0.15 0.15 0.01  0.53 1577.43    1
+    #> b_h_2,ty   0.26 0.17 0.24 0.01  0.62 2062.16    1
+    #> b_h_2,hn   0.20 0.17 0.15 0.01  0.63 1770.49    1
+    #> c_h_var_ty 0.22 0.10 0.21 0.07  0.47 1458.45    1
+    #> c_h_var_hn 0.39 0.15 0.38 0.14  0.72 1254.30    1
+    #> 
+    #> 
+    #> Constant correlation (R) coefficients:
+    #> 
+    #>         mean   sd  mdn 2.5% 97.5%   n_eff Rhat
+    #> R_hn-ty 0.73 0.05 0.73 0.62  0.81 2553.57    1
+    #> 
+    #> 
+    #> Intercept estimates on the location:
+    #> 
+    #>                     mean   sd   mdn  2.5% 97.5%   n_eff Rhat
+    #> (Intercept)_toyota -0.09 0.08 -0.09 -0.26  0.07 1749.19    1
+    #> (Intercept)_honda  -0.05 0.09 -0.05 -0.23  0.13 1586.00    1
+    #> 
+    #> 
+    #> Exogenous predictor (beta1 on log scale: c = exp( beta_0 + beta_1*x ):
+    #> 
+    #>           mean   sd   mdn  2.5% 97.5%   n_eff Rhat
+    #> beta0_ty -1.61 0.49 -1.57 -2.65 -0.75 1404.15    1
+    #> beta0_hn -1.03 0.44 -0.97 -1.99 -0.32 1115.48    1
+    #> beta_ty  -0.18 0.39 -0.18 -0.94  0.57 1485.92    1
+    #> beta_hn   0.04 0.33  0.06 -0.69  0.65 1319.36    1
+    #> 
+    #> 
+    #> Df constant student_t (nu):
+    #> 
+    #>    mean      sd     mdn    2.5%   97.5%   n_eff    Rhat 
+    #>   45.42   28.53   38.77    9.41  116.20 3323.47    1.00 
+    #> 
+    #> 
+    #> Log density posterior estimate:
+    #> 
+    #>    mean      sd     mdn    2.5%   97.5%   n_eff    Rhat 
+    #> -129.85    4.14 -129.53 -138.57 -122.82  755.26    1.00
+
+We can generate forecasts given the known values of the predictor. Note
+that the dimension of the predictor needs to match the number of
+timepoints that we predict ahead and the number of variables, 5 by 2, in
+this example:
+
+    fc2x <- forecast(fitx, ahead = 5, xC = stocks.z[101:105, c("nissan", "nissan")])
+    fc2x
+    #> ---
+    #> [Variance] Forecast for 5 ahead:
+    #> 
+    #> toyota :
+    #>       
+    #> period mean   sd  mdn 2.5% 97.5%   n_eff Rhat
+    #>    101 0.46 0.11 0.46 0.28  0.70 1941.21    1
+    #>    102 0.48 0.16 0.46 0.24  0.82 2163.48    1
+    #>    103 0.52 0.22 0.48 0.23  1.03 2177.91    1
+    #>    104 0.54 0.24 0.50 0.24  1.08 2249.09    1
+    #>    105 0.57 0.26 0.53 0.27  1.15 1949.69    1
+    #> honda :
+    #>       
+    #> period mean   sd  mdn 2.5% 97.5%   n_eff Rhat
+    #>    101 0.77 0.14 0.76 0.52  1.09 2072.75    1
+    #>    102 0.79 0.24 0.76 0.44  1.29 2241.84    1
+    #>    103 0.87 0.34 0.81 0.44  1.73 2180.81    1
+    #>    104 0.90 0.50 0.81 0.46  1.98 2069.16    1
+    #>    105 0.93 0.59 0.82 0.49  2.14 2006.15    1
