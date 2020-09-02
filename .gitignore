@@ -7,7 +7,6 @@
 *.hpp
 *.dll
 .Rproj.user/
-.cran-comments.md
 
 ## Do not ignore this:
 !inst/include/meta_header.hpp
