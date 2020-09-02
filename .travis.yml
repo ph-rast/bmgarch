@@ -41,9 +41,6 @@ after_script:
   - tar -ztvf yaml_*.tar.gz
   - echo ${NOT_CRAN}
 
-r_github_packages:
-  - ph-rast/bmgarch
-
 after_success:
   - travis_wait 40 Rscript -e 'library(covr); codecov()'
   - travis_wait 40 tar -C .. -xf $PKG_TARBALL
