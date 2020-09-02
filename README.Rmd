@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.com/ph-rast/bmgarch.svg?branch=master)](https://travis-ci.com/ph-rast/bmgarch)
 ![R-CMD-check](https://github.com/ph-rast/bmgarch/workflows/R-CMD-check/badge.svg)
+[![codecov](https://codecov.io/gh/ph-rast/bmgarch/branch/master/graph/badge.svg)](https://codecov.io/gh/ph-rast/bmgarch)
 <!-- badges: end -->
 
 # bmgarch
