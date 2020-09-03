@@ -3,3 +3,4 @@
 *.hpp
 *.cpp
 R/zzz.R
+/src
