@@ -38,7 +38,7 @@ to compute expected log predictive density (ELPD).
 We can either obtain stacking weights or pseudo-BMA+ weigths as described in \insertCite{Yao2018}{bmgarch}.
 }
 \examples{
-\dontrun{
+\donttest{
 data(stocks)
 # Fit at least two models on a subset of the stocks data
 # to compute model weights

@@ -1,35 +1,3 @@
-## ##' Figure out whther object is a list of models or just one model
-## ##' Check for nesting structure; If depth == 1, one object else list of models
-## ##' from: \url{https://stackoverflow.com/questions/13432863/determine-level-of-nesting-in-r}
-## ##' @title Obtain nesting depth of list
-## ##' @param this 
-## ##' @param thisdepth 
-## ##' @return Depth
-## ##' @keywords internal
-## .depth <- function(this,thisdepth=0){
-##   if(!is.list(this)){
-##     return(thisdepth)
-##   }else{
-##     return(max(unlist(lapply(this,.depth,thisdepth=thisdepth+1))))    
-##   }
-## }
-## ##' Obtain SD's over columns in lists
-## ##' @title Column SD's
-## ##' @param x 
-## ##' @return SD's at the columns level witin list
-## ##' @title Sort list object 
-## ##' @param x 
-## ##' @return sorted list as vector
-## ##' @author philippe
-## ##' @keywords internal
-## .sort <- function(x ) {
-##     c(apply( x, 1, FUN = function(x) {
-##         c(x )
-##     }))
-## }
-
-
-
 ##' Estimates (weighted) forecasted means, variances, and correlations from a fitted bmgarch model.
 ##' @title Forecast method for bmgarch objects.
 ##' @param object bmgarch object.
@@ -59,7 +27,7 @@
 ##' @export 
 ##' @export forecast
 ##' @examples
-##' \dontrun{
+##' \donttest{
 ##' data(panas)
 ##' # Fit DCC(2,2) with constant mean structure.
 ##' fit <- bmgarch(panas, parameterization = "DCC", P = 2, Q = 2, meanstructure = "constant")
@@ -293,7 +261,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
 ##' @importFrom stats fitted
 ##' @export
 ##' @examples
-##' \dontrun{
+##' \donttest{
 ##' data(panas)
 ##' # Fit CCC(1,1) and constant meanstructure.
 ##' fit <- bmgarch(panas, parameterization = "CCC", meanstructure = "constant")
