@@ -29,9 +29,6 @@ before_install:
   - sudo apt-get -y install libv8-dev
   - mkdir -p ~/.R/
 
-r_packages:
-  - covr
-
 script: 
   - |
     travis_wait 42 R CMD build .
@@ -43,7 +40,6 @@ after_script:
 
 after_success:
   - travis_wait 40 tar -C .. -xf $PKG_TARBALL
-  - travis_wait 50 Rscript -e 'library(covr); codecov()'
 
 after_failure:
 - cat yaml.Rcheck/00*
