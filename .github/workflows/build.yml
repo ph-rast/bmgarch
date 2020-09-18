@@ -27,18 +27,30 @@ jobs:
         - { os: macOS-latest, r: 'release'}
         - { os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest" }
       #  r-version: [3.6]
-
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      RSPM: ${{ matrix.config.rspm }}
+      # don't treat missing suggested packages as error
+      _R_CHECK_FORCE_SUGGESTS_: false
+  
     steps:
-     # - name: Install system dependencies on Linux
-     #   if: runner.os == 'Linux'
-     #    run: |
-     #      sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-     #      sudo apt-get update -q
-     #      sudo apt-get -y install libv8-dev libcurl4-openssl-dev
-      
-    #  - name: Set time zone for windows
-    #    if: runner.os == 'Windows'
-    #      run: tzutil /s "Pacific Standard Time"
+      - name: Install system dependencies for linux
+        if: runner.os == 'Linux'
+        env:
+          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
+        run: |
+          Rscript -e "remotes::install_github('r-hub/sysreqs')"
+          sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
+          sudo -s eval "$sysreqs"
+          
+      - name: Install system dependencies for mac
+        if: runner.os == 'MacOS'
+        run: |
+           curl -sL  https://mac.r-project.org/libs-4/ |
+           sed -n 's/.*href=\([^>]*x86_64.tar.gz\).*/\1/p' |
+           xargs -I % sh -c 'curl https://mac.r-project.org/libs-4/% --output %; sudo tar fvxz % -C /usr/local --strip 2'
+           ls -la /usr/local/lib
+           ls -la /usr/local/include
       
       - uses: actions/checkout@v2
       - name: Set up R ${{ matrix.r-version }}
