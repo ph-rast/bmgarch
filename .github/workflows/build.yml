@@ -45,6 +45,4 @@ jobs:
         uses: r-lib/actions/setup-r@ffe45a39586f073cc2e9af79c4ba563b657dc6e3
         with:
           r-version: ${{ matrix.r-version }}
-          action: 'build'
-        shell: Rscript {0}
 ...
