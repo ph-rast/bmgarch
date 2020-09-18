@@ -1,0 +1,50 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+#
+# See https://github.com/r-lib/actions/tree/master/examples#readme for
+# additional example workflows available for the R community.
+
+name: build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.config.os }}
+    
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      matrix:
+        config:
+        - { os: windows-latest, r: 'devel'}
+        - { os: macOS-latest, r: 'devel'}
+        - { os: ubuntu-18.04,   r: '3.6',   vdiffr: false, xref: true,  cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest" }
+      #  r-version: [3.6]
+
+    steps:
+      - name: Install system dependencies on Linux
+        if: runner.os == 'Linux'
+         run: |
+           add-apt-repository ppa:ubuntu-toolchain-r/test -y
+           apt-get update -q
+           apt-get -y install libv8-dev libcurl4-openssl-dev
+      
+      - name: Set time zone for windows
+        if: runner.os == 'Windows'
+          run: tzutil /s "Pacific Standard Time"
+      
+      - uses: actions/checkout@v2
+      - name: Set up R ${{ matrix.r-version }}
+        uses: r-lib/actions/setup-r@ffe45a39586f073cc2e9af79c4ba563b657dc6e3
+        with:
+          r-version: ${{ matrix.r-version }}
+          action: 'build'
+        shell: Rscript {0}
+...
