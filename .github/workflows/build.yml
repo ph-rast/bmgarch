@@ -34,6 +34,19 @@ jobs:
       _R_CHECK_FORCE_SUGGESTS_: false
 
     steps:
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+        shell: Rscript {0}
+
+      - uses: actions/checkout@v2
+      - name: Set up R ${{ matrix.r-version }}
+        uses: r-lib/actions/setup-r@ffe45a39586f073cc2e9af79c4ba563b657dc6e3
+        with:
+          r-version: ${{ matrix.r-version }}
+
       - name: Install system dependencies for linux
         if: runner.os == 'Linux'
         env:
@@ -51,12 +64,6 @@ jobs:
            xargs -I % sh -c 'curl https://mac.r-project.org/libs-4/% --output %; sudo tar fvxz % -C /usr/local --strip 2'
            ls -la /usr/local/lib
            ls -la /usr/local/include
-      
-      - uses: actions/checkout@v2
-      - name: Set up R ${{ matrix.r-version }}
-        uses: r-lib/actions/setup-r@ffe45a39586f073cc2e9af79c4ba563b657dc6e3
-        with:
-          r-version: ${{ matrix.r-version }}
           
       - name: build package
         run: |
