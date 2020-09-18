@@ -42,4 +42,31 @@ for(i in params ) {
         expect_is( mw, "model_weights")
     })
 
+<<<<<<< HEAD
 }
+=======
+    test_that( paste0(i, "generates non-null output"  ), {
+        expect_true( !is.null( summary( fit )$model_summary ) )
+    })
+
+    test_that( paste0(i,  "is bmgarch object" ), {
+        expect_is( print( fit )$RTS_full, "array" )
+    })
+
+    test_that( paste0(i, "generates list of ggplots" ), {
+        out <-  plot(fit, askNewPage = FALSE )
+        expect_is( out, "list" )    
+    })
+}
+
+## Simulation of BEKK data:
+test_that("Data gets simulated", {
+    simdat <- .sim.bekk(N = 100,
+                        C = matrix(c(1,0.5,0.5,1), ncol =  2),
+                        A = matrix(c(.5,-0.25,0.1,.2), ncol =  2),
+                        B = matrix(c(.3,0.1,0.2,.2), ncol =  2),
+                        phi = matrix(c(.2,0,0,.2), ncol =  2),
+                        theta = matrix(c(.2,0.1,0.1,.2), ncol =  2))
+    expect_equal( dim( simdat ) , c(100,  2) )
+})
+>>>>>>> 0ae26f456d0b7cbe3ce4eef54dace53b2523c217
