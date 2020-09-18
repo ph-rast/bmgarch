@@ -11,3 +11,4 @@
 ^\.github$
 ^/\.gitattributes$
 ^CRAN-RELEASE$
+^doc$

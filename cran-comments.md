@@ -25,7 +25,18 @@
 * This is a resubmission of the first version of the package to CRAN
 
 ## Comments from CRAN admins:
-* The first submission was rejected by Svetlana Herbrandt:
+* 10.09.20 Gregor Seyer: 
+> Please replace \dontrun with \donttest
+  
+  - Done
+
+* 28.08.20 Uwe Ligges: 
+> Please single quote software names such as 'rstan' in the Description field.
+
+	- Done
+
+
+* 26.08.20 The first submission was rejected by Swetlana Herbrandt:
 
 > examples are wrapped in \dontrun{}, hence nothing getst 
 > tested. Please unwrap the examples if that is feasible and if they can
@@ -54,8 +65,3 @@
 > with no space after 'doi:', 'arXiv:' and angle brackets for auto-linking.c
 
 	- Added corresponding information
-
-* Comment by Uwe Ligges: 
-> Please single quote software names such as 'rstan' in the Description field.
-	
-	- Done
