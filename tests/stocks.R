@@ -28,9 +28,6 @@ fc
 
 fc$forecast$log_lik
 
-fc <- forecast(fit1, ahead = 8 )
-
-fc
 
 plot(fc )
 
@@ -44,7 +41,7 @@ mw <-  model_weights(bmgarch_objects = blist, L =  98)
 mw
 
 
-fc <- forecast( blist, ahead = 1, weights = NULL, xC = cbind(stocks[101, c("honda")], stocks[101, c("honda")]), L =  80)
+fc <- forecast( blist, ahead = 1, weights = NULL, xC = cbind(stocks[101, c("honda")], stocks[101, c("honda")]), L =  98)
 fc
 
 
@@ -57,4 +54,4 @@ fc$meta$weights
 mf <- fit$model_fit
 
 rstan::check_hmc_diagnostics(mf )
-stan::plot(mf )
+rstan::plot(mf )
