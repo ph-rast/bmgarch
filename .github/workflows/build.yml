@@ -25,16 +25,16 @@ jobs:
         config:
         - { os: windows-latest, r: 'release'}
         - { os: macOS-latest, r: 'release'}
-        - { os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest" }
+      #  - { os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest" }
       #  r-version: [3.6]
 
     steps:
-      - name: Install system dependencies on Linux
-        if: runner.os == 'Linux'
-         run: |
-           sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-           sudo apt-get update -q
-           sudo apt-get -y install libv8-dev libcurl4-openssl-dev
+     # - name: Install system dependencies on Linux
+     #   if: runner.os == 'Linux'
+     #    run: |
+     #      sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+     #      sudo apt-get update -q
+     #      sudo apt-get -y install libv8-dev libcurl4-openssl-dev
       
       - name: Set time zone for windows
         if: runner.os == 'Windows'
