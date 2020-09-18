@@ -1,4 +1,5 @@
 /tests/local
+/tests/stocks.R
 *.hpp
 *.cpp
 R/zzz.R
