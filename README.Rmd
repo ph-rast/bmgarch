@@ -50,7 +50,7 @@ The development version can be installed from [GitHub](https://github.com/) with
 devtools::install_github("ph-rast/bmgarch")
 ```
 
-## How to Cite this Package
+## How to cite this package
 Please add following citation when referring to to this package:
 
 Rast, P., Martin, S. R., Liu, S., & Williams, D. R. (in press). A New Frontier for Studying Within-Person Variability: Bayesian Multivariate Generalized Autoregressive Conditional Heteroskedasticity Models. _Psychological Methods_. https://doi.org/10.1037/met0000357
