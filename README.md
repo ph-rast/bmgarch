@@ -38,7 +38,7 @@ The development version can be installed from
 
     devtools::install_github("ph-rast/bmgarch")
 
-How to Cite this Package
+How to cite this package
 ------------------------
 
 Please add following citation when referring to to this package:
