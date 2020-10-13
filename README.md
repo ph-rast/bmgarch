@@ -31,7 +31,9 @@ Installation
 
 Linux users may need to install `libv8` prior to installing `bmgarch`.
 For example, in Ubuntu, run `sudo apt install libv8-dev` before
-installing the package from CRAN or github.
+installing the package from CRAN or github. For those who's distro installs
+`libnode-dev` instead of `libv8-dev`, run `install.packages("V8")` in R
+prior to installing `bmgarch` (during installation`rstan` looks explicitly for V8)
 
 The development version can be installed from
 [GitHub](https://github.com/) with:
