@@ -114,7 +114,7 @@ loo.bmgarch <- function(x, ..., type = 'lfo', L = NULL, mode = "backward") {
         refits <- ks <- NULL
         
         if( mode == "backward" ) {
-            k_thres <- 0.6
+            k_thres <- 0.6 # Threshold of .6 based on Buerkner at al (2020) paper
             fit_past <- object
             i_refit <- N
 
