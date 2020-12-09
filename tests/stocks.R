@@ -24,7 +24,9 @@ fc <- forecast(fit, ahead = 8,
                inc_samples = TRUE,
                newdata = stocks[101:108, c("toyota",  "nissan" )])
 
-fc
+fc$forecast$log_lik[[1]]
+
+loo(fit, L =  94, M =  1)
 
 fc$forecast$log_lik
 
