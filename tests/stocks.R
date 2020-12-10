@@ -16,7 +16,7 @@ blist <- bmgarch_list(fit, fit2 )
 
 ## Compute model weights with the default stacking metod
 ## L is the upper boundary of the time-series before we engage in LFO-CV
-mw <- model_weights( blist, L =  98 )
+mw <- model_weights( blist, L =  94, M = 2)
 print(mw )
 
 fc <- forecast(fit, ahead = 8,
@@ -26,7 +26,7 @@ fc <- forecast(fit, ahead = 8,
 
 fc$forecast$log_lik[[1]]
 
-loo(fit, L =  94, M =  1)
+loo(fit, L =  90, M =  5)
 
 fc$forecast$log_lik
 

@@ -1,7 +1,7 @@
 ##' @keywords internal
 ##' @author philippe
-.ll_lfo <- function(x, L = NA, mode = 'backward') {
-    loo( x, type = 'lfo', L = L, mode = mode)$loglik
+.ll_lfo <- function(x, L = NA, M = M, mode = 'backward') {
+    loo( x, type = 'lfo', L = L, M = M, mode = mode)$loglik
 }
 
 ##' @keywords internal
@@ -20,7 +20,8 @@
 ##' \code{bmgarch_objects} takes a \code{bmgarch_object} lists. 
 ##' @title Model weights
 ##' @param bmgarch_objects list of bmgarch model objects in \code{bmgarch_object}  
-##' @param L Minimal length of time series before engaging in lfocv 
+##' @param L Minimal length of time series before engaging in lfocv
+##' @param M M step head predictions. Defines to what period the LFO-CV should be tuned to. Defaults to M=1.
 ##' @param method Ensemble methods, 'stacking' (default) or 'pseudobma'
 ##' @param mode Either 'backward' (default) or 'exact'
 ##' @return Model weights
@@ -56,8 +57,8 @@
 ##' @references
 ##'      \insertAllCited{}
 ##' @export
-model_weights <- function(bmgarch_objects = NULL,  #lfo_objects = NULL,
-                          L = NULL,
+model_weights <- function(bmgarch_objects = NULL,
+                          L = NULL, M = 1,
                           method = "stacking", mode = 'backward') {   
 
    # if( !is.null(bmgarch_objects ) & !is.null(lfo_objects )) stop( "Supply only 'bmgarch_objects' or 'lfo_objects', not both" )
@@ -65,19 +66,10 @@ model_weights <- function(bmgarch_objects = NULL,  #lfo_objects = NULL,
     
     if( !is.null(bmgarch_objects ) ) {
     ## Approximates LFO; Ie. results in refitting models.
-    ll_list <- lapply(bmgarch_objects, FUN = .ll_lfo, L = L, mode =  mode)
-    }# else if(!is.null(lfo_objects) ) {
-        ##if( is.list(lfo_objects ) ) {
-        ##    ll_list <- lapply(lfo_objects, FUN = function(x) x$loglik )
-        ##}
-        ## Need warmup, n_chains and iter form fitted models
-        ## if this is to be used, we need to add this to lfo_objects
-      # stop("Not yet implemnted" )
-   # } else {
-    #    stop("Supply model list for either bmgarch_objects or lfo_objects")
-    #}
-
-    ## Here, insert lfo_objects
+    ll_list <- lapply(bmgarch_objects, FUN = .ll_lfo, L = L, M = M, mode = mode)
+    }
+    
+    ## Insert lfo_objects
     ## obtain iter, warmup and n_chains from first model
     r_eff_list <- lapply( ll_list, FUN = .rel_eff, bmgarch_objects[[1]] )
 
