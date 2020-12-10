@@ -5,7 +5,7 @@
 \alias{loo}
 \title{Leave-Future-Out Cross Validation (LFO-CV)}
 \usage{
-\method{loo}{bmgarch}(x, ..., type = "lfo", L = NULL, mode = "backward")
+\method{loo}{bmgarch}(x, ..., type = "lfo", L = NULL, M = 1, mode = "backward")
 }
 \arguments{
 \item{x}{Fitted bmgarch model. \code{lfocv} inherits all attributes
@@ -17,6 +17,8 @@ from the bmgarch object}
 for time-series but LOO-CV may be obtained to assess the structural part of the model.}
 
 \item{L}{Minimal length of times series before computing LFO}
+
+\item{M}{M step head predictions. Defines to what period the LFO-CV should be tuned to. Defaults to M=1.}
 
 \item{mode}{backward elpd_lfo approximation, or exact elpd-lfo; 
 Takes 'backward', and 'exact'. 'exact' fits N-L models and may
