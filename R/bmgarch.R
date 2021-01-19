@@ -156,6 +156,7 @@ bmgarch <- function(data,
     stan_data <- return_standat[ c("T", "xC", "rts", "nt", "distribution", "P", "Q", "meanstructure")]
 
     stanmodel <- switch(parameterization,
+                        Constant =  stanmodels$Constant,
                         CCC = stanmodels$CCCMGARCH,
                         DCC = stanmodels$DCCMGARCH,
                         BEKK = stanmodels$BEKKMGARCH,
@@ -212,4 +213,4 @@ bmgarch <- function(data,
 #' May facilitate more parameterizations, as we only have to update these, and the switch statements.
 #' @keywords internal
 #' @author Stephen R. Martin
-supported_models <- c("DCC", "CCC", "BEKK", "pdBEKK")
+supported_models <- c("DCC", "CCC", "BEKK", "pdBEKK", "Constant")

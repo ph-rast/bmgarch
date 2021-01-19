@@ -128,6 +128,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
                         compute_log_lik =  compute_log_lik)
 
         gqs_model <- switch(m$param,
+                            Constant = stanmodels$forecastConstant,
                             DCC = stanmodels$forecastDCC,
                             CCC = stanmodels$forecastCCC,
                             BEKK =stanmodels$forecastBEKK,
