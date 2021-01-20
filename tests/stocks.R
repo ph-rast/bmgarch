@@ -3,7 +3,7 @@ options(mc.cores=2)
 
 ## Fit at least two models to compute model weights
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
-               parameterization = "DCC", standardize_data = TRUE,
+               parameterization = "CCC", standardize_data = TRUE,
                iterations = 10)
 
 fit2 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],

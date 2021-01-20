@@ -5,7 +5,7 @@
 \alias{supported_models}
 \title{Models supported by bmgarch}
 \format{
-An object of class \code{character} of length 4.
+An object of class \code{character} of length 5.
 }
 \usage{
 supported_models

@@ -1,4 +1,4 @@
-// Constant variance - No garch
+// BEKK-Parameterization
 functions { 
 #include /functions/cov2cor.stan
 }
@@ -42,6 +42,9 @@ parameters {
   // C_sd is defined in tp, as function of betas
   corr_matrix[nt] C_R;
 
+  matrix[nt, nt] A_raw[Q];
+  matrix[nt, nt] B_raw[P];
+
     // H1 init
   cov_matrix[nt] H1_init; 
   real< lower = 2 > nu; // nu for student_t
@@ -52,6 +55,8 @@ transformed parameters {
   matrix[nt,nt] rr[T-1];
   vector[nt] mu[T];
 
+  matrix[nt, nt] A_part = diag_matrix( rep_vector(0.0, nt));
+  matrix[nt, nt] B_part = diag_matrix( rep_vector(0.0, nt));
 
   matrix[nt+1, nt] beta = append_row( beta0, diag_matrix(beta1) );
   row_vector[nt] C_sd;
@@ -65,14 +70,25 @@ transformed parameters {
     // Meanstructure model:
 #include /model_components/mu.stan
 
+    // reset A_part and B_part to zero for each iteration t
+    A_part = diag_matrix( rep_vector(0.0, nt));
+    B_part = diag_matrix( rep_vector(0.0, nt));
+        
+    for (q in 1:min( t-1, Q) ) {
+      rr[t-q,] = ( rts[t-q,] - mu[t-q,] )*( rts[t-q,] - mu[t-q,] )';
+      A_part = A_part*0 + (A_raw[q]' * rr[t-q,] * A_raw[q])*0;
+    }
+    for (p in 1:min( t-1, P) ) {
+      B_part = B_part*0 + (B_raw[p]' * H[t-p,] * B_raw[p])*0;
+    }
     if( xC_marker == 0 ) {
       C_sd = exp( beta0 ); 
       Cnst =  quad_form_diag(C_R, C_sd );
-      H[t,] = Cnst ;
+      H[t,] = Cnst + A_part +  B_part;
     } else if( xC_marker >= 1) {
       C_sd = exp( append_col( 1.0, xC[t]' ) * beta ); 
       Cnst =  quad_form_diag(C_R, C_sd );
-      H[t,] = Cnst ;
+      H[t,] = Cnst  + A_part +  B_part;
     }
   }
 }
@@ -94,7 +110,14 @@ model {
   to_vector(beta0) ~ std_normal();
   to_vector(beta1) ~ std_normal();
   C_R ~ lkj_corr( 1 );
-   
+
+  for(q in 1:Q) {
+    to_vector(A_raw[q]) ~ std_normal();
+  }
+  for(p in 1:P) {
+    to_vector(B_raw[p]) ~ std_normal();
+  }
+    
   // likelihood
   if ( distribution == 0 ) {
     for(t in 1:T){
@@ -108,11 +131,24 @@ model {
 }
 //
 generated quantities {
+  matrix[nt, nt] A[Q] = A_raw;
+  matrix[nt, nt] B[P] = B_raw;
   matrix[nt,T] rts_out;
   real log_lik[T];
   corr_matrix[nt] corC;
   corr_matrix[nt] corH[T];
   row_vector[nt] C_var;
+
+  for(q in 1:Q) {
+    if(A[q,1,1] < 0) {
+      A[q] = -A[q];
+    }
+  }
+  for(p in 1:P) {
+    if(B[p,1,1] < 0) {
+      B[p] = -B[p];
+    }
+  }
 
 //Const = multiply_lower_tri_self_transpose(Cnst);
   corC = C_R;
