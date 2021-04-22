@@ -4,12 +4,23 @@ options(mc.cores=2)
 ## Fit at least two models to compute model weights
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
                parameterization = "DCC", standardize_data = TRUE,
-               iterations = 10)
+               iterations = 10, sampling_algorithm = 'VB')
+
+fit$sampling_algorithm
+summary(fit)
+
+plot(fit, type =  'var')
+
+bmgarch:::.get_stan_summary
+fc <- forecast(fit, ahead = 3 )
+fc
 
 fit2 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
                P = 2, Q =  2,
                parameterization = "DCC", standardize_data = TRUE,
                iterations = 10)
+fit2$model_fit[[1]]
+
 
 ## create a bmgarch_list object
 blist <- bmgarch_list(fit, fit2 )

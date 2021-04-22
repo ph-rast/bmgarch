@@ -85,6 +85,7 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##' @param standardize_data Logical (Default: FALSE). Whether data should be standardized. 
 ##' @param distribution Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"
 ##' @param meanstructure Character (Default: "constant"). Defines model for means. Either 'constant'  or 'arma'. Currently arma(1,1) only.
+##' @param sampling_algorithm Character (Default" "MCMC"). Define sampling algorithm. Either 'MCMC' or variational Bayes 'VB'.
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[rstan]{stan}}.
 ##' @return \code{bmgarch} object.
 ##' @importFrom Rdpack reprompt
@@ -143,7 +144,8 @@ bmgarch <- function(data,
                    chains = 4,
                    standardize_data = FALSE,
                    distribution = "Student_t",
-                   meanstructure = "constant", ...) {
+                   meanstructure = "constant",
+                   sampling_algorithm = "MCMC", ...) {
     if ( tolower(distribution) == "gaussian" ) {
         num_dist <- 0
     } else if ( tolower(distribution) == "student_t" ) {
@@ -169,14 +171,24 @@ bmgarch <- function(data,
              ".")
     }
 
-    model_fit <- rstan::sampling(stanmodel,
-                                 data = stan_data,
-                                 verbose = TRUE,
-                                 iter = iterations,
-                                 control = list(adapt_delta = .99),
-                                 chains = chains,
-                                 init_r = .05)
-
+    ## MCMC Sampling with NUTS
+    if(sampling_algorithm == 'MCMC' ) {
+        model_fit <- rstan::sampling(stanmodel,
+                                     data = stan_data,
+                                     verbose = TRUE,
+                                     iter = iterations,
+                                     control = list(adapt_delta = .99),
+                                     chains = chains,
+                                     init_r = .05)
+    } else if (sampling_algorithm == 'VB' ) {
+    ## Sampling via Variational Bayes
+    model_fit <- rstan::vb(stanmodel,
+                           data = stan_data,
+                           iter = iterations)
+    } else {
+        stop( "\n\n Provide sampling algorithm: 'MCMC' or 'VB'\n\n" )
+    }
+    
     ## Model fit is based on standardized values.
     mns <- return_standat$centered_data
     sds <- return_standat$scaled_data
@@ -200,7 +212,8 @@ bmgarch <- function(data,
                        mgarchP = stan_data$P,
                        xC = stan_data$xC,
                        meanstructure = stan_data$meanstructure,
-                       std_data = standardize_data)
+                       std_data = standardize_data,
+                       sampling_algorithm = sampling_algorithm)
     class(return_fit) <- "bmgarch"
     return(return_fit)
 }

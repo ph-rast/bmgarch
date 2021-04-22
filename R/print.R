@@ -63,7 +63,8 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
              object$param, "is not one in ", paste0(supported_models, collapse = ", "), ".")
     }
 
-    out$model_summary <- .get_stan_summary(object$model_fit, params, CrI)
+    out$model_summary <- .get_stan_summary(object$model_fit, params, CrI,
+                                           sampling_algorithm = object$sampling_algorithm)
 
     class(out) <- "summary.bmgarch"
     return(out)
@@ -74,16 +75,23 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
 ##' @param params Character vector. Names of params to pull from stan summary.
 ##' @param CrI Numeric vector (length 2).
 ##' @param weights Numeric vector. Weights for each model in model_fit, if list.
+##' @param sampling_algorithm Character vector for sampling method.
 ##' @return Stan summary for parameters. Columns: mean, sd, mdn, and CrIs.
 ##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
-.get_stan_summary <- function(model_fit, params, CrI, weights = NULL) {
+.get_stan_summary <- function(model_fit, params, CrI, weights = NULL, sampling_algorithm ) {
     if(class(model_fit) == "stanfit" | (class(model_fit) == "list" & length(model_fit) == 1)) { # One model fit
         if(class(model_fit) == "list") {
             model_fit <- model_fit[[1]]
         }
         CrI <- c(.5, CrI)
-        cols <- c("mean","sd",paste0(CrI*100, "%"), "n_eff", "Rhat")
+        if(sampling_algorithm == 'MCMC') {
+            cols <- c("mean","sd",paste0(CrI*100, "%"), "n_eff", "Rhat")            
+        } else { ## VB does not return n_eff and Rhat
+            if(sampling_algorithm == 'VB' ) {
+                cols <- c("mean","sd",paste0(CrI*100, "%"))                
+            }
+        }
         model_summary <- rstan::summary(model_fit, pars = params, probs = CrI)$summary[,cols]
         colnames(model_summary)[colnames(model_summary) == "50%"] <- "mdn"
         return(model_summary)
