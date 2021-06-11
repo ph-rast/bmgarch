@@ -15,22 +15,22 @@ Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesi
 License: GPL (>=3)
 Depends: 
     methods,
-    R (>= 3.5.0),
-    Rcpp (>= 1.0.1)
+    R (>= 4.1.0),
+    Rcpp (>= 1.0.6)
 Imports: 
     rstan (>= 2.21.2),
-    rstantools (>= 1.5.1),
+    rstantools (>= 2.1.1),
     ggplot2,
     MASS,
     forecast,
     loo,
     Rdpack
 LinkingTo: 
-    BH (>= 1.69.0-1),
-    Rcpp (>= 1.0.1),
-    RcppEigen (>= 0.3.3.5.0),
-    rstan (>= 2.18.2),
-    StanHeaders (>= 2.18.1)
+    BH (>= 1.75.0-0),
+    Rcpp (>= 1.0.6),
+    RcppEigen (>= 0.3.3.9.1),
+    rstan (>= 2.21.2),
+    StanHeaders (>= 2.21.0)
 RdMacros: Rdpack
 Encoding: UTF-8
 LazyData: true
@@ -38,5 +38,5 @@ NeedsCompilation: yes
 SystemRequirements: GNU make
 RoxygenNote: 7.1.1
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat (>= 3.0.2)
 BugReports: https://github.com/ph-rast/bmgarch/issues
