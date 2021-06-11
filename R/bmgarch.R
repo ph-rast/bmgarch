@@ -179,12 +179,13 @@ bmgarch <- function(data,
                                      iter = iterations,
                                      control = list(adapt_delta = .99),
                                      chains = chains,
-                                     init_r = .05)
+                                     init_r = .05, ...)
     } else if (sampling_algorithm == 'VB' ) {
     ## Sampling via Variational Bayes
     model_fit <- rstan::vb(stanmodel,
                            data = stan_data,
-                           iter = iterations)
+                           iter = iterations,
+                           importance_resampling = TRUE, ...)
     } else {
         stop( "\n\n Provide sampling algorithm: 'MCMC' or 'VB'\n\n" )
     }
