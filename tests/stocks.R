@@ -2,18 +2,43 @@ library(bmgarch )
 options(mc.cores=2)
 
 ## Fit at least two models to compute model weights
-fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
-               parameterization = "DCC", standardize_data = TRUE,
-               iterations = 10, sampling_algorithm = 'VB')
+x1 <- x2 <- 0
+for( i in 2:100 ) {
+    x1[i] <- x1[i-1] + rnorm(1,  0, 1 )
+    x2[i] <- x2[i-1] + rnorm(1,  0, 1 )
+}
+plot(x1)
+X <- cbind(x1,  x2 )
+
+fit <- bmgarch(data = X,#stocks[1:300, c("toyota",  "nissan" )],
+               parameterization = "DCC", standardize_data = FALSE,
+               meanstructure = 'arma',
+               iterations = 10000, sampling_algorithm = 'VB')
 
 fit$sampling_algorithm
 summary(fit)
 
-plot(fit, type =  'var')
 
-bmgarch:::.get_stan_summary
+plot( rstan::summary(fit$model_fit, pars =  'rts_out')$summary[1:100,'mean'], type =  'l')
+lines( x1, col =  'red')
+lines(fc$backcast$mean[,,1][,'mean'], col = 'blue')
+
+## same thing:
+fitted(fit )[[1]]$mean[,,1]
+fc$backcast$mean[,,1][,'mean']
+
+
+plot(fit, type =  'mean')
+
+
 fc <- forecast(fit, ahead = 3 )
-fc
+fc$forecast$mean
+
+plot( fc$backcast$mean[,,1][,'mean'], type =  'l')
+lines( x1, col =  'red')
+
+fc$backcast$mean[,,1][,'mean']
+x1
 
 fit2 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
                P = 2, Q =  2,
