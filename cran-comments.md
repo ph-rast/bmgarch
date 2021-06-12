@@ -11,19 +11,22 @@
 2 Notes:
 
 * checking installed package size ... NOTE
-    installed size is  8.8Mb
+    installed size is  10.1Mb
     sub-directories of 1Mb or more:
-      libs   8.1Mb
+      libs   9.5Mb
 
-  Compiled code bmgarch.so is 8.1 Mb large
+  - Note that compiled code bmgarch.so is 11.5 Mb large
 
 * checking for GNU extensions in Makefiles ... NOTE
   GNU make is a SystemRequirements.
 
-  GNU make is a build time requirement for Ubuntu
+  - Note that GNU make is a build time requirement for Ubuntu
 
 ## Comments from CRAN admins:
 
+### Version 1.0.1
+
+### Version 1.0.0
 * 10.09.20 Gregor Seyer: 
 > Please replace \dontrun with \donttest
   
