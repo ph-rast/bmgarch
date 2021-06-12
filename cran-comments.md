@@ -1,7 +1,7 @@
 ## Test environments
-* local ubuntu 20.04 install, R 4.1.0
-* Ubuntu-latest, MacOS-latest and Windows-latest (on github actions-ci)
-* win_devel
+* locally: Ubuntu 20.04 install, R 4.1.0
+* remotely: Ubuntu-latest, MacOS-latest and Windows-latest (on github actions-ci)
+* remotely: win_devel
 
   
 ## R CMD check results
