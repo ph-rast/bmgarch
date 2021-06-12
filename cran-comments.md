@@ -1,13 +1,13 @@
 ## Test environments
-* local ubuntu 18.10 install, R 4.0.2
-* ubuntu 16.04.6 LTS (on travis-ci), R Under development (unstable) (2020-08-23 r79071)
-* MacOS-latest and Windows-latest (on github acttions-ci)
+* local ubuntu 20.04 install, R 4.1.0
+* Ubuntu-latest, MacOS-latest and Windows-latest (on github actions-ci)
 * win_devel
 
   
-## R CMD check restults
+## R CMD check results
+* This is a resubmission, initiated by CRAN package check on 2021-06-12
 
-0 Errors or Warnnings
+0 Errors or Warnings
 2 Notes:
 
 * checking installed package size ... NOTE
@@ -22,9 +22,8 @@
 
   GNU make is a build time requirement for Ubuntu
 
-* This is a resubmission of the first version of the package to CRAN
-
 ## Comments from CRAN admins:
+
 * 10.09.20 Gregor Seyer: 
 > Please replace \dontrun with \donttest
   

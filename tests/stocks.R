@@ -16,20 +16,13 @@ blist <- bmgarch_list(fit, fit2 )
 
 ## Compute model weights with the default stacking metod
 ## L is the upper boundary of the time-series before we engage in LFO-CV
-mw <- model_weights( blist, L =  94, M = 2)
+mw <- model_weights( blist, L =  98)
 print(mw )
 
 fc <- forecast(fit, ahead = 8,
                #xC = cbind(stocks[101:110, c("honda")], stocks[101:110, c("honda")]),
                inc_samples = TRUE,
                newdata = stocks[101:108, c("toyota",  "nissan" )])
-
-fc$forecast$log_lik[[1]]
-
-loo(fit, L =  90, M =  5)
-
-fc$forecast$log_lik
-
 
 plot(fc )
 
