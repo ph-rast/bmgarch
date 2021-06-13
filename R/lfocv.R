@@ -67,7 +67,7 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
 ##' @importFrom loo loo
 ##' @importFrom stats sd weights
 ##' @examples
-##' \donttest{
+##' \dontrun{
 ##' data(stocks)
 ##' # Fit a DCC model 
 ##' fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],

@@ -11,9 +11,9 @@
 2 Notes:
 
 * checking installed package size ... NOTE
-    installed size is  10.1Mb
+    installed size is  9.4Mb
     sub-directories of 1Mb or more:
-      libs   9.5Mb
+      libs   8.7Mb
 
   - Note that compiled code bmgarch.so is 11.5 Mb large
 
@@ -25,6 +25,7 @@
 ## Comments from CRAN admins:
 
 ### Version 1.0.1
+
 
 ### Version 1.0.0
 * 10.09.20 Gregor Seyer: 

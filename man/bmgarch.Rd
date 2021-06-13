@@ -53,7 +53,7 @@ Four types of paramerizations are implemented. The constant conditional correlat
 The fitted models are 'rstan' objects and all posterior parameter estimates can be obtained and can be examined with either the 'rstan' toolbox, plotted and printed using generic functions  or passed to 'bmgarch' functions to 'forecast' or compute 'model_weights' or compute fit statistics based on leave-future-out cross-validation.
 }
 \examples{
-\donttest{
+\dontrun{
 data(panas)
 # Fit BEKK(1,1) mgarch model with a ARMA(1,1) meanstructure,
 # and student-t residual distribution

@@ -37,7 +37,7 @@ importance sampling
 described in \insertCite{Buerkner2019}{bmgarch}.
 }
 \examples{
-\donttest{
+\dontrun{
 data(stocks)
 # Fit a DCC model 
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
