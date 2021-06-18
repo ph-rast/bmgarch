@@ -1,36 +1,38 @@
 Package: bmgarch
 Title: Bayesian Multivariate GARCH Models
-Version: 1.0.0
-Authors@R: c( person(given = "Philippe",
+Version: 1.0.1
+Authors@R: c(
+	   person(given = "Philippe",
            family = "Rast",
            role = c("aut", "cre"),
            email = "rast.ph@gmail.com",
            comment = c(ORCID = "0000-0003-3630-6629")),
-   person(given = "Stephen",
+  	    person(given = "Stephen",
            family = "Martin",
            role = c("aut"),
            email = "stephenSRMmartin@gmail.com",
-	   comment = c(ORCID = "0000-0001-8085-2390")))
+	   comment = c(ORCID = "0000-0001-8085-2390"))
+	   )
 Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Generate (weighted) forecasts for means, variances (volatility) and correlations. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. DCC and CCC models are based on Engle (2002) <doi:10.1198/073500102288618487> and Bollerslev (1990) <doi:10.2307/2109358>. The BEKK parameterization follows Engle and Kroner (1995) <doi:10.1017/S0266466600009063> while the pdBEKK as well as the estimation approach for this package is described in Rast et al. (2020) <doi:10.31234/osf.io/j57pk>. The fitted models contain 'rstan' objects and can be examined with 'rstan' functions.  
 License: GPL (>=3)
 Depends: 
     methods,
-    R (>= 3.5.0),
-    Rcpp (>= 1.0.1)
+    R (>= 4.1.0),
+    Rcpp (>= 1.0.6)
 Imports: 
     rstan (>= 2.21.2),
-    rstantools (>= 1.5.1),
+    rstantools (>= 2.1.1),
     ggplot2,
     MASS,
     forecast,
     loo,
     Rdpack
 LinkingTo: 
-    BH (>= 1.69.0-1),
-    Rcpp (>= 1.0.1),
-    RcppEigen (>= 0.3.3.5.0),
-    rstan (>= 2.18.2),
-    StanHeaders (>= 2.18.1)
+    BH (>= 1.75.0-0),
+    Rcpp (>= 1.0.6),
+    RcppEigen (>= 0.3.3.9.1),
+    rstan (>= 2.21.2),
+    StanHeaders (>= 2.21.0)
 RdMacros: Rdpack
 Encoding: UTF-8
 LazyData: true
@@ -38,5 +40,5 @@ NeedsCompilation: yes
 SystemRequirements: GNU make
 RoxygenNote: 7.1.1
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat (>= 3.0.2)
 BugReports: https://github.com/ph-rast/bmgarch/issues

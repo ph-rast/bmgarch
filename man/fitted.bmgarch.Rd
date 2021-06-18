@@ -42,7 +42,7 @@ Extracts the model-predicted means, variances, and correlations for the fitted d
 Whereas \code{\link{forecast.bmgarch}} computes the \emph{forecasted} values for future time periods, \code{fitted.bmgarch} computes the \emph{backcasted} (model-predicted) values for the observed time periods.
 }
 \examples{
-\donttest{
+\dontrun{
 data(panas)
 # Fit CCC(1,1) and constant meanstructure.
 fit <- bmgarch(panas, parameterization = "CCC", meanstructure = "constant")
