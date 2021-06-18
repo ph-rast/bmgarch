@@ -27,7 +27,7 @@
 ##' @export 
 ##' @export forecast
 ##' @examples
-##' \donttest{
+##' \dontrun{
 ##' data(panas)
 ##' # Fit DCC(2,2) with constant mean structure.
 ##' fit <- bmgarch(panas, parameterization = "DCC", P = 2, Q = 2, meanstructure = "constant")
@@ -261,7 +261,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
 ##' @importFrom stats fitted
 ##' @export
 ##' @examples
-##' \donttest{
+##' \dontrun{
 ##' data(panas)
 ##' # Fit CCC(1,1) and constant meanstructure.
 ##' fit <- bmgarch(panas, parameterization = "CCC", meanstructure = "constant")

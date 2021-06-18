@@ -1,30 +1,33 @@
 ## Test environments
-* local ubuntu 18.10 install, R 4.0.2
-* ubuntu 16.04.6 LTS (on travis-ci), R Under development (unstable) (2020-08-23 r79071)
-* MacOS-latest and Windows-latest (on github acttions-ci)
-* win_devel
+* locally: Ubuntu 20.04 install, R 4.1.0
+* remotely: Ubuntu-latest, MacOS-latest and Windows-latest (on github actions-ci)
+* remotely: win_devel
 
   
-## R CMD check restults
+## R CMD check results
+* This is a resubmission, initiated by CRAN package check on 2021-06-12
 
-0 Errors or Warnnings
+0 Errors or Warnings
 2 Notes:
 
 * checking installed package size ... NOTE
-    installed size is  8.8Mb
+    installed size is  9.4Mb
     sub-directories of 1Mb or more:
-      libs   8.1Mb
+      libs   8.7Mb
 
-  Compiled code bmgarch.so is 8.1 Mb large
+  - Note that compiled code bmgarch.so is 11.5 Mb large
 
 * checking for GNU extensions in Makefiles ... NOTE
   GNU make is a SystemRequirements.
 
-  GNU make is a build time requirement for Ubuntu
-
-* This is a resubmission of the first version of the package to CRAN
+  - Note that GNU make is a build time requirement for Ubuntu
 
 ## Comments from CRAN admins:
+
+### Version 1.0.1
+
+
+### Version 1.0.0
 * 10.09.20 Gregor Seyer: 
 > Please replace \dontrun with \donttest
   

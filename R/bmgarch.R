@@ -93,7 +93,7 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##'    \insertAllCited()
 ##' @export
 ##' @examples
-##' \donttest{
+##' \dontrun{
 ##' data(panas)
 ##' # Fit BEKK(1,1) mgarch model with a ARMA(1,1) meanstructure,
 ##' # and student-t residual distribution

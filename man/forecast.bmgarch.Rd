@@ -61,7 +61,7 @@ See \code{\link{fitted.bmgarch}} for information on \code{backcast}.
 Estimates (weighted) forecasted means, variances, and correlations from a fitted bmgarch model.
 }
 \examples{
-\donttest{
+\dontrun{
 data(panas)
 # Fit DCC(2,2) with constant mean structure.
 fit <- bmgarch(panas, parameterization = "DCC", P = 2, Q = 2, meanstructure = "constant")
