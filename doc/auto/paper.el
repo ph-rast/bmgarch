@@ -11,6 +11,8 @@
     "Engle2002"
     "Engle1995"
     "Rast2020"
+    "rstan"
+    "stanCppLibrary"
     "Tsay2013"
     "Yao2018"))
  :bibtex)

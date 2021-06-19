@@ -11,7 +11,8 @@ plot(x1)
 X <- cbind(x1,  x2 )
 
 fit <- bmgarch(data = X,#stocks[1:300, c("toyota",  "nissan" )],
-               parameterization = "DCC", standardize_data = FALSE,
+               Q =  2,
+               parameterization = "CCC", standardize_data = FALSE,
                meanstructure = 'arma',
                iterations = 10000, sampling_algorithm = 'VB')
 
@@ -43,7 +44,7 @@ x1
 fit2 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
                P = 2, Q =  2,
                parameterization = "DCC", standardize_data = TRUE,
-               iterations = 10)
+               iterations = 10000, sampling_algorithm = "VB")
 fit2$model_fit[[1]]
 
 
