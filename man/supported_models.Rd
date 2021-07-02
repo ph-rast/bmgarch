@@ -15,6 +15,6 @@ To be used when checking whether a parameterization or object type is a supporte
 May facilitate more parameterizations, as we only have to update these, and the switch statements.
 }
 \author{
-Stephen R. Martin
+Philippe Rast and Stephen R. Martin
 }
 \keyword{internal}

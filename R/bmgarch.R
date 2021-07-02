@@ -20,12 +20,14 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     ## Model for meanstructure
     if( meanstructure == "constant" | meanstructure == 0 ) {
         meanstructure <- 0
-    } else if ( meanstructure == "arma" | meanstructure == 1 ){
+    } else if ( meanstructure == "arma" | meanstructure == "ARMA" | meanstructure == 1 ){
         meanstructure <- 1
+    } else if ( meanstructure == "VAR" | meanstructure == 2) {
+        meanstructure <- 2
     } else {
-        stop("meanstructure must be either 'constant' or 'arma'.")
+        stop("meanstructure must be either 'constant', 'ARMA' or 'VAR'.")
     }
-                                                       
+    
     ## Tests on predictor
     ## Pass in a 0 matrix, so that stan does not complain
     if ( is.null(xC) ) {
@@ -40,30 +42,30 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     }
 
     if( standardize_data ) {
-    ## Standardize time-series
+        ## Standardize time-series
         stdx <- scale(data)
         centered_data <- attr(stdx, "scaled:center")
         scaled_data <- attr(stdx, "scaled:scale")
         return_standat <- list(T = nrow(stdx),
-                            rts = stdx,
-                            xC = xC,
-                            nt = ncol(stdx),
-                            centered_data = centered_data,
-                            scaled_data = scaled_data,
-                            distribution = distribution,
-                            P = P,
-                            Q = Q,
-                            meanstructure = meanstructure)
-        } else {
+                               rts = stdx,
+                               xC = xC,
+                               nt = ncol(stdx),
+                               centered_data = centered_data,
+                               scaled_data = scaled_data,
+                               distribution = distribution,
+                               P = P,
+                               Q = Q,
+                               meanstructure = meanstructure)
+    } else {
         ## Unstandardized
         return_standat <- list(T = nrow(data),
-                                rts = data,
-                                xC = xC,
-                                nt = ncol(data),
-                                distribution = distribution,
-                                P = P,
-                                Q = Q,
-                                meanstructure = meanstructure)
+                               rts = data,
+                               xC = xC,
+                               nt = ncol(data),
+                               distribution = distribution,
+                               P = P,
+                               Q = Q,
+                               meanstructure = meanstructure)
     }
     return(return_standat)
 }
@@ -84,7 +86,7 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##' @param chains Integer (Default: 4). The number of Markov chains.
 ##' @param standardize_data Logical (Default: FALSE). Whether data should be standardized. 
 ##' @param distribution Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"
-##' @param meanstructure Character (Default: "constant"). Defines model for means. Either 'constant'  or 'arma'. Currently arma(1,1) only.
+##' @param meanstructure Character (Default: "constant"). Defines model for means. Either 'constant'  or 'ARMA'. Currently ARMA(1,1) only. OR 'VAR' (VAR1).
 ##' @param sampling_algorithm Character (Default" "MCMC"). Define sampling algorithm. Either 'MCMC' or variational Bayes 'VB'.
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[rstan]{stan}}.
 ##' @return \code{bmgarch} object.
@@ -225,5 +227,5 @@ bmgarch <- function(data,
 #' To be used when checking whether a parameterization or object type is a supported type.
 #' May facilitate more parameterizations, as we only have to update these, and the switch statements.
 #' @keywords internal
-#' @author Stephen R. Martin
+#' @author Philippe Rast and Stephen R. Martin
 supported_models <- c("DCC", "CCC", "BEKK", "pdBEKK")
