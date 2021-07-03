@@ -22,7 +22,7 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
         meanstructure <- 0
     } else if ( meanstructure == "arma" | meanstructure == "ARMA" | meanstructure == 1 ){
         meanstructure <- 1
-    } else if ( meanstructure == "VAR" | meanstructure == 2) {
+    } else if ( meanstructure == "var"  | meanstructure == "VAR"  | meanstructure == 2) {
         meanstructure <- 2
     } else {
         stop("meanstructure must be either 'constant', 'ARMA' or 'VAR'.")

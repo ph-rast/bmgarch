@@ -13,7 +13,7 @@ X <- cbind(x1,  x2 )
 fit <- bmgarch(data = X,#stocks[1:300, c("toyota",  "nissan" )],
                Q =  2,
                parameterization = "CCC", standardize_data = FALSE,
-               meanstructure = 'arma',
+               meanstructure = 'VAR',
                iterations = 10000, sampling_algorithm = 'VB')
 
 fit$sampling_algorithm
