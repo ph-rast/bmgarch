@@ -7,12 +7,13 @@ for( i in 2:100 ) {
     x1[i] <- x1[i-1] + rnorm(1,  0, 1 )
     x2[i] <- x2[i-1] + rnorm(1,  0, 1 )
 }
+
 plot(x1)
 X <- cbind(x1,  x2 )
 
 fit <- bmgarch(data = X,#stocks[1:300, c("toyota",  "nissan" )],
                Q =  2,
-               parameterization = "CCC", standardize_data = FALSE,
+               parameterization = "DCC", standardize_data = FALSE,
                meanstructure = 'VAR',
                iterations = 10000, sampling_algorithm = 'VB')
 
