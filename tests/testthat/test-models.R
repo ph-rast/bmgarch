@@ -3,34 +3,38 @@ library(testthat )
 options(mc.cores=2)
 
 params <- c('CCC', 'DCC', 'BEKK', 'pdBEKK')
+meanstr <- c('arma',  'VAR' )
 
 for(i in params ) {
-    
-    fit <- suppressWarnings( bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
-                                     parameterization = i,
-                                     standardize_data = TRUE,
-                                     iterations = 10))
+    for(j in meanstr ) {
+        
+        fit <- suppressWarnings( bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+                                         parameterization = i,
+                                         meanstructure = j,
+                                         standardize_data = TRUE,
+                                         iterations = 10))
 
-    fit2 <- suppressWarnings( bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
-                                      P =  2, Q =  2,
-                                      parameterization = i,
-                                      standardize_data = TRUE,
-                                      iterations = 10))
+        fit2 <- suppressWarnings( bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+                                          P =  2, Q =  2,
+                                          parameterization = i,
+                                          meanstructure = j,
+                                          standardize_data = TRUE,
+                                          iterations = 10))
 
-    test_that(paste0("basic model ", i), {
-        expect_is( fit, "bmgarch" )                                  
-    })
+        test_that(paste0("basic model ", i), {
+            expect_is( fit, "bmgarch" )                                  
+        })
 
-    ## test_that("basic model", {
-    ##     for(i in 1:4 ) {
-    ##      expect_is( fit[[i]], "bmgarch" )   
-    ##     }
-    ## })
+        ## test_that("basic model", {
+        ##     for(i in 1:4 ) {
+        ##      expect_is( fit[[i]], "bmgarch" )   
+        ##     }
+        ## })
 
-    test_that(paste0("forecast model",i), {
-        fc <- forecast( fit,  ahead = 3 )
-        expect_is( fc, "forecast.bmgarch" )                                  
-    })
+        test_that(paste0("forecast model",i), {
+            fc <- forecast( fit,  ahead = 3 )
+            expect_is( fc, "forecast.bmgarch" )                                  
+        })
         ## test_that("forecast model", {
         ##     for( i in 1:4 ) {
         ##         fc <- forecast( fit[[i]],  ahead = 3 )
@@ -38,34 +42,35 @@ for(i in params ) {
         ##     }
         ## })
 
-    test_that(paste0("lfo without refits",i), {
-        lfob <- suppressWarnings( loo(fit, mode = 'backward',  L = 99 ) )
-        expect_is(lfob, "loo.bmgarch" )
-    })
+        test_that(paste0("lfo without refits",i), {
+            lfob <- suppressWarnings( loo(fit, mode = 'backward',  L = 99 ) )
+            expect_is(lfob, "loo.bmgarch" )
+        })
 
-    test_that(paste0("bmgarch model list",i), {
-        mlist <- bmgarch_list( fit, fit2 )
-        expect_is( mlist,"bmgarch_list")
-    })
+        test_that(paste0("bmgarch model list",i), {
+            mlist <- bmgarch_list( fit, fit2 )
+            expect_is( mlist,"bmgarch_list")
+        })
 
-    test_that(paste0("model weights",i),  {
-        mlist <- bmgarch_list( fit, fit2 )
-        mw <- suppressWarnings( model_weights( mlist, L = 98 ) )
-        expect_is( mw, "model_weights")
-    })
-    
-    test_that( paste0(i, "generates non-null output"  ), {
-        expect_true( !is.null( summary( fit )$model_summary ) )
-    })
+        test_that(paste0("model weights",i),  {
+            mlist <- bmgarch_list( fit, fit2 )
+            mw <- suppressWarnings( model_weights( mlist, L = 98 ) )
+            expect_is( mw, "model_weights")
+        })
+        
+        test_that( paste0(i, "generates non-null output"  ), {
+            expect_true( !is.null( summary( fit )$model_summary ) )
+        })
 
-    test_that( paste0(i,  "is bmgarch object" ), {
-        expect_is( print( fit )$RTS_full, "array" )
-    })
+        test_that( paste0(i,  "is bmgarch object" ), {
+            expect_is( print( fit )$RTS_full, "array" )
+        })
 
-    test_that( paste0(i, "generates list of ggplots" ), {
-        out <-  plot(fit, askNewPage = FALSE )
-        expect_is( out, "list" )    
-    })
+        test_that( paste0(i, "generates list of ggplots" ), {
+            out <-  plot(fit, askNewPage = FALSE )
+            expect_is( out, "list" )    
+        })
+    }
 }
 
 ## Simulation of BEKK data:
