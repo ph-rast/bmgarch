@@ -1,0 +1,57 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+#
+# See https://github.com/r-lib/actions/tree/master/examples#readme for
+# additional example workflows available for the R community.
+
+name: R-CMD-check
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+#    runs-on: macOS-latest
+    runs-on: ${{ matrix.config.os }}
+    
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      matrix:
+        config:
+        - { os: windows-latest, r: 'release'}
+#        - { os: macOS-latest, r: 'release'}
+#        - { os: ubuntu-16.04,   r: '3.6',   vdiffr: false, xref: true,  cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest" }
+      #  r-version: [3.6]
+
+    steps:
+      # - name: Install system dependencies on Linux
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #     sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+      #     sudo apt-get update -q
+      #     sudo apt-get -y install libv8-dev libcurl4-openssl-dev
+      
+       - name: Set time zone for windows
+         if: runner.os == 'Windows'
+         run: tzutil /s "Pacific Standard Time"
+      
+      - uses: actions/checkout@v2
+      - name: Set up R ${{ matrix.r-version }}
+        uses: r-lib/actions/setup-r@master
+        with:
+          r-version: ${{ matrix.r-version }}
+      - name: Install dependencies
+        run: |
+          install.packages(c("remotes", "devtools"))
+          remotes::install_deps(dependencies = TRUE)
+        shell: Rscript {0}
+      - name: Testing
+        run: devtools::test()
+        shell: Rscript {0}
+...
