@@ -45,6 +45,13 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
       - name: Test
-        run: devtools::test()
+        run: | 
+          library(bmgarch)
+          fit <- bmgarch(panas,
+                 parameterization = "pdBEKK",
+                 iterations = 100,
+                 P = 1, Q = 1,
+                 distribution = "Student_t",
+                 meanstructure = "arma")
         shell: Rscript {0}
 ...
