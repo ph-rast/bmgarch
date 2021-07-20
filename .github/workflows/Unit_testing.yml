@@ -46,7 +46,6 @@ jobs:
         shell: Rscript {0}
       - name: Test
         run: | 
-          library(bmgarch)
           fit <- bmgarch(panas,
                  parameterization = "pdBEKK",
                  iterations = 100,
