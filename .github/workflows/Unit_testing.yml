@@ -24,8 +24,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: windows-latest, r: 'release'}
-          - { os: macOS-latest, r: 'release'}
+          - { os: windows-latest, r: 'devel'}
+       #   - { os: macOS-latest, r: 'release'}
        #   - { os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
@@ -35,60 +35,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - uses: r-lib/actions/setup-r@master
+      - name: Set up R ${{ matrix.r-version }}
+        uses: r-lib/actions/setup-r@master
         with:
-          r-version: ${{ matrix.config.r }}
-
-      - uses: r-lib/actions/setup-pandoc@master
-
-      - name: Query dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-          writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
-        shell: Rscript {0}
-
-      - name: Cache R packages
-        if: runner.os != 'Windows'
-        uses: actions/cache@v1
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
-
-      - name: Install system dependencies for linux
-        if: runner.os == 'Linux'
-        env:
-          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
-        run: |
-          Rscript -e "remotes::install_github('r-hub/sysreqs')"
-          sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
-          sudo -s eval "$sysreqs"
-      - name: Install system dependencies for mac
-        if: runner.os == 'MacOS'
-        run: |
-           curl -sL  https://mac.r-project.org/libs-4/ |
-           sed -n 's/.*href=\([^>]*x86_64.tar.gz\).*/\1/p' |
-           xargs -I % sh -c 'curl https://mac.r-project.org/libs-4/% --output %; sudo tar fvxz % -C /usr/local --strip 2'
-           ls -la /usr/local/lib
-           ls -la /usr/local/include
+          r-version: ${{ matrix.r-version }}
       - name: Install dependencies
         run: |
+          install.packages(c("remotes", "devtools"))
           remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
-          
-      - name: build package
-        run: |
-          install.packages( "remotes", "devtools" )
-          remotes::install_deps(dependencies = TRUE)
-          devtools::test()
+      - name: Test
+        run: devtools::test()
         shell: Rscript {0}
-
-      #- name: Testing
-      #  run: |
-      #    install.packages("devtools")
-      #    devtools::test()
-      #  shell: Rscript {0}
 ...
