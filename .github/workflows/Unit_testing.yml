@@ -86,6 +86,8 @@ jobs:
         shell: Rscript {0}
 
       - name: Testing
-        run: devtools::test()
+        run: |
+          install.packages("devtools")
+          devtools::test()
         shell: Rscript {0}
 ...
