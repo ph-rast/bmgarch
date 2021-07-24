@@ -8,6 +8,7 @@
 ^man/figures$
 ^todo.org$
 ^cran-comments\.md$
+^code_of_conduct\.md$
 ^\.github$
 ^/\.gitattributes$
 ^CRAN-RELEASE$
