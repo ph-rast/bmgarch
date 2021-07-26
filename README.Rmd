@@ -227,7 +227,7 @@ fitx <- bmgarch(stocks.z[1:100, c("toyota", "honda")],
                 meanstructure = "constant")
 ```
 
-The preidictors for C are on a log scale in section `Exogenous predictor`
+The predictors for C are on a log scale in section `Exogenous predictor`
 ```{r}
 summary(fitx)
 ```

@@ -672,7 +672,7 @@ bivariate MGARCH:
     #> 
     #> STARTING SAMPLER FOR MODEL 'CCCMGARCH' NOW.
 
-The preidictors for C are on a log scale in section
+The predictors for C are on a log scale in section
 `Exogenous predictor`
 
     summary(fitx)
@@ -761,3 +761,13 @@ this example:
     #>    103 0.88 0.37 0.81 0.45  1.73 2154.06    1
     #>    104 0.89 0.39 0.81 0.45  1.81 1913.36    1
     #>    105 0.92 0.63 0.82 0.48  2.03 2054.87    1
+
+## Community Guidelines
+
+1. Contributions and suggestions to the software are always welcome. Please consult our [contribution guidelines](CONTRIBUTING.md) prior to submitting a pull request.
+2. Report issues or problems with the software using github's [issue tracker](https://github.com/ph-rast/bmgarch/issues).
+3. Contributors must adhere to the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Acknowledgment
+This work was supported by the National Institute On Aging of the National Institutes of Health under
+Award Number [R01AG050720](https://reporter.nih.gov/project-details/9336761) to PR. The content is solely the responsibility of the authors and does not necessarily represent the official views of the funding agency.
