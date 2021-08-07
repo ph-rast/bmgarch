@@ -32,7 +32,7 @@ While there are a number of readily available packages for univariate GARCH mode
 At this current time, `bmgarch` implements a CCC [@Bollerslev1990], DCC [@Engle2002], pdBEKK [@Rast2020], and a BEKK [@Engle1995] model based on either Gaussian or Student-t distributed innovations. All parameterizations allow arbitrary ARCH and GARCH orders.
 The Bayesian framework is ideally suited to handle the necessary constraints imposed on the MGARCH specifications to both keep the solution stationary and all $t$ conditional covariance matrices $\mathbf{H}_t$ positive definite. Moreover, the model allows one to examine the posterior distribution in order to obtain the full range of Bayesian inference.
 
-The model parameters are estimated using the probabilistic programming language Stan @stanCppLibrary, which also allows one to use stan related diagnostics implemented in `rstan` @rstan. 
+The model parameters are estimated using the probabilistic programming language Stan [@stanCppLibrary], which also allows one to use stan related diagnostics implemented in `rstan` [@rstan]. 
 
 # bmgarch
 
