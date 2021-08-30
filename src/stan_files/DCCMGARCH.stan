@@ -20,7 +20,7 @@ transformed data {
       rts_m[i] = mean(rts[,i]);
       rts_sd[i] = sd(rts[,i]);
     }
-  } else if (meanstructure == 1 ){
+  } else if (meanstructure == 1 || meanstructure == 2 ){
       // set rts_m to first element in ts
       for ( i in 1:nt ){
 	rts_m[i] = rts[1,i];
@@ -74,13 +74,7 @@ transformed parameters {
   vector[nt] UPs = upper_limits(a_h);
   vector[nt] ULs = raw_sum_to_b_h_sum(b_h_sum_s, UPs);
   vector<lower = 0, upper = 1>[nt] b_h[P] = simplex_to_bh(b_h_simplex, ULs);
-  // vector<lower = 0, upper = 1>[nt] b_h[P] = simplex_to_bh(b_h_simplex,
-  // 							  raw_limit_to_b_h_limit(b_h_limit_s,
-  // 										 upper_limits(a_h)
-  // 										 )
-  // 							  );
-  // print("b_h:", b_h);
-
+  
   // Initialize t=1
   mu[1,] = phi0;
   u[1,] = u1_init;

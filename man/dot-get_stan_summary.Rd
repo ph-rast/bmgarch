@@ -4,7 +4,7 @@
 \alias{.get_stan_summary}
 \title{Get stan summaries.}
 \usage{
-.get_stan_summary(model_fit, params, CrI, weights = NULL)
+.get_stan_summary(model_fit, params, CrI, weights = NULL, sampling_algorithm)
 }
 \arguments{
 \item{model_fit}{stanfit object or list of stanfit objects.}
@@ -14,6 +14,8 @@
 \item{CrI}{Numeric vector (length 2).}
 
 \item{weights}{Numeric vector. Weights for each model in model_fit, if list.}
+
+\item{sampling_algorithm}{Character vector for sampling method.}
 }
 \value{
 Stan summary for parameters. Columns: mean, sd, mdn, and CrIs.

@@ -36,6 +36,7 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
     # Parameters for each model
     common_params <- c("lp__", "nu")
     arma_params <- c("phi0", "phi", "theta")
+    var_params <- c("phi0", "phi")
 
     ccc_params <- c("c_h", "a_h", "b_h", "R", "beta", "c_h_var")
     dcc_params <- c("c_h", "a_h", "b_h", "beta", "c_h_var", "a_q", "b_q", "S")
@@ -52,10 +53,10 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
 
     # Get the model summaries. print.summary.bmgarch will process this + meta.
     params <- switch(object$param,
-                     CCC = c(ccc_params, arma_params, common_params),
-                     DCC = c(dcc_params, arma_params, common_params),
-                     BEKK = c(bekk_params, arma_params, common_params),
-                     pdBEKK = c(bekk_params, arma_params, common_params),
+                     CCC = c(ccc_params, arma_params, var_params, common_params),
+                     DCC = c(dcc_params, arma_params, var_params, common_params),
+                     BEKK = c(bekk_params, arma_params, var_params, common_params),
+                     pdBEKK = c(bekk_params, arma_params, var_params, common_params),
                      NULL
                      )
     if(is.null(params)) {
@@ -170,7 +171,7 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
 ##' @param x summary.bmgarch object.
 ##' @param ... Not used.
 ##' @return x (invisible).
-##' @author Stephen R. Martin
+##' @author Philippe Rast, Stephen R. Martin
 ##' @export
 print.summary.bmgarch <- function(x, ...) {
     if(x$meta$param == "CCC") {
@@ -182,7 +183,7 @@ print.summary.bmgarch <- function(x, ...) {
     }
     .newline(2)
 
-    .print.summary.arma(x)
+    .print.summary.means(x)
     .newline(2)
 
     if(x$meta$xC) {
@@ -503,12 +504,12 @@ print.summary.bmgarch <- function(x, ...) {
     print(round( B_out, digits = digits) )
 }
 
-##' @title Print helper for ARMA component.
+##' @title Print helper for means component.
 ##' @param bmsum summary.bmgarch object.
 ##' @return Void.
 ##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
-.print.summary.arma <- function(bmsum) {
+.print.summary.means <- function(bmsum) {
     ms <- bmsum$model_summary
     nt <- bmsum$meta$nt
     TS_names <- bmsum$meta$TS_names
@@ -529,16 +530,20 @@ print.summary.bmgarch <- function(x, ...) {
     rownames(ms)[ma_index] <- paste0("Theta_", TS_names[ma_indices[,1]], "-", TS_names[ma_indices[,2]])
 
     if(bmsum$meta$meanstructure == 0) {
-        arma_index <- intercept_index
+        means_index <- intercept_index
         msg <- "Intercept estimates on the location:"
-    } else {
-        arma_index <- c(intercept_index, ar_index, ma_index)
+    } else if(bmsum$meta$meanstructure == 1) {
+        means_index <- c(intercept_index, ar_index, ma_index)
         msg <- "ARMA(1,1) estimates on the location:"
+    } else if(bmsum$meta$meanstructure == 2) {
+        means_index <- c(intercept_index, ar_index)
+        msg <- "VAR(1) estimates on the location:"       
     }
     cat(msg)
     .newline(2)
-    print(round(ms[arma_index,], digits = bmsum$meta$digits))
+    print(round(ms[means_index,], digits = bmsum$meta$digits))
 }
+
 
 ##' @title Print helper for beta component.
 ##' @param bmsum summary.bmgarch object.

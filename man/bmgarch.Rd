@@ -38,7 +38,7 @@ bmgarch(
 
 \item{distribution}{Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"}
 
-\item{meanstructure}{Character (Default: "constant"). Defines model for means. Either 'constant'  or 'arma'. Currently arma(1,1) only.}
+\item{meanstructure}{Character (Default: "constant"). Defines model for means. Either 'constant'  or 'ARMA'. Currently ARMA(1,1) only. OR 'VAR' (VAR1).}
 
 \item{sampling_algorithm}{Character (Default" "MCMC"). Define sampling algorithm. Either 'MCMC' or variational Bayes 'VB'.}
 
