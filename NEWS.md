@@ -1,3 +1,8 @@
+# bmgarch 1.1.0
+
+* Meanstructure now also takes `VAR` argument a VAR(1) model. 
+* Added variational Bayes `VB` as a sampling algorithm option. bmgarch now takes `VB` and  the standard `MCMC` argument in sampling_algorithm. VB inherits from rstan and is still experimental - use with caution.
+
 # bmgarch 1.0.1
 
 * `loo` function now takes `m`-ahead argument for the "backward" approximation allowing one to tune the forcast to arbitrary steps ahead.
