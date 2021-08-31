@@ -45,7 +45,12 @@ The development version can be installed from
 How to cite this package
 ------------------------
 
-Please add following citation when referring to to this package:
+Please add at least one of the following citations when referring to to this package:
+
+Rast, P., & Martin, S. R. (2021). bmgarch: An R-Package for Bayesian Multivariate 
+GARCH models. 
+*Journal of Open Source Software*, 6, 3452 - 4354. 
+doi: <a href="https://doi.org/10.21105/joss.03452" class="uri">https://doi.org/10.21105/joss.03452</a>
 
 Rast, P., Martin, S. R., Liu, S., & Williams, D. R. (in press). A New
 Frontier for Studying Within-Person Variability: Bayesian Multivariate
