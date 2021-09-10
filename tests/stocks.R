@@ -11,11 +11,11 @@ for( i in 2:100 ) {
 plot(x1)
 X <- cbind(x1,  x2 )
 
-fit <- bmgarch(data = X,#stocks[1:300, c("toyota",  "nissan" )],
-               Q =  2,
+fit <- bmgarch(data = stocks[1:300, c("toyota",  "nissan" )],
+               Q =  1,
                parameterization = "DCC", standardize_data = FALSE,
                meanstructure = 'VAR',
-               iterations = 10000, sampling_algorithm = 'VB')
+               iterations = 1000, sampling_algorithm = 'MCMC')
 
 fit$sampling_algorithm
 summary(fit)
