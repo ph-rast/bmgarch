@@ -18,7 +18,7 @@ transformed data {
       rts_m[i] = mean(rts[,i]);
       rts_sd[i] = sd(rts[,i]);
     }
-  } else if (meanstructure == 1 ){
+  } else if (meanstructure == 1 || meanstructure == 2){
       // set rts_m to first element in ts
       for ( i in 1:nt ){
 	rts_m[i] = rts[1,i];

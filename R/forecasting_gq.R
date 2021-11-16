@@ -67,7 +67,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
                              newdata = NULL, CrI = c(.025, .975),
                              seed = NA, digits = 2, weights = NULL,
                              L = NA, method = 'stacking', inc_samples = FALSE, ...) {
-    
+       
     ## Are we dealing with one object or a list of objects
     n_mods <- 1
     if("bmgarch_list" %in% class(object)) {
@@ -153,13 +153,16 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
     })
 
     ## Init f.mean
-    f.mean <- .get_stan_summary(object.f, "rts_forecasted", CrI, weights)
+    f.mean <- .get_stan_summary(object.f, "rts_forecasted", CrI, weights,
+                                sampling_algorithm = object[[1]]$sampling_algorithm)
 
     ## f.var
-    f.var <- .get_stan_summary(object.f, "H_forecasted", CrI, weights)
+    f.var <- .get_stan_summary(object.f, "H_forecasted", CrI, weights,
+                               sampling_algorithm = object[[1]]$sampling_algorithm)
 
     ## Init f.cor
-    f.cor <- .get_stan_summary(object.f, "R_forecasted", CrI, weights)
+    f.cor <- .get_stan_summary(object.f, "R_forecasted", CrI, weights,
+                               sampling_algorithm = object[[1]]$sampling_algorithm)
 
     # Restructure to array
     ## backcast <- max(object[[1]]$mgarchP, object[[1]]$mgarchQ)
@@ -296,9 +299,12 @@ fitted.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, weights = NU
     }
 
     fits <- lapply(object, function(m) {m$model_fit})
-    b.mean <- .get_stan_summary(fits, "mu", CrI, weights)
-    b.var <- .get_stan_summary(fits, "H", CrI, weights)
-    b.cor <- .get_stan_summary(fits, "corH", CrI, weights)
+    b.mean <- .get_stan_summary(fits, "mu", CrI, weights,
+                                sampling_algorithm = object[[1]]$sampling_algorithm)
+    b.var <- .get_stan_summary(fits, "H", CrI, weights,
+                               sampling_algorithm = object[[1]]$sampling_algorithm)
+    b.cor <- .get_stan_summary(fits, "corH", CrI, weights,
+                               sampling_algorithm = object[[1]]$sampling_algorithm)
 
     # Restructure
     ## b.mean

@@ -61,18 +61,24 @@ model_weights <- function(bmgarch_objects = NULL,
                           L = NULL, M = 1,
                           method = "stacking", mode = 'backward') {   
 
-   # if( !is.null(bmgarch_objects ) & !is.null(lfo_objects )) stop( "Supply only 'bmgarch_objects' or 'lfo_objects', not both" )
+    ## Check if model list is based on same alogrithm, if not, stop
+    same_algo <- length(unique(lapply(bmgarch_objects, FUN = function(x) x$sampling_algorithm)))
+    if( same_algo > 1 ) stop( "All models in list must be estimated with same sampling algorithm")
+    ## if( !is.null(bmgarch_objects ) & !is.null(lfo_objects )) stop( "Supply only 'bmgarch_objects' or 'lfo_objects', not both" )
     if( is.null(bmgarch_objects ) ) stop( "Supply 'bmgarch_objects'" )
-    
+
     if( !is.null(bmgarch_objects ) ) {
     ## Approximates LFO; Ie. results in refitting models.
     ll_list <- lapply(bmgarch_objects, FUN = .ll_lfo, L = L, M = M, mode = mode)
     }
     
     ## Insert lfo_objects
-    ## obtain iter, warmup and n_chains from first model
-    r_eff_list <- lapply( ll_list, FUN = .rel_eff, bmgarch_objects[[1]] )
-
+    ## obtain iter, warmup and n_chains from each model - loop through all models in list
+    r_eff_list <- list(NA)
+    for( i in seq_len(length(bmgarch_objects))) {
+        r_eff_list[[i]] <- .rel_eff( ll_list[[i]], bmgarch_objects[[i]] )
+    }
+    
     wts <- loo::loo_model_weights( ll_list, method = method,
                                   r_eff_list = r_eff_list,
                                   optim_control = list(reltol=1e-10))

@@ -16,7 +16,7 @@ affiliations:
    index: 1
  - name: Comscore, Inc.
    index: 2
-date: June 18 2021
+date: June 28 2021
 bibliography: paper.bib
 ---
 

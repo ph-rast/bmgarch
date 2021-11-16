@@ -20,10 +20,12 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     ## Model for meanstructure
     if( meanstructure == "constant" | meanstructure == 0 ) {
         meanstructure <- 0
-    } else if ( meanstructure == "arma" | meanstructure == 1 ){
+    } else if ( meanstructure == "arma" | meanstructure == "ARMA" | meanstructure == 1 ){
         meanstructure <- 1
+    } else if ( meanstructure == "var"  | meanstructure == "VAR"  | meanstructure == 2) {
+        meanstructure <- 2
     } else {
-        stop("meanstructure must be either 'constant' or 'arma'.")
+        stop("meanstructure must be either 'constant', 'ARMA' or 'VAR'.")
     }
 
     ## Test that all data vectors have variance > 0
@@ -46,30 +48,30 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     }
 
     if( standardize_data ) {
-    ## Standardize time-series
+        ## Standardize time-series
         stdx <- scale(data)
         centered_data <- attr(stdx, "scaled:center")
         scaled_data <- attr(stdx, "scaled:scale")
         return_standat <- list(T = nrow(stdx),
-                            rts = stdx,
-                            xC = xC,
-                            nt = ncol(stdx),
-                            centered_data = centered_data,
-                            scaled_data = scaled_data,
-                            distribution = distribution,
-                            P = P,
-                            Q = Q,
-                            meanstructure = meanstructure)
-        } else {
+                               rts = stdx,
+                               xC = xC,
+                               nt = ncol(stdx),
+                               centered_data = centered_data,
+                               scaled_data = scaled_data,
+                               distribution = distribution,
+                               P = P,
+                               Q = Q,
+                               meanstructure = meanstructure)
+    } else {
         ## Unstandardized
         return_standat <- list(T = nrow(data),
-                                rts = data,
-                                xC = xC,
-                                nt = ncol(data),
-                                distribution = distribution,
-                                P = P,
-                                Q = Q,
-                                meanstructure = meanstructure)
+                               rts = data,
+                               xC = xC,
+                               nt = ncol(data),
+                               distribution = distribution,
+                               P = P,
+                               Q = Q,
+                               meanstructure = meanstructure)
     }
     return(return_standat)
 }
@@ -90,7 +92,8 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##' @param chains Integer (Default: 4). The number of Markov chains.
 ##' @param standardize_data Logical (Default: FALSE). Whether data should be standardized to easy computations. 
 ##' @param distribution Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"
-##' @param meanstructure Character (Default: "constant"). Defines model for means. Either 'constant'  or 'arma'. Currently arma(1,1) only.
+##' @param meanstructure Character (Default: "constant"). Defines model for means. Either 'constant'  or 'ARMA'. Currently ARMA(1,1) only. OR 'VAR' (VAR1).
+##' @param sampling_algorithm Character (Default" "MCMC"). Define sampling algorithm. Either 'MCMC'for Hamiltonian Monte Carlo or 'VB' for variational Bayes. 'VB' is inherited from stan and is currently in heavy development -- do not trust estimates.
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[rstan]{stan}}.
 ##' @return \code{bmgarch} object.
 ##' @importFrom Rdpack reprompt
@@ -149,7 +152,8 @@ bmgarch <- function(data,
                    chains = 4,
                    standardize_data = FALSE,
                    distribution = "Student_t",
-                   meanstructure = "constant", ...) {
+                   meanstructure = "constant",
+                   sampling_algorithm = "MCMC", ...) {
     if ( tolower(distribution) == "gaussian" ) {
         num_dist <- 0
     } else if ( tolower(distribution) == "student_t" ) {
@@ -175,14 +179,25 @@ bmgarch <- function(data,
              ".")
     }
 
-    model_fit <- rstan::sampling(stanmodel,
-                                 data = stan_data,
-                                 verbose = TRUE,
-                                 iter = iterations,
-                                 control = list(adapt_delta = .99),
-                                 chains = chains,
-                                 init_r = .05)
-
+    ## MCMC Sampling with NUTS
+    if(sampling_algorithm == 'MCMC' ) {
+        model_fit <- rstan::sampling(stanmodel,
+                                     data = stan_data,
+                                     verbose = TRUE,
+                                     iter = iterations,
+                                     control = list(adapt_delta = .99),
+                                     chains = chains,
+                                     init_r = .05, ...)
+    } else if (sampling_algorithm == 'VB' ) {
+    ## Sampling via Variational Bayes
+    model_fit <- rstan::vb(stanmodel,
+                           data = stan_data,
+                           iter = iterations,
+                           importance_resampling = TRUE, ...)
+    } else {
+        stop( "\n\n Provide sampling algorithm: 'MCMC' or 'VB'\n\n" )
+    }
+    
     ## Model fit is based on standardized values.
     mns <- return_standat$centered_data
     sds <- return_standat$scaled_data
@@ -206,7 +221,8 @@ bmgarch <- function(data,
                        mgarchP = stan_data$P,
                        xC = stan_data$xC,
                        meanstructure = stan_data$meanstructure,
-                       std_data = standardize_data)
+                       std_data = standardize_data,
+                       sampling_algorithm = sampling_algorithm)
     class(return_fit) <- "bmgarch"
     return(return_fit)
 }
@@ -217,5 +233,5 @@ bmgarch <- function(data,
 #' To be used when checking whether a parameterization or object type is a supported type.
 #' May facilitate more parameterizations, as we only have to update these, and the switch statements.
 #' @keywords internal
-#' @author Stephen R. Martin
+#' @author Philippe Rast and Stephen R. Martin
 supported_models <- c("DCC", "CCC", "BEKK", "pdBEKK")

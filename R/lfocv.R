@@ -13,7 +13,8 @@
                         iterations = object$iter,
                         standardize_data = FALSE,
                         distribution = object$distribution,
-                        meanstructure = object$meanstructure )
+                        meanstructure = object$meanstructure,
+                        sampling_algorithm = object$sampling_algorithm)
 }
 
 ##' @keywords internal

@@ -15,6 +15,7 @@ bmgarch(
   standardize_data = FALSE,
   distribution = "Student_t",
   meanstructure = "constant",
+  sampling_algorithm = "MCMC",
   ...
 )
 }
@@ -37,7 +38,9 @@ bmgarch(
 
 \item{distribution}{Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"}
 
-\item{meanstructure}{Character (Default: "constant"). Defines model for means. Either 'constant'  or 'arma'. Currently arma(1,1) only.}
+\item{meanstructure}{Character (Default: "constant"). Defines model for means. Either 'constant'  or 'ARMA'. Currently ARMA(1,1) only. OR 'VAR' (VAR1).}
+
+\item{sampling_algorithm}{Character (Default" "MCMC"). Define sampling algorithm. Either 'MCMC'for Hamiltonian Monte Carlo or 'VB' for variational Bayes. 'VB' is inherited from stan and is currently in heavy development -- do not trust estimates.}
 
 \item{...}{Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[rstan]{stan}}.}
 }
