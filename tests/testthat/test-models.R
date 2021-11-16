@@ -83,3 +83,23 @@ test_that("Data gets simulated", {
                         theta = matrix(c(.2,0.1,0.1,.2), ncol =  2))
     expect_equal( dim( simdat ) , c(100,  2) )
 })
+
+
+fitvb <- suppressWarnings( bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+                                   sampling_algorithm = 'VB',
+                                   parameterization = 'CCC',
+                                   standardize_data = TRUE,
+                                   iterations = 100))
+
+test_that( "VB returns a VB algo", {
+    expect_match( fitvb$sampling_algorithm, "VB"  )
+})
+
+fit <- suppressWarnings( bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+                                         parameterization = 'CCC',
+                                         standardize_data = TRUE,
+                                         iterations = 10))
+
+test_that( "model weights return error if sampling algo does not match", {
+    expect_error( model_weights( bmgarch_objects =  bmgarch_list(fit, fitvb), L =  90) )
+})

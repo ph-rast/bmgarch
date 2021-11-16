@@ -44,7 +44,9 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
     
     # Meta-data needed for printing
     # TODO: Revisit this; some can be removed. Kitchen sink for now.
-    metaNames <- c("param", "distribution", "num_dist", "iter", "chains", "elapsed_time", "date", "nt", "TS_names", "mgarchQ", "mgarchP", "meanstructure")
+    metaNames <- c("param", "distribution", "num_dist", "iter", "chains",
+                   "elapsed_time", "date", "nt", "TS_names", "mgarchQ",
+                   "mgarchP", "meanstructure", "sampling_algorithm")
     meta <- with(object, mget(metaNames))
     meta$xC <- !all(object$xC == 0)
     out <- list()
@@ -651,6 +653,8 @@ print.summary.bmgarch <- function(x, ...) {
 ##' @keywords internal
 .print.config <- function(bmsum) {
     .newline()
+    cat("Sampling Algorithm: ", bmsum$meta$sampling_algorithm)
+    .newline()
     cat("Distribution: ", bmsum$meta$distribution)
     .newline()
     .sep()
@@ -659,8 +663,12 @@ print.summary.bmgarch <- function(x, ...) {
     cat("Chains: ", bmsum$meta$chains)
     .newline()
     cat("Date: ", bmsum$meta$date)
-    .newline()
-    cat("Elapsed time (min): ", round((max(bmsum$meta$elapsed_time[,1]) + max(bmsum$meta$elapsed_time[,2]))/60, 2))
+    if( !is.null( bmsum$meta$elapsed_time ) ) {
+        .newline()
+        cat("Elapsed time (min): ", round((max(bmsum$meta$elapsed_time[,1]) + max(bmsum$meta$elapsed_time[,2]))/60, 2))
+    } else {
+        warning("VB is not fully functional yet.",
+            "\n", "Use only for exploration -- for inference run models with \"sampling_algorithm = 'MCMC'\" ", call. = FALSE)
+    }
     .newline(2)
-    
 }

@@ -67,7 +67,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
                              newdata = NULL, CrI = c(.025, .975),
                              seed = NA, digits = 2, weights = NULL,
                              L = NA, method = 'stacking', inc_samples = FALSE, ...) {
-    
+       
     ## Are we dealing with one object or a list of objects
     n_mods <- 1
     if("bmgarch_list" %in% class(object)) {
