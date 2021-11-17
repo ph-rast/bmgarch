@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 # bmgarch
 
 `bmgarch` estimates Bayesian multivariate generalized autoregressive conditional heteroskedasticity (MGARCH) models.
-Currently, bmgarch supports ARMA(1,1) and intercept-only (Constant) mean structures, and a variety of MGARCH(P,Q) parameterizations.
+Currently, bmgarch supports a variety of MGARCH(P,Q) parameterizations and simultaneous estimation of ARMA(1,1), VAR(1) and intercept-only (Constant) mean structures.
 In increasing order of complexity:
 
 * CCC(P, Q): Constant Conditional Correlation
@@ -41,11 +41,14 @@ In increasing order of complexity:
 install.packages('bmgarch')
 ```
 
+### Linux
+
 Linux users may need to install `libv8` prior to installing `bmgarch`.
 For example, in Ubuntu, run `sudo apt install libv8-dev` before installing the package from CRAN or github.
 For those who's distro installs `libnode-dev` instead of `libv8-dev`, run `install.packages("V8")` in R
 prior to installing `bmgarch` (during installation`rstan` looks explicitly for V8).
 
+### Development Version
 
 The development version can be installed from [GitHub](https://github.com/) with:
 
@@ -58,7 +61,7 @@ Please add at least one of the following citations when referring to to this pac
 
 Rast, P., & Martin, S. R. (2021). bmgarch: An R-Package for Bayesian Multivariate GARCH models. _Journal of Open Source Software_, 6, 3452 - 4354. doi: https://doi.org/10.21105/joss.03452
 
-Rast, P., Martin, S. R., Liu, S., & Williams, D. R. (in press). A New Frontier for Studying Within-Person Variability: Bayesian Multivariate Generalized Autoregressive Conditional Heteroskedasticity Models. _Psychological Methods_. https://doi.org/10.1037/met0000357
+Rast, P., Martin, S. R., Liu, S., & Williams, D. R. (in press). A New Frontier for Studying Within-Person Variability: Bayesian Multivariate Generalized Autoregressive Conditional Heteroskedasticity Models. _Psychological Methods_. https://doi.org/10.1037/met0000357; Preprint-doi: https://psyarxiv.com/j57pk/
 
 
 
@@ -76,14 +79,13 @@ library(bmgarch)
 data(panas)
 head(panas)
 
-# Fit pdBEKK(1, 1) with ARMA(1,1) on the mean structure.
+## Fit pdBEKK(1, 1) with ARMA(1,1) on the mean structure.
 fit <- bmgarch(panas,
                parameterization = "pdBEKK",
                iterations = 1000,
                P = 1, Q = 1,
                distribution = "Student_t",
                meanstructure = "arma")
-
 ```
 
 ### Parameter estimates
@@ -106,7 +108,7 @@ plot(fit.fc, askNewPage = FALSE, type = "cor")
 
 ## Example 2: Stocks
 
-Here we use the first 100 days of Stata's stocks data on daily lagged returns of three Japanese automakers, Toyota, Nissan, and Honda. 
+Here we use the first 100 days (we only base our analyses on 100 days to reduce wait time -- this is not meant to be a serious analysis) of Stata's stocks data on daily returns of three Japanese automakers, Toyota, Nissan, and Honda. 
 
 ```{r label="example 2", error = FALSE, warning = FALSE, message = FALSE}
 library(bmgarch)
@@ -187,7 +189,7 @@ First, gather models to a `bmgarch_list`.
 modfits <- bmgarch_list(fit1, fit2, fit3)
 ```
 
-Compute model weights with the stacking method (default) and the the approximate (default) leave-future-out cross validation (LFO CV).
+Compute model weights with the stacking method (default) and the approximate (default) leave-future-out cross validation (LFO CV).
 `L` defines the minimal length of the time series before we start engaging in cross-validation. Eg., for a time series with length 100, `L = 50` reserves values 51--100 as the cross-validation sample. Note that the standard is to use the approximate `backward` method to CV as it results in fewest refits. Exact CV is also available with `exact` but not encouraged as it results in refitting all CV models. 
 
 ```{r error = FALSE, warning = FALSE, message = FALSE}
@@ -218,7 +220,7 @@ library( patchwork )
 We can add predictors for the constant variance term, c or C, in the MGARCH model with the option `xC = `
 The predictors need to be of the same dimension as the time-series object. For example, with three time-series of lenght 100, the predictor needs to be entered as a 100 by 3 matrix as well.
 
-As an example, we will add `nissan` as the predictor for C in a bivariate MGARCH:
+To illustrate, we will add `nissan` as the predictor for C in a bivariate MGARCH:
 ```{r error = FALSE, warning = FALSE, message = FALSE}
 # Fit CCC(1, 1) with constant on the mean structure.
 fitx <- bmgarch(stocks.z[1:100, c("toyota", "honda")],
@@ -230,16 +232,22 @@ fitx <- bmgarch(stocks.z[1:100, c("toyota", "honda")],
                 meanstructure = "constant")
 ```
 
-The predictors for C are on a log scale in section `Exogenous predictor`
+The estimates for the predictors for C are on a log scale in section `Exogenous predictor`:
 ```{r}
 summary(fitx)
 ```
+The predictor results in a linear model (on the log scale) with an intercept $\beta_0$ and the effect of the predictor in the slope $\beta_1$. 
+
 
 We can generate forecasts given the known values of the predictor. Note that the dimension of the predictor needs to match the number of timepoints that we predict ahead and the number of variables, 5 by 2, in this example:
 ```{r}
 fc2x <- forecast(fitx, ahead = 5, xC = stocks.z[101:105, c("nissan", "nissan")])
 fc2x
 ```
+
+### Variational Approximation
+
+The package features the option to use Stan's variational Bayes (`sampling_algorithm = "VB"`) algorithm. Currently, this feature is lagging behind CmdStan's version and is considered to be experimental and mostly a placeholder for future improvements. 
 
 ## Community Guidelines
 

@@ -3,21 +3,17 @@ library(testthat )
 options(mc.cores=2)
 
 params <- c('CCC', 'DCC', 'BEKK', 'pdBEKK')
-meanstr <- c('arma',  'VAR' )
 
 for(i in params ) {
-    for(j in meanstr ) {
         
         fit <- suppressWarnings( bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
                                          parameterization = i,
-                                         meanstructure = j,
                                          standardize_data = TRUE,
                                          iterations = 10))
 
         fit2 <- suppressWarnings( bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
                                           P =  2, Q =  2,
                                           parameterization = i,
-                                          meanstructure = j,
                                           standardize_data = TRUE,
                                           iterations = 10))
 
@@ -70,7 +66,6 @@ for(i in params ) {
             out <-  plot(fit, askNewPage = FALSE )
             expect_is( out, "list" )    
         })
-    }
 }
 
 ## Simulation of BEKK data:

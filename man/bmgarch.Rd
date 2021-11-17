@@ -34,7 +34,7 @@ bmgarch(
 
 \item{chains}{Integer (Default: 4). The number of Markov chains.}
 
-\item{standardize_data}{Logical (Default: FALSE). Whether data should be standardized.}
+\item{standardize_data}{Logical (Default: FALSE). Whether data should be standardized to easy computations.}
 
 \item{distribution}{Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"}
 
