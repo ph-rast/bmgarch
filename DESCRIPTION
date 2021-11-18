@@ -14,10 +14,10 @@ Authors@R: c(
 	   comment = c(ORCID = "0000-0001-8085-2390"))
 	   )
 Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Generate (weighted) forecasts for means, variances (volatility) and correlations. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. DCC and CCC models are based on Engle (2002) <doi:10.1198/073500102288618487> and Bollerslev (1990) <doi:10.2307/2109358>. The BEKK parameterization follows Engle and Kroner (1995) <doi:10.1017/S0266466600009063> while the pdBEKK as well as the estimation approach for this package is described in Rast et al. (2020) <doi:10.31234/osf.io/j57pk>. The fitted models contain 'rstan' objects and can be examined with 'rstan' functions.  
-License: GPL (>=3)
+License: GPL (>=3) + file LICENSE
 Depends: 
     methods,
-    R (>= 4.0.2),
+    R (>= 4.0.0),
     Rcpp (>= 1.0.5)
 Imports: 
     forecast,

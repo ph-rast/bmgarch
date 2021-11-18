@@ -7,7 +7,8 @@
 #' @param standardize_data Logical.
 #' @param distribution Character.
 #' @param meanstructure Character.
-#' @return bmgarch stan data list. 
+#' @return bmgarch stan data list.
+#' @importFrom stats var
 #' @keywords internal
 standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructure){
 
@@ -29,8 +30,8 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     }
 
     ## Test that all data vectors have variance > 0
-    ## Stop if a vector as zero variance
-    dvar = apply(data, 2, var)
+    ## Stop if a vector has zero variance
+    dvar <- apply(data, 2, var )
     if( sum(ifelse(dvar == 0, 1, 0)) > 0 ) stop(
                   paste0("Datavector ", names(which(dvar == 0 ) ), " has zero variance.") )
                                                        
