@@ -765,7 +765,7 @@ post-process
 We can add predictors for the constant variance term, c or C, in the
 MGARCH model with the option `xC =` The predictors need to be of the
 same dimension as the time-series object. For example, with three
-time-series of lenght 100, the predictor needs to be entered as a 100 by
+time-series of length 100, the predictor needs to be entered as a 100 by
 3 matrix as well.
 
 To illustrate, we will add `nissan` as the predictor for C in a
