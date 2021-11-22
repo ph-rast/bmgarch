@@ -24,13 +24,13 @@ Imports:
     ggplot2,
     loo,
     MASS,
-    RcppParallel (>= 5.0.1),
     Rdpack,
     rstan (>= 2.21.2),
     rstantools (>= 2.1.1)
 LinkingTo: 
     BH (>= 1.72.0-0),
     Rcpp (>= 1.0.5),
+    RcppParallel (>= 5.0.1),
     RcppEigen (>= 0.3.3.7.0),
     RcppParallel (>= 5.0.1),
     rstan (>= 2.21.2),

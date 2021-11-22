@@ -1,10 +1,26 @@
 ## Test environments
-* locally: Ubuntu 20.04 install, R 4.1.0
+* locally: Ubuntu 20.04 install, R 4.1.2
 * remotely: Ubuntu-latest, MacOS-latest and Windows-latest (on github actions-ci)
-* remotely: win_devel
 
   
 ## R CMD check results
+
+### Version 1.1.0
+0 errors ✔ | 0 warnings ✔ | 2 notes ✖
+
+* checking installed package size ... NOTE
+    installed size is 288.8Mb
+    sub-directories of 1Mb or more:
+      libs   288.1Mb
+  - 
+
+* checking for GNU extensions in Makefiles ... NOTE
+  GNU make is a SystemRequirements.
+  
+  - GNU make is a build time requirement for Ubuntu
+
+
+### Version 1.0.1
 * This is a resubmission, initiated by CRAN package check on 2021-06-12
 
 0 Errors or Warnings
@@ -23,8 +39,6 @@
   - Note that GNU make is a build time requirement for Ubuntu
 
 ## Comments from CRAN admins:
-
-### Version 1.0.1
 
 
 ### Version 1.0.0
