@@ -9,10 +9,11 @@
 0 errors ✔ | 0 warnings ✔ | 2 notes ✖
 
 * checking installed package size ... NOTE
-    installed size is 288.8Mb
+    installed size is 10.5Mb
     sub-directories of 1Mb or more:
-      libs   288.1Mb
-  - 
+      libs   9.6Mb
+
+  - Compiled code bmgarch.so is relatively large
 
 * checking for GNU extensions in Makefiles ... NOTE
   GNU make is a SystemRequirements.
