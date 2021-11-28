@@ -5,7 +5,7 @@
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/bmgarch)](https://cran.r-project.org/package=bmgarch)
 ![build](https://github.com/ph-rast/bmgarch/workflows/build/badge.svg)
 ![R-CMD-check](https://github.com/ph-rast/bmgarch/workflows/R-CMD-check/badge.svg)
-[![codecov](https://codecov.io/gh/ph-rast/bmgarch/branch/master/graph/badge.svg)](https://codecov.io/gh/ph-rast/bmgarch)
+[![codecov](https://app.codecov.io/gh/ph-rast/bmgarch/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ph-rast/bmgarch)
 [![status](https://joss.theoj.org/papers/fc0db2c4d3bbf1eb18611131f848ed5a/status.svg)](https://joss.theoj.org/papers/fc0db2c4d3bbf1eb18611131f848ed5a)
 <!-- badges: end -->
 
@@ -61,7 +61,7 @@ Rast, P., Martin, S. R., Liu, S., & Williams, D. R. (in press). A New
 Frontier for Studying Within-Person Variability: Bayesian Multivariate
 Generalized Autoregressive Conditional Heteroskedasticity Models.
 *Psychological Methods*.
-<a href="https://doi.org/10.1037/met0000357" class="uri">https://doi.org/10.1037/met0000357</a>;
+<a href="https://doi.org/10.1037/met0000357" class="uri">https://doi.apa.org/10.1037/met0000357</a>;
 Preprint-doi:
 <a href="https://psyarxiv.com/j57pk/" class="uri">https://psyarxiv.com/j57pk/</a>
 
