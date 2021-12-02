@@ -11,6 +11,8 @@
     "Engle2002"
     "Engle1995"
     "Rast2020"
+    "rmgarch"
+    "mgarchBEKK"
     "rstan"
     "stanCppLibrary"
     "Tsay2013"

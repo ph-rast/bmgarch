@@ -55,7 +55,7 @@ this package:
 Rast, P., & Martin, S. R. (2021). bmgarch: An R-Package for Bayesian
 Multivariate GARCH models. *Journal of Open Source Software*, 6, 3452 -
 4354. doi:
-<a href="https://doi.org/10.21105/joss.03452" class="uri">https://doi.org/10.21105/joss.03452</a>
+<a href="https://joss.theoj.org/papers/10.21105/joss.03452" class="uri">https://joss.theoj.org/papers/10.21105/joss.03452</a>
 
 Rast, P., Martin, S. R., Liu, S., & Williams, D. R. (in press). A New
 Frontier for Studying Within-Person Variability: Bayesian Multivariate
@@ -63,7 +63,7 @@ Generalized Autoregressive Conditional Heteroskedasticity Models.
 *Psychological Methods*.
 <a href="https://doi.org/10.1037/met0000357" class="uri">https://doi.apa.org/10.1037/met0000357</a>;
 Preprint-doi:
-<a href="https://psyarxiv.com/j57pk/" class="uri">https://psyarxiv.com/j57pk/</a>
+<a href="https://psyarxiv.com/j57pk" class="uri">https://psyarxiv.com/j57pk</a>
 
 Examples:
 ---------
@@ -892,12 +892,12 @@ Community Guidelines
 --------------------
 
 1.  Contributions and suggestions to the software are always welcome.
-    Please consult our [contribution guidelines](CONTRIBUTING.md) prior
+    Please consult our [contribution guidelines](https://github.com/ph-rast/bmgarch/CONTRIBUTING.md) prior
     to submitting a pull request.
 2.  Report issues or problems with the software using github’s [issue
     tracker](https://github.com/ph-rast/bmgarch/issues).
 3.  Contributors must adhere to the [Code of
-    Conduct](CODE_OF_CONDUCT.md).
+    Conduct](https://github.com/ph-rast/bmgarch/CODE_OF_CONDUCT.md).
 
 Acknowledgment
 --------------
