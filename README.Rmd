@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 ![build](https://github.com/ph-rast/bmgarch/workflows/build/badge.svg)
 ![R-CMD-check](https://github.com/ph-rast/bmgarch/workflows/R-CMD-check/badge.svg)
 [![codecov](https://app.codecov.io/gh/ph-rast/bmgarch/branch/master/graph/badge.svg)](https://app.codecov.io/gh/ph-rast/bmgarch)
-[![status](https://joss.theoj.org/papers/fc0db2c4d3bbf1eb18611131f848ed5a/status.svg)](https://joss.theoj.org/papers/fc0db2c4d3bbf1eb18611131f848ed5a)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.03452/status.svg)](https://doi.org/10.21105/joss.03452)
 <!-- badges: end -->
 
 # bmgarch
@@ -251,9 +251,9 @@ The package features the option to use Stan's variational Bayes (`sampling_algor
 
 ## Community Guidelines
 
-1. Contributions and suggestions to the software are always welcome. Please consult our [contribution guidelines](https://github.com/ph-rast/bmgarch/CONTRIBUTING.md) prior to submitting a pull request.
+1. Contributions and suggestions to the software are always welcome. Please consult our [contribution guidelines](https://github.com/ph-rast/bmgarch/blob/master/CONTRIBUTING.md) prior to submitting a pull request.
 2. Report issues or problems with the software using github's [issue tracker](https://github.com/ph-rast/bmgarch/issues).
-3. Contributors must adhere to the [Code of Conduct](https://github.com/ph-rast/bmgarch/CODE_OF_CONDUCT.md).
+3. Contributors must adhere to the [Code of Conduct](https://github.com/ph-rast/bmgarch/blob/master/CODE_OF_CONDUCT.md).
 
 ## Acknowledgment
 This work was supported by the National Institute On Aging of the National Institutes of Health under
