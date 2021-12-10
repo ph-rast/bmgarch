@@ -23,7 +23,8 @@
 ## Comments from CRAN admins:
 * 06.12.21 Ligges:
   > Pls fix the 404s and 301s from the URL checks.
-  - Fixed url errors in README and DESCRIPTION
+  - Fixed 404 and 301 errors in README and DESCRIPTION
+
 
 ### Version 1.0.1
 * This is a resubmission, initiated by CRAN package check on 2021-06-12
