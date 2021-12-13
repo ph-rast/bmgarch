@@ -21,7 +21,7 @@
   - GNU make is a build time requirement for Ubuntu
   
 ## Comments from CRAN admins:
-* 06.12.21 Ligges:
+* 06.12.21 and 10.12 Ligges:
   > Pls fix the 404s and 301s from the URL checks.
   - Fixed 404 and 301 errors in README and DESCRIPTION
 

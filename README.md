@@ -5,7 +5,7 @@
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/bmgarch)](https://cran.r-project.org/package=bmgarch)
 ![build](https://github.com/ph-rast/bmgarch/workflows/build/badge.svg)
 ![R-CMD-check](https://github.com/ph-rast/bmgarch/workflows/R-CMD-check/badge.svg)
-[![codecov](https://codecov.io/gh/ph-rast/bmgarch/branch/master/graph/badge.svg?token=HWhk5QKhQp)](https://codecov.io/gh/ph-rast/bmgarch)
+[![codecov](https://codecov.io/gh/ph-rast/bmgarch/branch/master/graph/badge.svg?token=HWhk5QKhQp)](https://app.codecov.io/gh/ph-rast/bmgarch)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.03452/status.svg)](https://doi.org/10.21105/joss.03452)
 <!-- badges: end -->
 
