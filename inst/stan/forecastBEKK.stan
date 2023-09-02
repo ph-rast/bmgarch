@@ -38,33 +38,33 @@ parameters {
   //  cholesky_factor_cov[nt] Cnst; // Const is symmetric, A, B, are not
   cov_matrix[nt] Cnst; // Const is symmetric, A, B, are not  
 
-  cov_matrix[nt] H[T];
-  matrix[nt,nt] rr[T-1];
-  vector[nt] mu[T];
-  matrix[nt, nt] A[Q];
-  matrix[nt, nt] B[P];
-  corr_matrix[nt] corH[T];
+  array[T] cov_matrix[nt] H;
+  array[T-1] matrix[nt,nt] rr;
+  array[T] vector[nt] mu;
+  array[Q] matrix[nt, nt] A;
+  array[P] matrix[nt, nt] B;
+  array[T] corr_matrix[nt] corH;
 }
 
 generated quantities {
   // Define matrix for rts prediction
-  vector[nt] rts_p[ahead + max(Q,P)];
-  vector[nt] rts_forecasted[ahead];
+  array[ahead + max(Q,P)] vector[nt] rts_p;
+  array[ahead] vector[nt] rts_forecasted;
   
-  cov_matrix[nt] H_p[ahead + max(Q,P)];
-  corr_matrix[nt] R_p[ahead + max(Q,P)];
-  cov_matrix[nt] H_forecasted[ahead];
-  corr_matrix[nt] R_forecasted[ahead];
+  array[ahead + max(Q,P)] cov_matrix[nt] H_p;
+  array[ahead + max(Q,P)] corr_matrix[nt] R_p;
+  array[ahead] cov_matrix[nt] H_forecasted;
+  array[ahead] corr_matrix[nt] R_forecasted;
 
-  matrix[nt,nt] rr_p[ahead + max(Q,P)];
-  vector[nt] mu_p[ahead + max(Q,P)];
-  vector[nt] mu_forecasted[ahead];
+  array[ahead + max(Q,P)] matrix[nt,nt] rr_p;
+  array[ahead + max(Q,P)] vector[nt] mu_p;
+  array[ahead] vector[nt] mu_forecasted;
 
   matrix[nt+1, nt] beta = append_row( beta0, diag_matrix(beta1) );
 
   // log lik for LFO-CV
   // only compute log_lik if it is actually requested
-  real log_lik[compute_log_lik ==1 ? ahead:0];
+  array[compute_log_lik ==1 ? ahead:0] real log_lik;
   
   // Placeholders
   matrix[nt, nt] A_part_p;

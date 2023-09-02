@@ -35,9 +35,9 @@ parameters {
   // GARCH h parameters on variance metric
   vector[nt] c_h; 
   // vector<lower=0, upper = 1 >[nt] a_h[Q];
-  simplex[Q] a_h_simplex[nt];
+  array[nt] simplex[Q] a_h_simplex;
   vector<lower=0, upper = 1>[nt] a_h_sum;
-  simplex[P] b_h_simplex[nt];
+  array[nt] simplex[P] b_h_simplex;
   vector[nt] b_h_sum_s;
   // vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
 
@@ -52,17 +52,17 @@ parameters {
 
 }
 transformed parameters {
-  cov_matrix[nt] H[T];
-  vector[nt] rr[T-1];
-  vector[nt] mu[T];
-  vector[nt] D[T];
-  real<lower = 0> vd[nt];
-  real<lower = 0> ma_d[nt];
-  real<lower = 0> ar_d[nt];
-  vector<lower=0, upper = 1>[nt] a_h[Q] = simplex_to_bh(a_h_simplex, a_h_sum);
+  array[T] cov_matrix[nt] H;
+  array[T-1] vector[nt] rr;
+  array[T] vector[nt] mu;
+  array[T] vector[nt] D;
+  array[nt] real<lower = 0> vd;
+  array[nt] real<lower = 0> ma_d;
+  array[nt] real<lower = 0> ar_d;
+  array[Q] vector<lower=0, upper = 1>[nt] a_h = simplex_to_bh(a_h_simplex, a_h_sum);
   vector[nt] UPs = upper_limits(a_h);
   vector[nt] ULs = raw_sum_to_b_h_sum(b_h_sum_s, UPs);
-  vector<lower = 0, upper = 1>[nt] b_h[P] = simplex_to_bh(b_h_simplex, ULs);
+  array[P] vector<lower = 0, upper = 1>[nt] b_h = simplex_to_bh(b_h_simplex, ULs);
   // Initialize t=1
   // Check "Order Sensitivity and Repeated Variables" in stan reference manual
   mu[1,] = phi0;
@@ -129,8 +129,8 @@ model {
 }
 generated quantities {
   matrix[nt,T] rts_out;
-  real log_lik[T];
-  corr_matrix[nt] corH[T];
+  array[T] real log_lik;
+  array[T] corr_matrix[nt] corH;
   vector<lower=0>[nt] c_h_var = exp(c_h);
 
   // retrodict

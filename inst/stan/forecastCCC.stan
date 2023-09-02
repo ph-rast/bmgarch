@@ -25,8 +25,8 @@ parameters {
   //  CCC specifics
   //  GARCH h parameters on variance metric
   vector[nt] c_h;
-  vector<lower=0, upper = 1 >[nt] a_h[Q];
-  vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
+  array[Q] vector<lower=0, upper = 1 >[nt] a_h;
+  array[P] vector<lower=0, upper = 1 >[nt] b_h; // TODO actually: 1 - a_h, across all Q and P...
 
   // GARCH constant correlation
   corr_matrix[nt] R;
@@ -34,36 +34,36 @@ parameters {
   // D1 init
   vector<lower = 0>[nt] D1_init;
 
-  cov_matrix[nt] H[T];
-  vector[nt] rr[T-1];
-  vector[nt] mu[T]; 
-  vector[nt] D[T];
+  array[T] cov_matrix[nt] H;
+  array[T-1] vector[nt] rr;
+  array[T] vector[nt] mu; 
+  array[T] vector[nt] D;
 }
 
 generated quantities {
   // Params for prediction
-  vector[nt] D_p[ahead + max(Q,P)];
-  corr_matrix[nt] R_p[ahead + max(Q, P)] = rep_array(R, ahead + max(Q, P)); // R_p = R for all t.
-  corr_matrix[nt] R_forecasted[ahead] = rep_array(R, ahead);
+  array[ahead + max(Q,P)] vector[nt] D_p;
+  array[ahead + max(Q, P)] corr_matrix[nt] R_p = rep_array(R, ahead + max(Q, P)); // R_p = R for all t.
+  array[ahead] corr_matrix[nt] R_forecasted = rep_array(R, ahead);
 
-  cov_matrix[nt] H_p[ahead + max(Q,P)];
-  cov_matrix[nt] H_forecasted[ahead];
+  array[ahead + max(Q,P)] cov_matrix[nt] H_p;
+  array[ahead] cov_matrix[nt] H_forecasted;
   
   // Define Vector that contains max of Q or P lag plus the forecasted ahead
-  vector[nt] mu_p[ahead + max(Q,P)];
-  vector[nt] mu_forecasted[ahead];
+  array[ahead + max(Q,P)] vector[nt] mu_p;
+  array[ahead] vector[nt] mu_forecasted;
   // Define matrix for rts prediction
-  vector[nt] rts_p[ahead + max(Q,P)];
-  vector[nt] rts_forecasted[ahead];
-  vector[nt] rr_p[ahead + max(Q,P)];
+  array[ahead + max(Q,P)] vector[nt] rts_p;
+  array[ahead] vector[nt] rts_forecasted;
+  array[ahead + max(Q,P)] vector[nt] rr_p;
 
   // log lik for LFO-CV
   // only compute log_lik if it is actually requested
-  real log_lik[ compute_log_lik ==1 ? ahead:0];
+  array[ compute_log_lik ==1 ? ahead:0] real log_lik;
   
-  real<lower = 0> vd[nt];
-  real<lower = 0> ma_d[nt];
-  real<lower = 0> ar_d[nt];
+  array[nt] real<lower = 0> vd;
+  array[nt] real<lower = 0> ma_d;
+  array[nt] real<lower = 0> ar_d;
   
   // Populate with non-NA values to avoid Error in stan
   mu_p[ 1:(ahead + max(Q,P)), ] = mu[  1:(ahead + max(Q,P)), ];

@@ -28,7 +28,7 @@ real a_b_scale(real a, real b, real value) {
   @param a_h Array of vectors [nt, Q].
   @return vector[nt] Upper limits such that sum(b_h{k}) < UpperLimit{k} = 1 - sum(a_h{k})
  */
-vector upper_limits(vector[] a_h) {
+vector upper_limits(array[] vector a_h) {
   int nt = num_elements(a_h[1]);
   int Q = size(a_h);
   vector[nt] a_h_sums;
@@ -68,10 +68,10 @@ vector raw_sum_to_b_h_sum(vector b_h_sum_s, vector upperLimits) {
   @param b_h_sum vector [nt] of the value to which the b_h's should be summed.
   @return An array [P] of vectors [nt].
  */
-vector[] simplex_to_bh(vector[] b_h_simplex, vector b_h_sum) {
+array[] vector simplex_to_bh(array[] vector b_h_simplex, vector b_h_sum) {
   int nt = size(b_h_simplex);
   int P = num_elements(b_h_simplex[1]);
-  vector[nt] b_h[P];
+  array[P] vector[nt] b_h;
   for(k in 1:nt) {
     b_h[1:P, k] = to_array_1d(b_h_simplex[k] * b_h_sum[k]);
   }
