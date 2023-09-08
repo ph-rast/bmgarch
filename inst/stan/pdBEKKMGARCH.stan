@@ -12,7 +12,7 @@ transformed data {
   vector[nt] rts_m;
   vector[nt] rts_sd;
   // off diagonal elements
-  int<lower = 1> od = ( nt*nt - nt ) / 2;
+  int<lower = 1> od = ( nt*nt - nt ) %/% 2;
 #include /transformed_data/xh_marker.stan
 
   if( meanstructure == 0 ){
@@ -42,13 +42,13 @@ parameters {
   // C_sd is defined in tp, as function of betas
   corr_matrix[nt] C_R;
 
-  vector<lower = 0, upper = 1>[nt] A_diag[Q];
-  vector<lower = 0, upper = 1>[nt] B_diag[P];
+  array[Q] vector<lower = 0, upper = 1>[nt] A_diag;
+  array[P] vector<lower = 0, upper = 1>[nt] B_diag;
 
-  vector[ od ] A_lower[Q];
-  vector[ od ] B_lower[P];
-  vector[ od ] A_upper[Q];
-  vector[ od ] B_upper[P];
+  array[Q] vector[ od ] A_lower;
+  array[P] vector[ od ] B_lower;
+  array[Q] vector[ od ] A_upper;
+  array[P] vector[ od ] B_upper;
 
     // H1 init
   cov_matrix[nt] H1_init; 
@@ -56,9 +56,9 @@ parameters {
 
 }
 transformed parameters {
-  cov_matrix[nt] H[T];
-  matrix[nt,nt] rr[T-1];
-  vector[nt] mu[T];
+  array[T] cov_matrix[nt] H;
+  array[T-1] matrix[nt,nt] rr;
+  array[T] vector[nt] mu;
 
   matrix[nt, nt] A_part = diag_matrix( rep_vector(0.0, nt));
   matrix[nt, nt] B_part = diag_matrix( rep_vector(0.0, nt));
@@ -68,8 +68,8 @@ transformed parameters {
   cov_matrix[nt] Cnst; // Const is symmetric, A, B, are not  
 
   // Construct square matrices with positive diagonals
-  matrix[nt, nt] A_raw[Q]; 
-  matrix[nt, nt] B_raw[P];
+  array[Q] matrix[nt, nt] A_raw; 
+  array[P] matrix[nt, nt] B_raw;
 
    for(q in 1:Q) {
     int L = 0;
@@ -181,12 +181,12 @@ model {
 }
 //
 generated quantities {
-  matrix[nt, nt] A[Q] = A_raw;
-  matrix[nt, nt] B[P] = B_raw;
+  array[Q] matrix[nt, nt] A = A_raw;
+  array[P] matrix[nt, nt] B = B_raw;
   matrix[nt,T] rts_out;
-  real log_lik[T];
+  array[T] real log_lik;
   corr_matrix[nt] corC;
-  corr_matrix[nt] corH[T];
+  array[T] corr_matrix[nt] corH;
   row_vector[nt] C_var;
 
   

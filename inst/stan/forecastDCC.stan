@@ -24,8 +24,8 @@ parameters {
   
    // GARCH h parameters on variance metric
   vector[nt] c_h;
-  vector<lower=0 >[nt] a_h[Q];
-  vector<lower=0, upper = 1 >[nt] b_h[P]; // TODO actually: 1 - a_h, across all Q and P...
+  array[Q] vector<lower=0 >[nt] a_h;
+  array[P] vector<lower=0, upper = 1 >[nt] b_h; // TODO actually: 1 - a_h, across all Q and P...
 
   // GARCH q parameters
   real<lower=0, upper = 1 > a_q; //
@@ -33,39 +33,39 @@ parameters {
   corr_matrix[nt] S;  // DCC keeps this constant
 
   // inits
-  cov_matrix[nt] H[T];
-  corr_matrix[nt] R[T];
-  vector[nt] rr[T-1];
-  vector[nt] mu[T];
-  vector[nt] D[T];
-  cov_matrix[nt] Qr[T];
-  vector[nt] Qr_sdi[T];
-  vector[nt] u[T];
+  array[T] cov_matrix[nt] H;
+  array[T] corr_matrix[nt] R;
+  array[T-1] vector[nt] rr;
+  array[T] vector[nt] mu;
+  array[T] vector[nt] D;
+  array[T] cov_matrix[nt] Qr;
+  array[T] vector[nt] Qr_sdi;
+  array[T] vector[nt] u;
 }
 
 generated quantities {
   // Define matrix for rts prediction
-  vector[nt] rts_p[ahead + max(Q,P)];
-  vector[nt] rts_forecasted[ahead];
-  cov_matrix[nt] H_p[ahead + max(Q,P)];
-  cov_matrix[nt] H_forecasted[ahead];
-  corr_matrix[nt] R_p[ahead + max(Q,P)]; // 
-  corr_matrix[nt] R_forecasted[ahead]; // 
-  vector[nt] rr_p[ahead + max(Q,P)];
-  vector[nt] mu_p[ahead + max(Q,P)];
-  vector[nt] mu_forecasted[ahead];
-  vector[nt] D_p[ahead + max(Q,P)];
-  cov_matrix[nt] Qr_p[ahead + max(Q,P)];
-  vector[nt] u_p[ahead + max(Q,P)];
-  vector[nt] Qr_sdi_p[ahead + max(Q,P)];
+  array[ahead + max(Q,P)] vector[nt] rts_p;
+  array[ahead] vector[nt] rts_forecasted;
+  array[ahead + max(Q,P)] cov_matrix[nt] H_p;
+  array[ahead] cov_matrix[nt] H_forecasted;
+  array[ahead + max(Q,P)] corr_matrix[nt] R_p; // 
+  array[ahead] corr_matrix[nt] R_forecasted; // 
+  array[ahead + max(Q,P)] vector[nt] rr_p;
+  array[ahead + max(Q,P)] vector[nt] mu_p;
+  array[ahead] vector[nt] mu_forecasted;
+  array[ahead + max(Q,P)] vector[nt] D_p;
+  array[ahead + max(Q,P)] cov_matrix[nt] Qr_p;
+  array[ahead + max(Q,P)] vector[nt] u_p;
+  array[ahead + max(Q,P)] vector[nt] Qr_sdi_p;
   // log lik for LFO-CV
 // only compute log_lik if it is actually requested 
-  real log_lik[compute_log_lik ==1 ? ahead:0];
+  array[compute_log_lik ==1 ? ahead:0] real log_lik;
   
   // Placeholders
-  real<lower = 0> vd_p[nt];
-  real<lower = 0> ma_d_p[nt];
-  real<lower = 0> ar_d_p[nt];
+  array[nt] real<lower = 0> vd_p;
+  array[nt] real<lower = 0> ma_d_p;
+  array[nt] real<lower = 0> ar_d_p;
   
 
   // Populate with non-NA values to avoid Error in stan

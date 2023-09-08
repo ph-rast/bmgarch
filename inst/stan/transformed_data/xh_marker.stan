@@ -1,5 +1,5 @@
 // Check whether xC contains a predictor or not.
-matrix[nt, nt] xC_m[T];
+array[T] matrix[nt, nt] xC_m;
 int<lower = 0> xC_marker = 0;
 real<lower = 0> cp;
 
