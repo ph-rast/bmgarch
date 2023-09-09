@@ -14,55 +14,32 @@ on:
   pull_request:
     branches: [ main, master ]
 
-jobs:
+permissions:
+  contents: read
+
+jobs: # from https://github.com/r-lib/actions/tree/v2/examples
   R-CMD-check:
-    build:
-      #    runs-on: macOS-latest
-      runs-on: ${{ matrix.config.os }}
-      
-      name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+    steps:
+      - uses: actions/checkout@v3
 
-      strategy:
-        matrix:
-          config:
-            # - { os: windows-latest, r: 'release'}
-            - { os: macos-latest, r: 'release'}
-            # - { os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true # use public R package manager
 
-      env:
-        GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-        R_KEEP_PKG_SOURCE: yes
-            
-            
-        steps:
-          - uses: actions/checkout@v3
-            
-          - uses: r-lib/actions/setup-pandoc@v2
-          
-          - uses: r-lib/actions/setup-r@v2
-            with:
-              r-version: ${{ matrix.config.r }}
-              http-user-agent: ${{ matrix.config.http-user-agent }}
-              use-public-rspm: true
-
-          - uses: r-lib/actions/setup-r-dependencies@v2
-            with:
-               extra-packages: any::rcmdcheck
-               needs: check
-
-          - uses: r-lib/actions/check-r-package@v2
-            with:
-              upload-snapshots: true
-
-          # - name: Install dependencies
-          #   run: |
-          #     install.packages(c("remotes", "rcmdcheck", "covr"))
-          #     remotes::install_deps(dependencies = TRUE)
-          #     shell: Rscript {0}
-          #     - name: Check
-          #       run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-          #       shell: Rscript {0}
-          #     - name: Coverage
-          #       run: covr::codecov()
-          #       shell: Rscript {0}
+      - name: Install jags
+        run: |
+          sudo apt install jags
+  
+      - name: Install dependencies
+        run: |
+          install.packages(c("remotes", "rcmdcheck"))
+          remotes::install_deps(dependencies = TRUE)
+        shell: Rscript {0}
+      - name: Check
+        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+        shell: Rscript {0}
 ...
