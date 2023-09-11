@@ -1,3 +1,7 @@
+# bmgarch 2.0.0
+
+* All stan models are rewritten to match the new `rstan 2.26.0` array syntax.
+
 # bmgarch 1.1.0
 
 * Meanstructure now also takes the `VAR` argument for a VAR(1) model. 

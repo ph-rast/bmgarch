@@ -17,5 +17,5 @@
     "stanCppLibrary"
     "Tsay2013"
     "Yao2018"))
- :bibtex)
+ '(or :bibtex :latex))
 

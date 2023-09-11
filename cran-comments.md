@@ -1,9 +1,20 @@
 ## Test environments
-* locally: Ubuntu 20.04 install, R 4.1.2
-* remotely: Ubuntu-latest, MacOS-latest and Windows-latest (on github actions-ci)
-
+* locally: Ubuntu 22.04 install, R 4.3.1
+* remotely: Ubuntu-latest, MacOS-latest and Windows-latest (on github actions-ci), Rhub
   
 ## R CMD check results
+
+### Version 2.0.0
+0 errors ✔ | 0 warnings ✔ | 2 notes ✖
+
+❯ checking installed package size ... NOTE
+    installed size is 261.6Mb
+    sub-directories of 1Mb or more:
+      libs  260.8Mb
+
+❯ checking for GNU extensions in Makefiles ... NOTE
+  GNU make is a SystemRequirements.
+
 
 ### Version 1.1.0
 0 errors ✔ | 0 warnings ✔ | 2 notes ✖
@@ -45,8 +56,6 @@
   - Note that GNU make is a build time requirement for Ubuntu
 
 ## Comments from CRAN admins:
-
-
 ### Version 1.0.0
 * 10.09.20 Gregor Seyer: 
 > Please replace \dontrun with \donttest

@@ -61,7 +61,7 @@ Please add at least one of the following citations when referring to to this pac
 
 Rast, P., & Martin, S. R. (2021). bmgarch: An R-Package for Bayesian Multivariate GARCH models. _Journal of Open Source Software_, 6, 3452 - 4354. doi: https://joss.theoj.org/papers/10.21105/joss.03452
 
-Rast, P., Martin, S. R., Liu, S., & Williams, D. R. (in press). A New Frontier for Studying Within-Person Variability: Bayesian Multivariate Generalized Autoregressive Conditional Heteroskedasticity Models. _Psychological Methods_. https://doi.apa.org/10.1037/met0000357; Preprint-doi: https://psyarxiv.com/j57pk
+Rast, P., Martin, S. R., Liu, S., & Williams, D. R. (2022). A New Frontier for Studying Within-Person Variability: Bayesian Multivariate Generalized Autoregressive Conditional Heteroskedasticity Models. _Psychological Methods, 27_, 856--873. https://doi.apa.org/10.1037/met0000357; Preprint-doi: https://psyarxiv.com/j57pk
 
 
 
