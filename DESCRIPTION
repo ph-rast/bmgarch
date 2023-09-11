@@ -1,6 +1,6 @@
 Package: bmgarch
 Title: Bayesian Multivariate GARCH Models
-Version: 1.1.0
+Version: 2.0.0
 Authors@R: c(
 	   person(given = "Philippe",
            family = "Rast",
