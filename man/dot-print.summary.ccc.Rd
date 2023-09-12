@@ -4,14 +4,10 @@
 \alias{.print.summary.ccc}
 \title{Print helper for CCC.}
 \usage{
-.print.summary.ccc(bmsum, ...)
+.print.summary.ccc(bmsum)
 }
 \arguments{
 \item{bmsum}{summary.bmgarch object.}
-
-\item{...}{Not used.}
-
-\item{x}{bmgarch.summary object.}
 }
 \value{
 Void.

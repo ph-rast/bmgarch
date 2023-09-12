@@ -206,12 +206,10 @@ print.summary.bmgarch <- function(x, ...) {
 }
 ##' @title Print helper for CCC.
 ##' @param bmsum summary.bmgarch object.
-##' @param x bmgarch.summary object.
-##' @param ... Not used.
 ##' @return Void.
 ##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
-.print.summary.ccc <- function(bmsum, ...) {
+.print.summary.ccc <- function(bmsum) {
     # Meta-data
     cat("Model:", paste0(bmsum$meta$param, "-MGARCH\n"))
     cat("Basic Specification: ")
