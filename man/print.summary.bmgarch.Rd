@@ -18,5 +18,5 @@ x (invisible).
 Print method for bmgarch.summary objects.
 }
 \author{
-Stephen R. Martin
+Philippe Rast, Stephen R. Martin
 }

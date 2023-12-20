@@ -8,10 +8,6 @@
 }
 \arguments{
 \item{bmsum}{summary.bmgarch object.}
-
-\item{x}{bmgarch.summary object.}
-
-\item{...}{Not used.}
 }
 \value{
 Void.

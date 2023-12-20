@@ -15,13 +15,14 @@ bmgarch(
   standardize_data = FALSE,
   distribution = "Student_t",
   meanstructure = "constant",
+  sampling_algorithm = "MCMC",
   ...
 )
 }
 \arguments{
 \item{data}{Time-series or matrix object. A time-series or matrix object containing observations at the same interval.}
 
-\item{xC}{Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).}
+\item{xC}{Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c, used in a log-linear model on the constant variance terms \insertCite{Rast2020}{bmgarch}. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).}
 
 \item{parameterization}{Character (Default: "CCC"). The type of of parameterization. Must be one of "CCC", "DCC", "BEKK", or "pdBEKK".}
 
@@ -33,11 +34,13 @@ bmgarch(
 
 \item{chains}{Integer (Default: 4). The number of Markov chains.}
 
-\item{standardize_data}{Logical (Default: FALSE). Whether data should be standardized.}
+\item{standardize_data}{Logical (Default: FALSE). Whether data should be standardized to easy computations.}
 
 \item{distribution}{Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"}
 
-\item{meanstructure}{Character (Default: "constant"). Defines model for means. Either 'constant'  or 'arma'. Currently arma(1,1) only.}
+\item{meanstructure}{Character (Default: "constant"). Defines model for means. Either 'constant'  or 'ARMA'. Currently ARMA(1,1) only. OR 'VAR' (VAR1).}
+
+\item{sampling_algorithm}{Character (Default" "MCMC"). Define sampling algorithm. Either 'MCMC'for Hamiltonian Monte Carlo or 'VB' for variational Bayes. 'VB' is inherited from stan and is currently in heavy development -- do not trust estimates.}
 
 \item{...}{Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[rstan]{stan}}.}
 }
@@ -45,16 +48,22 @@ bmgarch(
 \code{bmgarch} object.
 }
 \description{
-Draw samples from a specified multivariate GARCH model, given multivariate time-series.
+Draw samples from a specified multivariate GARCH model using 'Stan', given multivariate time-series. Currently supports CCC, DCC, BEKK, and pdBEKK model parameterizations.
 }
 \details{
-Three paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK.
+Four types of paramerizations are implemented. The constant conditional correlation (CCC) and the dynamic conditional correlation \insertCite{@DCC; Engle2002,Engle2001a}{bmgarch}, as well as  BEKK \insertCite{Engle1995}{bmgarch} and a BEKK model with positivity constraints on the diagonals of the ARCH and GARCH parameters "pdBEKK" \insertCite{Rast2020}{bmgarch}.
+
+The fitted models are 'rstan' objects and all posterior parameter estimates can be obtained and can be examined with either the 'rstan' toolbox, plotted and printed using generic functions  or passed to 'bmgarch' functions to 'forecast' or compute 'model_weights' or compute fit statistics based on leave-future-out cross-validation.
 }
 \examples{
 \dontrun{
 data(panas)
-# Fit pdBEKK(1,1) mgarch model with a ARMA(1,1) meanstructure, and student-t residual distribution
-fit <- bmgarch(panas, parameterization = "pdBEKK", P = 1, Q = 1, meanstructure = "arma", distribution = "Student_t")
+# Fit BEKK(1,1) mgarch model with a ARMA(1,1) meanstructure,
+# and student-t residual distribution
+fit <- bmgarch(panas, parameterization = "BEKK",
+               P = 1, Q = 1,
+               meanstructure = "arma",
+               distribution = "Student_t")
 
 # Summarize the parameters
 summary(fit)
@@ -80,7 +89,17 @@ fit.bc <- fitted(fit)
 
 # Save estimated and forecasted data as a data.frame
 df.fc <- as.data.frame(fit.fc)
+
+# Access rstan's model fit object
+mf <- fit$model_fit
+
+# Return diagnostics and a plot of the first 10 parameters
+rstan::check_hmc_diagnostics(mf)
+rstan::plot(mf)
 }
+}
+\references{
+\insertAllCited()
 }
 \author{
 Philippe Rast, Stephen R. Martin

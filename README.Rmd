@@ -5,6 +5,7 @@ output:
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- knit with rmarkdown::render("README.Rmd", output_format = "md_document") -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -14,11 +15,18 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
+<!-- badges: start -->
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/bmgarch)](https://cran.r-project.org/package=bmgarch)
+![build](https://github.com/ph-rast/bmgarch/workflows/build/badge.svg)
+![R-CMD-check](https://github.com/ph-rast/bmgarch/workflows/R-CMD-check/badge.svg)
+[![codecov](https://codecov.io/gh/ph-rast/bmgarch/branch/master/graph/badge.svg?token=HWhk5QKhQp)](https://app.codecov.io/gh/ph-rast/bmgarch)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.03452/status.svg)](https://doi.org/10.21105/joss.03452)
+<!-- badges: end -->
 
 # bmgarch
 
 `bmgarch` estimates Bayesian multivariate generalized autoregressive conditional heteroskedasticity (MGARCH) models.
-Currently, bmgarch supports ARMA(1,1) and intercept-only (Constant) mean structures, and a variety of MGARCH(P,Q) parameterizations.
+Currently, bmgarch supports a variety of MGARCH(P,Q) parameterizations and simultaneous estimation of ARMA(1,1), VAR(1) and intercept-only (Constant) mean structures.
 In increasing order of complexity:
 
 * CCC(P, Q): Constant Conditional Correlation
@@ -28,31 +36,56 @@ In increasing order of complexity:
 
 ## Installation
 
-`bmgarch` is not yet available on CRAN.
+`bmgarch` is available on CRAN and can be installed with:
+``` r
+install.packages('bmgarch')
+```
+
+### Linux
+
+Linux users may need to install `libv8` prior to installing `bmgarch`.
+For example, in Ubuntu, run `sudo apt install libv8-dev` before installing the package from CRAN or github.
+For those who's distro installs `libnode-dev` instead of `libv8-dev`, run `install.packages("V8")` in R
+prior to installing `bmgarch` (during installation`rstan` looks explicitly for V8).
+
+### Development Version
 
 The development version can be installed from [GitHub](https://github.com/) with:
 
 ``` r
 devtools::install_github("ph-rast/bmgarch")
 ```
-## Example
+
+## How to cite this package
+Please add at least one of the following citations when referring to to this package:
+
+Rast, P., & Martin, S. R. (2021). bmgarch: An R-Package for Bayesian Multivariate GARCH models. _Journal of Open Source Software_, 6, 3452 - 4354. doi: https://joss.theoj.org/papers/10.21105/joss.03452
+
+Rast, P., Martin, S. R., Liu, S., & Williams, D. R. (2022). A New Frontier for Studying Within-Person Variability: Bayesian Multivariate Generalized Autoregressive Conditional Heteroskedasticity Models. _Psychological Methods, 27_, 856--873. https://doi.apa.org/10.1037/met0000357; Preprint-doi: https://psyarxiv.com/j57pk
+
+
+
+## Examples:
+
+We present two examples, one with behavioral data and one with stocks from three major Japanese automakers. 
+
+## Example 1: Behavioral Data
 
 In this example, we use the pdBEKK(1,1) model for the variances, and an intercept-only model for the means.
 
-```{r example, error = FALSE, warning = FALSE, message = FALSE}
+```{r label="example 1", error = FALSE, warning = FALSE, message = FALSE}
 library(bmgarch)
 
 data(panas)
 head(panas)
 
-# Fit pdBEKK(1, 1) with ARMA(1,1) on the mean structure.
+## Fit pdBEKK(1, 1) with ARMA(1,1) on the mean structure.
 fit <- bmgarch(panas,
                parameterization = "pdBEKK",
                iterations = 1000,
                P = 1, Q = 1,
                distribution = "Student_t",
-               meanstructure = "constant")
-
+               meanstructure = "arma")
 ```
 
 ### Parameter estimates
@@ -72,3 +105,156 @@ plot(fit.fc, askNewPage = FALSE, type = "var")
 
 plot(fit.fc, askNewPage = FALSE, type = "cor")
 ```
+
+## Example 2: Stocks
+
+Here we use the first 100 days (we only base our analyses on 100 days to reduce wait time -- this is not meant to be a serious analysis) of Stata's stocks data on daily returns of three Japanese automakers, Toyota, Nissan, and Honda. 
+
+```{r label="example 2", error = FALSE, warning = FALSE, message = FALSE}
+library(bmgarch)
+
+data(stocks)
+head(stocks)
+```
+Ease computation by first standardizing the time series
+```{r error = FALSE, warning = FALSE, message = FALSE}
+stocks.z <- scale(stocks[,c("toyota", "nissan", "honda")])
+head(stocks.z )
+
+# Fit CCC(1, 1) with constant on the mean structure.
+fit1 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
+                parameterization = "CCC",
+                iterations = 1000,
+                P = 1, Q = 1,
+                distribution = "Student_t",
+                meanstructure = "constant")
+
+```
+
+### Parameter Estimates
+```{r}
+summary( fit1 )
+```
+
+### Forecasted Values
+Forecast volatility 10 days ahead
+```{r}
+fc <- forecast(fit1, ahead = 10 )
+fc
+```
+```{r stockForecastPlot}
+plot(fc,askNewPage = FALSE, type = 'var' )
+```
+
+### Ensemble Methods
+Here we illustrate how to obtain model weights across three models. These weights will be used to compute weighted forecasts, thus, taking into account that we do not have a single best model.
+
+Add two additional models, one with CCC(2,2) and a DCC(1,1)
+
+```{r error = FALSE, warning = FALSE, message = FALSE}
+# Fit CCC(1, 1) with constant on the mean structure.
+fit2 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
+                parameterization = "CCC",
+                iterations = 1000,
+                P = 2, Q = 2,
+                distribution = "Student_t",
+                meanstructure = "constant")
+
+fit3 <- bmgarch(stocks.z[1:100, c("toyota", "nissan", "honda")],
+                parameterization = "DCC",
+                iterations = 1000,
+                P = 1, Q = 1,
+                distribution = "Student_t",
+                meanstructure = "arma")
+
+```
+
+The DCC(1,1) model also incorporates an ARMA(1,1) meanstructure. The output will have the according information:
+
+```{r}
+summary( fit3 )
+fc <- forecast(fit3, ahead =  10)
+```
+```{r fit3ForecastPlot}
+plot( fc,askNewPage = FALSE, type =  'mean' ) 
+```
+
+
+### Compute Model Weights
+Obtain model weights with either the stacking or the pseudo BMA method. These methods are inherited from the `loo` package.
+
+First, gather models to a `bmgarch_list`.
+```{r ModelWeights}
+## use bmgarch_list function to collect bmgarch objects
+modfits <- bmgarch_list(fit1, fit2, fit3)
+```
+
+Compute model weights with the stacking method (default) and the approximate (default) leave-future-out cross validation (LFO CV).
+`L` defines the minimal length of the time series before we start engaging in cross-validation. Eg., for a time series with length 100, `L = 50` reserves values 51--100 as the cross-validation sample. Note that the standard is to use the approximate `backward` method to CV as it results in fewest refits. Exact CV is also available with `exact` but not encouraged as it results in refitting all CV models. 
+
+```{r error = FALSE, warning = FALSE, message = FALSE}
+mw <- model_weights(modfits, L = 50, method = 'stacking')
+```
+```{r}
+## Return model weights:
+mw
+```
+
+### Weighted Forecasting
+Use model weights to obtain weighted forecasts. Here we will forecast 5 days ahead.
+```{r}
+w_fc <- forecast(modfits, ahead = 5, weights = mw )
+w_fc
+```
+Plot the weighted forecast. Save plots into a ggplot object and post-process
+```{r weightedForecastPlot}
+plt <- plot(w_fc, askNewPage = FALSE, type =  'var' )
+
+library( patchwork )
+( plt$honda  + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) /
+( plt$toyota + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) /
+( plt$nissan + ggplot2::coord_cartesian(ylim = c(0, 2.5 ) ) ) 
+```
+
+### Predictors for Constant Variance (C)
+We can add predictors for the constant variance term, c or C, in the MGARCH model with the option `xC = `
+The predictors need to be of the same dimension as the time-series object. For example, with three time-series of length 100, the predictor needs to be entered as a 100 by 3 matrix as well.
+
+To illustrate, we will add `nissan` as the predictor for C in a bivariate MGARCH:
+```{r error = FALSE, warning = FALSE, message = FALSE}
+# Fit CCC(1, 1) with constant on the mean structure.
+fitx <- bmgarch(stocks.z[1:100, c("toyota", "honda")],
+                xC = stocks.z[1:100, c("nissan", "nissan")],
+                parameterization = "CCC",
+                iterations = 1000,
+                P = 2, Q = 2,
+                distribution = "Student_t",
+                meanstructure = "constant")
+```
+
+The estimates for the predictors for C are on a log scale in section `Exogenous predictor`:
+```{r}
+summary(fitx)
+```
+The predictor results in a linear model (on the log scale) with an intercept $\beta_0$ and the effect of the predictor in the slope $\beta_1$. 
+
+
+We can generate forecasts given the known values of the predictor. Note that the dimension of the predictor needs to match the number of timepoints that we predict ahead and the number of variables, 5 by 2, in this example:
+```{r}
+fc2x <- forecast(fitx, ahead = 5, xC = stocks.z[101:105, c("nissan", "nissan")])
+fc2x
+```
+
+### Variational Approximation
+
+The package features the option to use Stan's variational Bayes (`sampling_algorithm = "VB"`) algorithm. Currently, this feature is lagging behind CmdStan's version and is considered to be experimental and mostly a placeholder for future improvements. 
+
+## Community Guidelines
+
+1. Contributions and suggestions to the software are always welcome. Please consult our [contribution guidelines](https://github.com/ph-rast/bmgarch/blob/master/CONTRIBUTING.md) prior to submitting a pull request.
+2. Report issues or problems with the software using github's [issue tracker](https://github.com/ph-rast/bmgarch/issues).
+3. Contributors must adhere to the [Code of Conduct](https://github.com/ph-rast/bmgarch/blob/master/CODE_OF_CONDUCT.md).
+
+## Acknowledgment
+This work was supported by the National Institute On Aging of the National Institutes of Health under
+Award Number [R01AG050720](https://reporter.nih.gov/project-details/9336761) to PR. The content is solely the responsibility of the authors and does not necessarily represent the official views of the funding agency.

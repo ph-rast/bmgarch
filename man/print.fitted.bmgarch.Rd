@@ -4,10 +4,10 @@
 \alias{print.fitted.bmgarch}
 \title{Print method for fitted.bmgarch objects.}
 \usage{
-\method{print}{fitted.bmgarch}(object, ...)
+\method{print}{fitted.bmgarch}(x, ...)
 }
 \arguments{
-\item{object}{fitted.bmgarch object.}
+\item{x}{fitted.bmgarch object.}
 
 \item{...}{Not used.}
 }

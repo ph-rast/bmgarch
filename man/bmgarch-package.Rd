@@ -5,9 +5,9 @@
 \alias{bmgarch-package}
 \title{The 'bmgarch' package.}
 \description{
-The *bmgrach* package fits Bayesian mutivariate GARCH models specified via stan,
+The *bmgarch* package fits Bayesian multivariate GARCH models specified via stan,
 a C++ package providing HMC methods for full Bayesian inference (cf. [http://mc-stan.org]). The currently implemented parameterizations are DCC(Q,P),
-CCC(Q,P), and BEKK(Q,P) with arbitrary lags defined in Q, and P. The package provides summaries and plots for the esimates as well
+CCC(Q,P), and BEKK(Q,P) with arbitrary lags defined in Q, and P. The package provides summaries and plots for the estimates as well
 as forecasted series with corresponding plots. The fitted objects are rstan class objects that can be inspected and manipulated
 accordingly.
 }

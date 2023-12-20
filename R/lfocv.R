@@ -13,7 +13,8 @@
                         iterations = object$iter,
                         standardize_data = FALSE,
                         distribution = object$distribution,
-                        meanstructure = object$meanstructure )
+                        meanstructure = object$meanstructure,
+                        sampling_algorithm = object$sampling_algorithm)
 }
 
 ##' @keywords internal
@@ -48,26 +49,42 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
 ##' importance sampling
 ##' described in \insertCite{Buerkner2019}{bmgarch}.
 ##' @title Leave-Future-Out Cross Validation (LFO-CV)
-##' @param object Fitted bmgarch model. \code{lfocv} inherits all attributes
+##' @param x Fitted bmgarch model. \code{lfocv} inherits all attributes
 ##' from the bmgarch object
 ##' @param type Takes \code{lfo} (default) or \code{loo}. LFO-CV is recommended
-##' for time-seris but LOO-CV may be obtained to assess the structural part of the model.  
-##' @param L Minimal length of times series before computing LFO 
+##' for time-series but LOO-CV may be obtained to assess the structural part of the model.  
+##' @param L Minimal length of times series before computing LFO
+##' @param M M step head predictions. Defines to what period the LFO-CV should be tuned to. Defaults to M=1.  
 ##' @param mode backward elpd_lfo approximation, or exact elpd-lfo; 
 ##' Takes 'backward', and 'exact'. 'exact' fits N-L models and may
 ##' take a \emph{very} long time to complete. \code{forward} works too but is not
-##' complete yet. 
+##' complete yet.
+##' @param ... Not used
 ##' @return Approximate LFO-CV value and log-likelihood values across (L+1):N
 ##' timepoints
-##' @author philippe
 ##' @references
 ##' \insertAllCited{}
+##' @aliases loo
 ##' @importFrom loo loo
+##' @importFrom stats sd weights
+##' @examples
+##' \dontrun{
+##' data(stocks)
+##' # Fit a DCC model 
+##' fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+##'                parameterization = "DCC", standardize_data = TRUE,
+##'                iterations = 500)
+##'
+##' # Compute expected log-predictive density (elpd) using the backward mode
+##' # L is the upper boundary of the time-series before we engage in LFO-CV
+##' lfob <- loo(fit, mode = 'backward',  L = 50 )
+##' print(lfob)
+##' }
+##' @export 
 ##' @export loo
-##' @export
-loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
-    m <- 1 ## currently on only lfo-1-ahead
-    ahead <- m
+loo.bmgarch <- function(x, ..., type = 'lfo', L = NULL, M = 1, mode = "backward") {
+    object <- x
+    ahead <- M
     N <- object$TS_length
     ## List for returned objects
     outl <- list( )
@@ -98,12 +115,12 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
         refits <- ks <- NULL
         
         if( mode == "backward" ) {
-            k_thres <- 0.6
+            k_thres <- 0.6 # Threshold of .6 based on Buerkner at al (2020) paper
             fit_past <- object
             i_refit <- N
 
-            for (i in (N - 1):L) {
-                loglik[, i + 1] <- .log_lik(fit_past)[, i + 1]
+            for (i in seq((N - ahead), L, by = -ahead) ) {
+                loglik[, (i + 1):( i + ahead)] <- .log_lik(fit_past)[, (i + 1):( i + ahead)]
                 logratio <- .sum_log_ratios(loglik, (i + 1):i_refit)
                 psis_obj <- suppressWarnings(loo::psis(logratio))
                 k <- loo::pareto_k_values(psis_obj)
@@ -113,21 +130,30 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
                     i_refit <- i
                     refits <- c(refits, i)
                     past <- 1:i
-                    oos <- i + ahead ## come back and fix for when m > 1
+                    oos <- (i+1):(i+ahead)
                     df_past <- object$RTS_full[past, , drop = FALSE]
                     xC_past <- object$xC[past, , drop = FALSE]
                     df_oos <- object$RTS_full[c(past, oos), , drop = FALSE]
-                    xC_oos <-  object$xC[c(past, oos), , drop = FALSE]
+                    xC_oos <- object$xC[c(past, oos), , drop = FALSE]
                     fit_past <- .refit(object, data = df_past, xC_data = xC_past )
                     fc <- bmgarch::forecast(object = fit_past, ahead = ahead,
                                             xC = xC_oos[oos, ,drop = FALSE],
                                             newdata = df_oos[oos,,drop = FALSE])
-                    loglik[, i + 1 ] <- fc$forecast$log_lik[[1]]
-                    approx_elpds_1sap[i + 1] <- .log_mean_exp(loglik[, i + 1])
-                    
+                    loglik[, (i+1):(i+ahead) ] <- fc$forecast$log_lik[[1]]
+                    if(ahead == 1 ) {
+                        approx_elpds_1sap[ i+1 ] <- .log_mean_exp(loglik[, i+1 ])
+                    } else {
+                        approx_elpds_1sap[(i+1):(i+ahead)] <-
+                            apply(loglik[, (i+1):(i+ahead) ], MARGIN = 2, FUN = .log_mean_exp )    
+                    }
                 } else {
                     lw <- weights(psis_obj, normalize = TRUE)[, 1]
-                    approx_elpds_1sap[i + 1] <-  .log_sum_exp(lw + loglik[, i + 1])
+                    if(ahead == 1 ) {
+                        approx_elpds_1sap[ i+1 ] <-  .log_sum_exp(lw + loglik[, i+1 ])    
+                    } else {
+                        approx_elpds_1sap[(i+1):(i+ahead)] <-
+                            apply((lw + loglik[, (i+1):(i+ahead)]),2,.log_sum_exp )
+                    }
                 }
             }
             out <- approx_elpds_1sap
@@ -251,11 +277,12 @@ loo.bmgarch <- function(object, type = 'lfo', L = NULL, mode = "backward") {
 }
 
 ##' @title print method for lfocv
-##' @param x 
+##' @param x lfo object
+##' @param ... Not used.
 ##' @return Invisible lfocv object
 ##' @author philippe
 ##' @export
-print.loo.bmgarch <- function( x ) {
+print.loo.bmgarch <- function( x, ... ) {
     if( x$type == 'loo' ) {
         cat('elpd_loo ', x$backcast_loo)
     } else if( x$type == 'lfo' ) {

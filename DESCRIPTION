@@ -1,40 +1,47 @@
 Package: bmgarch
-Title: Bayesian Multivariate GARCH
-Version: 0.0.0.9000
-Authors@R: c( person(given = "Philippe",
+Title: Bayesian Multivariate GARCH Models
+Version: 2.0.0.9000
+Authors@R: c(
+	   person(given = "Philippe",
            family = "Rast",
            role = c("aut", "cre"),
            email = "rast.ph@gmail.com",
            comment = c(ORCID = "0000-0003-3630-6629")),
-   person(given = "Stephen",
+  	    person(given = "Stephen",
            family = "Martin",
            role = c("aut"),
            email = "stephenSRMmartin@gmail.com",
-	   comment = c(ORCID = "0000-0001-8085-2390")))
-Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. The fitted models are rstan objects and can be examined with rstan functions.  
+	   comment = c(ORCID = "0000-0001-8085-2390"))
+	   )
+Description: Fit Bayesian multivariate GARCH models using 'Stan' for full Bayesian inference. Generate (weighted) forecasts for means, variances (volatility) and correlations. Currently DCC(P,Q), CCC(P,Q), pdBEKK(P,Q), and BEKK(P,Q) parameterizations are implemented, based either on a multivariate gaussian normal or student-t distribution. DCC and CCC models are based on Engle (2002) <doi:10.1198/073500102288618487> and Bollerslev (1990). The BEKK parameterization follows Engle and Kroner (1995) <doi:10.1017/S0266466600009063> while the pdBEKK as well as the estimation approach for this package is described in Rast et al. (2020) <doi:10.31234/osf.io/j57pk>. The fitted models contain 'rstan' objects and can be examined with 'rstan' functions.  
 License: GPL (>=3)
 Depends: 
     methods,
-    R (>= 3.4.0),
-    Rcpp (>= 1.0.1)
+    R (>= 4.0.0),
+    Rcpp (>= 1.0.5)
 Imports: 
-    rstan (>= 2.18.2),
-    rstantools (>= 1.5.1),
-    ggplot2,
-    MASS,
     forecast,
-    Rdpack
+    ggplot2,
+    loo,
+    MASS,
+    Rdpack,
+    rstan (>= 2.26.0),
+    rstantools (>= 2.1.1)
 LinkingTo: 
-    BH (>= 1.69.0-1),
-    Rcpp (>= 1.0.1),
-    RcppEigen (>= 0.3.3.5.0),
-    rstan (>= 2.18.2),
-    StanHeaders (>= 2.18.1)
+    BH (>= 1.72.0-0),
+    Rcpp (>= 1.0.5),
+    RcppParallel (>= 5.0.1),
+    RcppEigen (>= 0.3.3.7.0),
+    RcppParallel (>= 5.0.1),
+    rstan (>= 2.26.0),
+    StanHeaders (>= 2.26.0)
 RdMacros: Rdpack
 Encoding: UTF-8
 LazyData: true
 NeedsCompilation: yes
 SystemRequirements: GNU make
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.2
 Suggests: 
-    testthat (>= 2.1.0)
+    testthat (>= 2.3.2)
+BugReports: https://github.com/ph-rast/bmgarch/issues
+Biarch: true

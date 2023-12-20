@@ -2,18 +2,23 @@
 % Please edit documentation in R/lfocv.R
 \name{loo.bmgarch}
 \alias{loo.bmgarch}
+\alias{loo}
 \title{Leave-Future-Out Cross Validation (LFO-CV)}
 \usage{
-\method{loo}{bmgarch}(object, type = "lfo", L = NULL, mode = "backward")
+\method{loo}{bmgarch}(x, ..., type = "lfo", L = NULL, M = 1, mode = "backward")
 }
 \arguments{
-\item{object}{Fitted bmgarch model. \code{lfocv} inherits all attributes
+\item{x}{Fitted bmgarch model. \code{lfocv} inherits all attributes
 from the bmgarch object}
 
+\item{...}{Not used}
+
 \item{type}{Takes \code{lfo} (default) or \code{loo}. LFO-CV is recommended
-for time-seris but LOO-CV may be obtained to assess the structural part of the model.}
+for time-series but LOO-CV may be obtained to assess the structural part of the model.}
 
 \item{L}{Minimal length of times series before computing LFO}
+
+\item{M}{M step head predictions. Defines to what period the LFO-CV should be tuned to. Defaults to M=1.}
 
 \item{mode}{backward elpd_lfo approximation, or exact elpd-lfo; 
 Takes 'backward', and 'exact'. 'exact' fits N-L models and may
@@ -31,9 +36,20 @@ forward or backward approximation strategies based on Pareto smoothed
 importance sampling
 described in \insertCite{Buerkner2019}{bmgarch}.
 }
+\examples{
+\dontrun{
+data(stocks)
+# Fit a DCC model 
+fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan" )],
+               parameterization = "DCC", standardize_data = TRUE,
+               iterations = 500)
+
+# Compute expected log-predictive density (elpd) using the backward mode
+# L is the upper boundary of the time-series before we engage in LFO-CV
+lfob <- loo(fit, mode = 'backward',  L = 50 )
+print(lfob)
+}
+}
 \references{
 \insertAllCited{}
-}
-\author{
-philippe
 }

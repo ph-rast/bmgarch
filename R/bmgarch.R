@@ -7,7 +7,8 @@
 #' @param standardize_data Logical.
 #' @param distribution Character.
 #' @param meanstructure Character.
-#' @return bmgarch stan data list. 
+#' @return bmgarch stan data list.
+#' @importFrom stats var
 #' @keywords internal
 standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructure){
 
@@ -20,11 +21,19 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     ## Model for meanstructure
     if( meanstructure == "constant" | meanstructure == 0 ) {
         meanstructure <- 0
-    } else if ( meanstructure == "arma" | meanstructure == 1 ){
+    } else if ( meanstructure == "arma" | meanstructure == "ARMA" | meanstructure == 1 ){
         meanstructure <- 1
+    } else if ( meanstructure == "var"  | meanstructure == "VAR"  | meanstructure == 2) {
+        meanstructure <- 2
     } else {
-        stop("meanstructure must be either 'constant' or 'arma'.")
+        stop("meanstructure must be either 'constant', 'ARMA' or 'VAR'.")
     }
+
+    ## Test that all data vectors have variance > 0
+    ## Stop if a vector has zero variance
+    dvar <- apply(data, 2, var )
+    if( sum(ifelse(dvar == 0, 1, 0)) > 0 ) stop(
+                  paste0("Datavector ", names(which(dvar == 0 ) ), " has zero variance.") )
                                                        
     ## Tests on predictor
     ## Pass in a 0 matrix, so that stan does not complain
@@ -40,58 +49,68 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
     }
 
     if( standardize_data ) {
-    ## Standardize time-series
+        ## Standardize time-series
         stdx <- scale(data)
         centered_data <- attr(stdx, "scaled:center")
         scaled_data <- attr(stdx, "scaled:scale")
         return_standat <- list(T = nrow(stdx),
-                            rts = stdx,
-                            xC = xC,
-                            nt = ncol(stdx),
-                            centered_data = centered_data,
-                            scaled_data = scaled_data,
-                            distribution = distribution,
-                            P = P,
-                            Q = Q,
-                            meanstructure = meanstructure)
-        } else {
+                               rts = stdx,
+                               xC = xC,
+                               nt = ncol(stdx),
+                               centered_data = centered_data,
+                               scaled_data = scaled_data,
+                               distribution = distribution,
+                               P = P,
+                               Q = Q,
+                               meanstructure = meanstructure)
+    } else {
         ## Unstandardized
         return_standat <- list(T = nrow(data),
-                                rts = data,
-                                xC = xC,
-                                nt = ncol(data),
-                                distribution = distribution,
-                                P = P,
-                                Q = Q,
-                                meanstructure = meanstructure)
+                               rts = data,
+                               xC = xC,
+                               nt = ncol(data),
+                               distribution = distribution,
+                               P = P,
+                               Q = Q,
+                               meanstructure = meanstructure)
     }
     return(return_standat)
 }
 
-##' Draw samples from a specified multivariate GARCH model, given multivariate time-series.
+##' Draw samples from a specified multivariate GARCH model using 'Stan', given multivariate time-series. Currently supports CCC, DCC, BEKK, and pdBEKK model parameterizations.
 ##'
-##' Three paramerizations are implemented. The constant conditinal correlation (CCC), the dynamic conditional correlation (DCC), and  BEKK.
+##' Four types of paramerizations are implemented. The constant conditional correlation (CCC) and the dynamic conditional correlation \insertCite{@DCC; Engle2002,Engle2001a}{bmgarch}, as well as  BEKK \insertCite{Engle1995}{bmgarch} and a BEKK model with positivity constraints on the diagonals of the ARCH and GARCH parameters "pdBEKK" \insertCite{Rast2020}{bmgarch}.
+##'
+##' The fitted models are 'rstan' objects and all posterior parameter estimates can be obtained and can be examined with either the 'rstan' toolbox, plotted and printed using generic functions  or passed to 'bmgarch' functions to 'forecast' or compute 'model_weights' or compute fit statistics based on leave-future-out cross-validation. 
+##' 
 ##' @title Estimate Bayesian Multivariate GARCH
 ##' @param data Time-series or matrix object. A time-series or matrix object containing observations at the same interval.
-##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c. Used in a log-linear model on the constant variance terms. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
+##' @param xC Numeric vector or matrix. Covariates(s) for the constant variance terms in C, or c, used in a log-linear model on the constant variance terms \insertCite{Rast2020}{bmgarch}. If vector, then it acts as a covariate for all constant variance terms. If matrix, must have columns equal to number of time series, and each column acts as a covariate for the respective time series (e.g., column 1 predicts constant variance for time series 1).
 ##' @param parameterization Character (Default: "CCC"). The type of of parameterization. Must be one of "CCC", "DCC", "BEKK", or "pdBEKK".
 ##' @param P Integer. Dimension of GARCH component in MGARCH(P,Q).
 ##' @param Q Integer. Dimension of ARCH component in MGARCH(P,Q).
 ##' @param iterations Integer (Default: 2000). Number of iterations for each chain (including warmup).
 ##' @param chains Integer (Default: 4). The number of Markov chains.
-##' @param standardize_data Logical (Default: FALSE). Whether data should be standardized. 
+##' @param standardize_data Logical (Default: FALSE). Whether data should be standardized to easy computations. 
 ##' @param distribution Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"
-##' @param meanstructure Character (Default: "constant"). Defines model for means. Either 'constant'  or 'arma'. Currently arma(1,1) only.
+##' @param meanstructure Character (Default: "constant"). Defines model for means. Either 'constant'  or 'ARMA'. Currently ARMA(1,1) only. OR 'VAR' (VAR1).
+##' @param sampling_algorithm Character (Default" "MCMC"). Define sampling algorithm. Either 'MCMC'for Hamiltonian Monte Carlo or 'VB' for variational Bayes. 'VB' is inherited from stan and is currently in heavy development -- do not trust estimates.
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[rstan]{stan}}.
 ##' @return \code{bmgarch} object.
 ##' @importFrom Rdpack reprompt
 ##' @author Philippe Rast, Stephen R. Martin
+##' @references
+##'    \insertAllCited()
 ##' @export
 ##' @examples
 ##' \dontrun{
 ##' data(panas)
-##' # Fit pdBEKK(1,1) mgarch model with a ARMA(1,1) meanstructure, and student-t residual distribution
-##' fit <- bmgarch(panas, parameterization = "pdBEKK", P = 1, Q = 1, meanstructure = "arma", distribution = "Student_t")
+##' # Fit BEKK(1,1) mgarch model with a ARMA(1,1) meanstructure,
+##' # and student-t residual distribution
+##' fit <- bmgarch(panas, parameterization = "BEKK",
+##'                P = 1, Q = 1,
+##'                meanstructure = "arma",
+##'                distribution = "Student_t")
 ##'
 ##' # Summarize the parameters
 ##' summary(fit)
@@ -117,6 +136,13 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##'
 ##' # Save estimated and forecasted data as a data.frame
 ##' df.fc <- as.data.frame(fit.fc)
+##'
+##' # Access rstan's model fit object
+##' mf <- fit$model_fit
+##'
+##' # Return diagnostics and a plot of the first 10 parameters
+##' rstan::check_hmc_diagnostics(mf)
+##' rstan::plot(mf)
 ##' }
 bmgarch <- function(data,
                    xC = NULL,
@@ -127,7 +153,8 @@ bmgarch <- function(data,
                    chains = 4,
                    standardize_data = FALSE,
                    distribution = "Student_t",
-                   meanstructure = "constant", ...) {
+                   meanstructure = "constant",
+                   sampling_algorithm = "MCMC", ...) {
     if ( tolower(distribution) == "gaussian" ) {
         num_dist <- 0
     } else if ( tolower(distribution) == "student_t" ) {
@@ -153,14 +180,25 @@ bmgarch <- function(data,
              ".")
     }
 
-    model_fit <- rstan::sampling(stanmodel,
-                                 data = stan_data,
-                                 verbose = TRUE,
-                                 iter = iterations,
-                                 control = list(adapt_delta = .99),
-                                 chains = chains,
-                                 init_r = .05)
-
+    ## MCMC Sampling with NUTS
+    if(sampling_algorithm == 'MCMC' ) {
+        model_fit <- rstan::sampling(stanmodel,
+                                     data = stan_data,
+                                     verbose = TRUE,
+                                     iter = iterations,
+                                     control = list(adapt_delta = .99),
+                                     chains = chains,
+                                     init_r = .05, ...)
+    } else if (sampling_algorithm == 'VB' ) {
+    ## Sampling via Variational Bayes
+    model_fit <- rstan::vb(stanmodel,
+                           data = stan_data,
+                           iter = iterations,
+                           importance_resampling = TRUE, ...)
+    } else {
+        stop( "\n\n Provide sampling algorithm: 'MCMC' or 'VB'\n\n" )
+    }
+    
     ## Model fit is based on standardized values.
     mns <- return_standat$centered_data
     sds <- return_standat$scaled_data
@@ -184,7 +222,8 @@ bmgarch <- function(data,
                        mgarchP = stan_data$P,
                        xC = stan_data$xC,
                        meanstructure = stan_data$meanstructure,
-                       std_data = standardize_data)
+                       std_data = standardize_data,
+                       sampling_algorithm = sampling_algorithm)
     class(return_fit) <- "bmgarch"
     return(return_fit)
 }
@@ -195,5 +234,5 @@ bmgarch <- function(data,
 #' To be used when checking whether a parameterization or object type is a supported type.
 #' May facilitate more parameterizations, as we only have to update these, and the switch statements.
 #' @keywords internal
-#' @author Stephen R. Martin
+#' @author Philippe Rast and Stephen R. Martin
 supported_models <- c("DCC", "CCC", "BEKK", "pdBEKK")

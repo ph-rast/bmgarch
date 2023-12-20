@@ -4,14 +4,14 @@
 \alias{as.data.frame.forecast.bmgarch}
 \title{as.data.frame method for forecast.bmgarch objects.}
 \usage{
-\method{as.data.frame}{forecast.bmgarch}(x, backcast = TRUE, ...)
+\method{as.data.frame}{forecast.bmgarch}(x, ..., backcast = TRUE)
 }
 \arguments{
 \item{x}{forecast.bmgarch object.}
 
-\item{backcast}{Logical (Default: True). Whether to include "backcasted" values from \code{\link{fitted.bmgarch}} in data frame.}
-
 \item{...}{Not used.}
+
+\item{backcast}{Logical (Default: True). Whether to include "backcasted" values from \code{\link{fitted.bmgarch}} in data frame.}
 }
 \value{
 Data frame.
