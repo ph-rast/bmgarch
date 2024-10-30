@@ -11,3 +11,4 @@
 ## Do not ignore this:
 !inst/include/stan_meta_header.hpp
 src/Makevars
+/inst/stan/CCCMGARCH

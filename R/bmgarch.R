@@ -95,6 +95,7 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##' @param distribution Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"
 ##' @param meanstructure Character (Default: "constant"). Defines model for means. Either 'constant'  or 'ARMA'. Currently ARMA(1,1) only. OR 'VAR' (VAR1).
 ##' @param sampling_algorithm Character (Default" "MCMC"). Define sampling algorithm. Either 'MCMC'for Hamiltonian Monte Carlo or 'VB' for variational Bayes. 'VB' is inherited from stan and is currently in heavy development -- do not trust estimates.
+##' @param backend Select backend. Defaults to 'rstan' or select 'cmdstanr' if installed.
 ##' @param ... Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[rstan]{stan}}.
 ##' @return \code{bmgarch} object.
 ##' @importFrom Rdpack reprompt
@@ -154,7 +155,8 @@ bmgarch <- function(data,
                    standardize_data = FALSE,
                    distribution = "Student_t",
                    meanstructure = "constant",
-                   sampling_algorithm = "MCMC", ...) {
+                   sampling_algorithm = "MCMC",
+                   backend =  "rstan", ...) {
     if ( tolower(distribution) == "gaussian" ) {
         num_dist <- 0
     } else if ( tolower(distribution) == "student_t" ) {
@@ -166,12 +168,31 @@ bmgarch <- function(data,
     return_standat <- standat(data, xC, P, Q,  standardize_data, distribution = num_dist, meanstructure )
     stan_data <- return_standat[ c("T", "xC", "rts", "nt", "distribution", "P", "Q", "meanstructure")]
 
+    if(backend == 'rstan') {
     stanmodel <- switch(parameterization,
                         CCC = stanmodels$CCCMGARCH,
                         DCC = stanmodels$DCCMGARCH,
                         BEKK = stanmodels$BEKKMGARCH,
                         pdBEKK = stanmodels$pdBEKKMGARCH,
                         NULL)
+    } else if(backend == 'cmdstanr') {
+      stan_path <- .get_target_stan_path()
+
+      ccc_file <- file.path(stan_path, "CCCMGARCH.stan" )
+      dcc_file <- file.path(stan_path, "DCCMGARCH.stan" )
+      bekk_file <-file.path(stan_path, "BEKKMGARCH.stan" )
+      pdbekk_file <-file.path(stan_path, "pdBEKKMGARCH.stan" )
+      stanmodel <- switch(parameterization,
+                        CCC = cmdstanr::cmdstan_model(ccc_file, include_paths =  stan_path,
+                                            cpp_options = list(stan_threads = TRUE)),
+                        DCC = cmdstanr::cmdstan_model(dcc_file, include_paths =  stan_path,
+                                            cpp_options = list(stan_threads = TRUE)),
+                        BEKK = cmdstanr::cmdstan_model(bekk_file, include_paths =  stan_path,
+                                                       cpp_options = list(stan_threads = TRUE)),
+                        pdBEKK = cmdstanr::cmdstan_model(pdbekk_file, include_paths =  stan_path,
+                                                         cpp_options = list(stan_threads = TRUE)),
+                        NULL)
+    }
     if(is.null(stanmodel)) {
         stop("Not a valid model specification. ",
              parameterization,
@@ -190,13 +211,22 @@ bmgarch <- function(data,
                                      chains = chains,
                                      init_r = .05, ...)
     } else if (sampling_algorithm == 'VB' ) {
-    ## Sampling via Variational Bayes
-    model_fit <- rstan::vb(stanmodel,
-                           data = stan_data,
-                           iter = iterations,
-                           importance_resampling = TRUE, ...)
+      if(backend == 'rstan') {
+        ## Sampling via Variational Bayes
+        model_fit <- rstan::vb(stanmodel,
+                               data = stan_data,
+                               iter = iterations,
+                               importance_resampling = TRUE, ...)
+      } else if (backend == 'cmdstanr') {
+        model_fit <- stanmodel$variational(stanmodel,
+                                      data = stan_data,
+                                      iter = iterations,
+                                      ...)
+      } else {
+        stop("Invalid backend specified.")
+      }
     } else {
-        stop( "\n\n Provide sampling algorithm: 'MCMC' or 'VB'\n\n" )
+      stop( "\n\n Provide sampling algorithm: 'MCMC' or 'VB'\n\n" )
     }
     
     ## Model fit is based on standardized values.
