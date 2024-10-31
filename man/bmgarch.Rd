@@ -16,6 +16,7 @@ bmgarch(
   distribution = "Student_t",
   meanstructure = "constant",
   sampling_algorithm = "MCMC",
+  backend = "rstan",
   ...
 )
 }
@@ -41,6 +42,8 @@ bmgarch(
 \item{meanstructure}{Character (Default: "constant"). Defines model for means. Either 'constant'  or 'ARMA'. Currently ARMA(1,1) only. OR 'VAR' (VAR1).}
 
 \item{sampling_algorithm}{Character (Default" "MCMC"). Define sampling algorithm. Either 'MCMC'for Hamiltonian Monte Carlo or 'VB' for variational Bayes. 'VB' is inherited from stan and is currently in heavy development -- do not trust estimates.}
+
+\item{backend}{Select backend. Defaults to 'rstan' or select 'cmdstanr' if installed.}
 
 \item{...}{Additional arguments can be ‘chain_id’, ‘init_r’, ‘test_grad’, ‘append_samples’, ‘refresh’, ‘enable_random_init’ etc. See the documentation in \code{\link[rstan]{stan}}.}
 }
