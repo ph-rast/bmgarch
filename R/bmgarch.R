@@ -174,14 +174,16 @@ bmgarch <- function(data,
                         DCC = stanmodels$DCCMGARCH,
                         BEKK = stanmodels$BEKKMGARCH,
                         pdBEKK = stanmodels$pdBEKKMGARCH,
+                        const = stanmodels$constMGARCH,
                         NULL)
     } else if(backend == 'cmdstanr') {
       stan_path <- .get_target_stan_path()
 
-      ccc_file <- file.path(stan_path, "CCCMGARCH.stan" )
-      dcc_file <- file.path(stan_path, "DCCMGARCH.stan" )
-      bekk_file <-file.path(stan_path, "BEKKMGARCH.stan" )
-      pdbekk_file <-file.path(stan_path, "pdBEKKMGARCH.stan" )
+      ccc_file    <- file.path(stan_path, "CCCMGARCH.stan")
+      dcc_file    <- file.path(stan_path, "DCCMGARCH.stan")
+      bekk_file   <- file.path(stan_path, "BEKKMGARCH.stan")
+      pdbekk_file <- file.path(stan_path, "pdBEKKMGARCH.stan")
+      const_file  <- file.path(stan_path, "constMGARCH.stan")
       stanmodel <- switch(parameterization,
                         CCC = cmdstanr::cmdstan_model(ccc_file, include_paths =  stan_path,
                                             cpp_options = list(stan_threads = TRUE)),
@@ -191,6 +193,8 @@ bmgarch <- function(data,
                                                        cpp_options = list(stan_threads = TRUE)),
                         pdBEKK = cmdstanr::cmdstan_model(pdbekk_file, include_paths =  stan_path,
                                                          cpp_options = list(stan_threads = TRUE)),
+                        const = cmdstanr::cmdstan_model(const_file, include_paths = stan_path,
+                                                        cpp_options = list(stan_threads = TRUE)),
                         NULL)
     }
     if(is.null(stanmodel)) {
@@ -265,4 +269,4 @@ bmgarch <- function(data,
 #' May facilitate more parameterizations, as we only have to update these, and the switch statements.
 #' @keywords internal
 #' @author Philippe Rast and Stephen R. Martin
-supported_models <- c("DCC", "CCC", "BEKK", "pdBEKK")
+supported_models <- c("DCC", "CCC", "BEKK", "pdBEKK", "const")

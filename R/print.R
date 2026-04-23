@@ -54,11 +54,13 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
     out$meta$digits <- digits
 
     # Get the model summaries. print.summary.bmgarch will process this + meta.
+    const_params <- c("c_h", "R", "c_h_var")
     params <- switch(object$param,
                      CCC = c(ccc_params, arma_params, var_params, common_params),
                      DCC = c(dcc_params, arma_params, var_params, common_params),
                      BEKK = c(bekk_params, arma_params, var_params, common_params),
                      pdBEKK = c(bekk_params, arma_params, var_params, common_params),
+                     const = c(const_params, arma_params, var_params, common_params),
                      NULL
                      )
     if(is.null(params)) {

@@ -15,8 +15,10 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 RcppExport SEXP _rcpp_module_boot_stan_fit4BEKKMGARCH_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4CCCMGARCH_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4DCCMGARCH_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4constMGARCH_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4forecastBEKK_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4forecastCCC_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4forecastConst_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4forecastDCC_mod();
 RcppExport SEXP _rcpp_module_boot_stan_fit4pdBEKKMGARCH_mod();
 
@@ -24,8 +26,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rcpp_module_boot_stan_fit4BEKKMGARCH_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4BEKKMGARCH_mod, 0},
     {"_rcpp_module_boot_stan_fit4CCCMGARCH_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4CCCMGARCH_mod, 0},
     {"_rcpp_module_boot_stan_fit4DCCMGARCH_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4DCCMGARCH_mod, 0},
+    {"_rcpp_module_boot_stan_fit4constMGARCH_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4constMGARCH_mod, 0},
     {"_rcpp_module_boot_stan_fit4forecastBEKK_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4forecastBEKK_mod, 0},
     {"_rcpp_module_boot_stan_fit4forecastCCC_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4forecastCCC_mod, 0},
+    {"_rcpp_module_boot_stan_fit4forecastConst_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4forecastConst_mod, 0},
     {"_rcpp_module_boot_stan_fit4forecastDCC_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4forecastDCC_mod, 0},
     {"_rcpp_module_boot_stan_fit4pdBEKKMGARCH_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4pdBEKKMGARCH_mod, 0},
     {NULL, NULL, 0}

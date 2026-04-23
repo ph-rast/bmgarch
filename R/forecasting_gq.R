@@ -128,10 +128,11 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
                         compute_log_lik =  compute_log_lik)
 
         gqs_model <- switch(m$param,
-                            DCC = stanmodels$forecastDCC,
-                            CCC = stanmodels$forecastCCC,
-                            BEKK =stanmodels$forecastBEKK,
+                            DCC    = stanmodels$forecastDCC,
+                            CCC    = stanmodels$forecastCCC,
+                            BEKK   = stanmodels$forecastBEKK,
                             pdBEKK = stanmodels$forecastBEKK,
+                            const  = stanmodels$forecastConst,
                             NULL)
         if(is.null(gqs_model)) {
             stop("bmgarch object 'param' does not match a supported model. ",

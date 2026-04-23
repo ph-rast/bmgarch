@@ -6,6 +6,8 @@
 *.so
 *.hpp
 *.dll
+*.cc
+*.h
 .Rproj.user/
 
 ## Do not ignore this:
