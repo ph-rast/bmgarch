@@ -14,8 +14,8 @@ devtools::load_all()
 
 
 out <- standat(data = stocks[1:100, c("toyota",  "nissan" )],
-        P = 1, Q = 1, meanstructure = 0, xC = NULL,
-        standardize_data = 1, distribution = 0)
+               P = 1, Q = 1, meanstructure = 0, xC = NULL,
+               standardize_data = 1, distribution = 0)
 
 stan_data <- out[ c("T", "xC", "rts", "nt", "distribution", "P", "Q", "meanstructure")]
 stan_data$rts[100]
@@ -24,7 +24,7 @@ stan_data$T
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan", "honda")],
                Q =  1,
                standardize_data = TRUE,
-               parameterization = "CCC", 
+               parameterization = "BEKK", 
                iterations = 500, sampling_algorithm = 'VB',
                backend =  "cmdstanr",
                threads =  1,

@@ -222,10 +222,10 @@ bmgarch <- function(data,
                                iter = iterations,
                                importance_resampling = TRUE, ...)
       } else if (backend == 'cmdstanr') {
-        model_fit <- stanmodel$variational(stanmodel,
-                                      data = stan_data,
-                                      iter = iterations,
-                                      ...)
+          model_fit <- stanmodel$variational(
+                                     data = stan_data,
+                                     iter = iterations,
+                                     ...)
       } else {
         stop("Invalid backend specified.")
       }
@@ -239,13 +239,21 @@ bmgarch <- function(data,
     ## Values could be converted to original scale using something like this on the estimates
     ## orig_sd = stan_data$rts %*% diag(sds)
     ## orig_scale = orig_sd + array(rep(mns, each = aussi[[1]]$T), dim = c(aussi[[1]]$T, aussi[[1]]$nt) )
+    elapsed_time <- if (backend == 'rstan') {
+      rstan::get_elapsed_time(model_fit)
+    } else if (backend == 'cmdstanr' && sampling_algorithm == 'MCMC') {
+      t <- model_fit$time()$chains
+      matrix(c(t$warmup, t$sampling), ncol = 2, dimnames = list(NULL, c("warmup", "sample")))
+    } else {
+      NULL
+    }
     return_fit <- list(model_fit = model_fit,
                        param = parameterization,
                        distribution = distribution,
                        num_dist = num_dist,
                        iter = iterations,
                        chains = chains,
-                       elapsed_time = rstan::get_elapsed_time(model_fit),
+                       elapsed_time = elapsed_time,
                        date = date(),
                        nt = stan_data$nt,
                        TS_length = stan_data$T,

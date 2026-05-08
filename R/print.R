@@ -85,17 +85,43 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
 ##' @author Stephen R. Martin, Philippe Rast
 ##' @keywords internal
 .get_stan_summary <- function(model_fit, params, CrI, weights = NULL, sampling_algorithm ) {
-    ## Check if we are dealing with 1 or multiple models
-    if (inherits(model_fit, "stanfit") || (inherits(model_fit, "list") && length(model_fit) == 1)) {
-      if (inherits(model_fit, "list")) {
+    ## Unwrap single-element list before backend detection
+    if (inherits(model_fit, "list") && length(model_fit) == 1) {
         model_fit <- model_fit[[1]]
-      }
+    }
+    is_cmdstan <- inherits(model_fit, c("CmdStanMCMC", "CmdStanVB", "CmdStanMLE", "CmdStanGQ"))
+    ## Check if we are dealing with 1 or multiple models
+    if (inherits(model_fit, "stanfit") || is_cmdstan) {
         CrI <- c(.5, CrI)
+        if (is_cmdstan) {
+            tbl <- model_fit$summary(
+                variables = params,
+                mean = ~mean(.x),
+                sd = ~sd(.x),
+                ~quantile(.x, probs = CrI, names = TRUE)
+            )
+            if (sampling_algorithm == 'MCMC') {
+                diag_tbl <- model_fit$summary(variables = params,
+                                              rhat = posterior::rhat,
+                                              n_eff = posterior::ess_bulk)
+                tbl$n_eff <- diag_tbl$n_eff[match(tbl$variable, diag_tbl$variable)]
+                tbl$Rhat  <- diag_tbl$rhat[match(tbl$variable, diag_tbl$variable)]
+            } else {
+                tbl$n_eff <- NA_real_
+                tbl$Rhat  <- NA_real_
+            }
+            rn <- tbl$variable
+            tbl$variable <- NULL
+            mat <- as.matrix(tbl)
+            rownames(mat) <- rn
+            colnames(mat)[colnames(mat) == "50%"] <- "mdn"
+            return(mat)
+        }
         if(sampling_algorithm == 'MCMC') {
-            cols <- c("mean","sd",paste0(CrI*100, "%"), "n_eff", "Rhat")            
+            cols <- c("mean","sd",paste0(CrI*100, "%"), "n_eff", "Rhat")
         } else { ## VB does not return n_eff and Rhat
             if(sampling_algorithm == 'VB' ) {
-                cols <- c("mean","sd",paste0(CrI*100, "%"))                
+                cols <- c("mean","sd",paste0(CrI*100, "%"))
             }
         }
         model_summary <- rstan::summary(model_fit, pars = params, probs = CrI)$summary[,cols]

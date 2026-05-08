@@ -146,8 +146,13 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
         forecast_end <- (m$TS_length + ahead)
 
         ## TODO: Limit pars to only what is needed (H_p, R/R_p, rts_p, mu_p)
+        draws_mat <- if (inherits(m$model_fit, c("CmdStanMCMC", "CmdStanVB", "CmdStanMLE", "CmdStanGQ"))) {
+            as.matrix(m$model_fit$draws())
+        } else {
+            as.matrix(m$model_fit)
+        }
         forecasted <- rstan::gqs(gqs_model,
-                                 draws = as.matrix(m$model_fit),
+                                 draws = draws_mat,
                                  data = standat,
                                  seed = seed)
         return(forecasted)
