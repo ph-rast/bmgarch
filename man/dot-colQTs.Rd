@@ -7,7 +7,7 @@
 .colQTs(x, probs)
 }
 \arguments{
-\item{x}{}
+\item{x}{List of parameter sample arrays.}
 
 \item{probs}{Quantile(s). Inherits from \code{forecast} which defaults to \code{c(.025, .975)}.}
 }

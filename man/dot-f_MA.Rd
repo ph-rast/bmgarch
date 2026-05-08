@@ -7,15 +7,15 @@
 .f_MA(MA, theta, mu, rts, i)
 }
 \arguments{
-\item{MA}{}
+\item{MA}{MA coefficient array.}
 
-\item{theta}{}
+\item{theta}{Theta coefficient matrix.}
 
-\item{mu}{}
+\item{mu}{Mean matrix.}
 
-\item{rts}{}
+\item{rts}{Return time series matrix.}
 
-\item{i}{}
+\item{i}{Index of current period.}
 }
 \value{
 matrix

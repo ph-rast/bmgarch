@@ -7,13 +7,13 @@
 .f_array_x_mat(mat_out, array_obj, mat_obj, i)
 }
 \arguments{
-\item{mat_out}{}
+\item{mat_out}{Output matrix.}
 
-\item{array_obj}{}
+\item{array_obj}{3-D coefficient array.}
 
-\item{mat_obj}{}
+\item{mat_obj}{Matrix to multiply.}
 
-\item{i}{}
+\item{i}{Index of current period.}
 }
 \value{
 matrix

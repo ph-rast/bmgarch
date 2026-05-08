@@ -9,7 +9,7 @@
 
 ##' Obtain quantiles over columns in lists
 ##' @title Quantiles within lists
-##' @param x 
+##' @param x List of parameter sample arrays.
 ##' @param probs Quantile(s). Inherits from \code{forecast} which defaults to \code{c(.025, .975)}.
 ##' @return Quantiles at the column level within lists
 ##' @author philippe

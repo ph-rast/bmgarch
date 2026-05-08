@@ -7,7 +7,7 @@
 .qtile(x, CrI = c(0.025, 0.975))
 }
 \arguments{
-\item{x}{}
+\item{x}{Numeric vector.}
 }
 \description{
 Internal function to be used

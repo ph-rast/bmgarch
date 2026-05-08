@@ -1,10 +1,10 @@
 ## obtain MA piece for Forecasting
-##' @title Multiply matrices in array with a vector 
-##' @param MA 
-##' @param theta 
-##' @param mu 
-##' @param rts 
-##' @param i 
+##' @title Multiply matrices in array with a vector
+##' @param MA MA coefficient array.
+##' @param theta Theta coefficient matrix.
+##' @param mu Mean matrix.
+##' @param rts Return time series matrix.
+##' @param i Index of current period.
 ##' @return matrix
 ##' @author Philippe Rast
 ##' @keywords internal
@@ -14,10 +14,10 @@
 }
 
 ##' @title Multiply matrices in array with a vector -- generic
-##' @param mat_out 
-##' @param array_obj 
-##' @param mat_obj 
-##' @param i 
+##' @param mat_out Output matrix.
+##' @param array_obj 3-D coefficient array.
+##' @param mat_obj Matrix to multiply.
+##' @param i Index of current period.
 ##' @return matrix
 ##' @author Philippe Rast
 ##' @keywords internal
@@ -44,7 +44,7 @@
 }
 
 ##' @title Internal function to be used
-##' @param x 
+##' @param x Numeric vector.
 ##' @keywords internal
 ##' @importFrom stats quantile
 .qtile <- function(x, CrI = c(.025, .975) ) {
