@@ -147,7 +147,7 @@ forecast.bmgarch <- function(object, ahead = 1, xC = NULL,
 
         ## TODO: Limit pars to only what is needed (H_p, R/R_p, rts_p, mu_p)
         draws_mat <- if (inherits(m$model_fit, c("CmdStanMCMC", "CmdStanVB", "CmdStanMLE", "CmdStanGQ"))) {
-            as.matrix(m$model_fit$draws())
+            as.matrix(posterior::as_draws_matrix(m$model_fit$draws()))
         } else {
             as.matrix(m$model_fit)
         }

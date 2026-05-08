@@ -14,3 +14,5 @@
 !inst/include/stan_meta_header.hpp
 src/Makevars
 /inst/stan/CCCMGARCH
+/inst/stan/BEKKMGARCH
+/inst/stan/DCCMGARCH

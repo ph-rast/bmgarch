@@ -24,8 +24,10 @@ stan_data$T
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan", "honda")],
                Q =  1,
                standardize_data = TRUE,
-               parameterization = "BEKK", 
-               iterations = 500, sampling_algorithm = 'VB',
+               parameterization = "DCC",
+               meanstructure = "VAR",
+               iterations = 500,
+               sampling_algorithm = 'MCMC',
                backend =  "cmdstanr",
                threads =  1,
                seed =  123,
@@ -41,4 +43,6 @@ fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan", "honda")],
 
 summary(fit )
 plot(fit )
-forecast(fit,  ahead = 10 )
+fc <- forecast(fit,  ahead = 10 )
+fc
+plot(fc, type = 'var')

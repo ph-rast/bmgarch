@@ -89,7 +89,7 @@ standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructur
 ##' @param parameterization Character (Default: "CCC"). The type of of parameterization. Must be one of "CCC", "DCC", "BEKK", or "pdBEKK".
 ##' @param P Integer. Dimension of GARCH component in MGARCH(P,Q).
 ##' @param Q Integer. Dimension of ARCH component in MGARCH(P,Q).
-##' @param iterations Integer (Default: 2000). Number of iterations for each chain (including warmup).
+##' @param iterations Integer (Default: 2000 for MCMC, 30000 for VB). Number of iterations. For MCMC, this includes warmup. For VB, this is the maximum number of ADVI gradient ascent iterations.
 ##' @param chains Integer (Default: 4). The number of Markov chains.
 ##' @param standardize_data Logical (Default: FALSE). Whether data should be standardized to easy computations. 
 ##' @param distribution Character (Default: "Student_t"). Distribution of innovation: "Student_t"  or "Gaussian"
@@ -150,7 +150,7 @@ bmgarch <- function(data,
                    parameterization = "CCC",
                    P = 1,
                    Q = 1,
-                   iterations = 2000,
+                   iterations = NULL,
                    chains = 4,
                    standardize_data = FALSE,
                    distribution = "Student_t",
@@ -163,6 +163,10 @@ bmgarch <- function(data,
         num_dist <- 1
     } else {
         stop( "\n\n Specify distribution: Gaussian or Student_t \n\n")
+    }
+
+    if (is.null(iterations)) {
+        iterations <- if (sampling_algorithm == 'VB') 30000L else 2000L
     }
 
     return_standat <- standat(data, xC, P, Q,  standardize_data, distribution = num_dist, meanstructure )
@@ -207,13 +211,25 @@ bmgarch <- function(data,
 
     ## MCMC Sampling with NUTS
     if(sampling_algorithm == 'MCMC' ) {
-        model_fit <- rstan::sampling(stanmodel,
-                                     data = stan_data,
-                                     verbose = TRUE,
-                                     iter = iterations,
-                                     control = list(adapt_delta = .99),
-                                     chains = chains,
-                                     init_r = .05, ...)
+        if(backend == 'rstan') {
+            model_fit <- rstan::sampling(stanmodel,
+                                         data = stan_data,
+                                         verbose = TRUE,
+                                         iter = iterations,
+                                         control = list(adapt_delta = .99),
+                                         chains = chains,
+                                         init_r = .05, ...)
+        } else if(backend == 'cmdstanr') {
+            model_fit <- stanmodel$sample(
+                                         data = stan_data,
+                                         iter_warmup = iterations %/% 2,
+                                         iter_sampling = iterations %/% 2,
+                                         chains = chains,
+                                         adapt_delta = .99,
+                                         ...)
+        } else {
+            stop("Invalid backend specified.")
+        }
     } else if (sampling_algorithm == 'VB' ) {
       if(backend == 'rstan') {
         ## Sampling via Variational Bayes

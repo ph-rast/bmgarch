@@ -129,7 +129,7 @@ model {
   // UL transform jacobian
   for(k in 1:nt) {
     ULs[k] ~ uniform(0, UPs[k]); // Truncation not needed.
-    target += a_b_scale_jacobian(0, ULs[k], b_h_sum_s[k]);
+    target += a_b_scale_jac(0, ULs[k], b_h_sum_s[k]);
   }
 
   // priors

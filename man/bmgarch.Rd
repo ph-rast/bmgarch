@@ -10,7 +10,7 @@ bmgarch(
   parameterization = "CCC",
   P = 1,
   Q = 1,
-  iterations = 2000,
+  iterations = NULL,
   chains = 4,
   standardize_data = FALSE,
   distribution = "Student_t",
@@ -31,7 +31,7 @@ bmgarch(
 
 \item{Q}{Integer. Dimension of ARCH component in MGARCH(P,Q).}
 
-\item{iterations}{Integer (Default: 2000). Number of iterations for each chain (including warmup).}
+\item{iterations}{Integer (Default: 2000 for MCMC, 30000 for VB). Number of iterations. For MCMC, this includes warmup. For VB, this is the maximum number of ADVI gradient ascent iterations.}
 
 \item{chains}{Integer (Default: 4). The number of Markov chains.}
 

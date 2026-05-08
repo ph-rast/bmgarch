@@ -5,7 +5,7 @@
   @param value The unconstrained value to be transformed.
   @return log jacobian contribution.
  */
-real a_b_scale_jacobian(real a, real b, real value) {
+real a_b_scale_jac(real a, real b, real value) {
   real invlogit_value = inv_logit(value);
   real out = log(b - a) + log(invlogit_value) + log1m(invlogit_value);
   return(out);
