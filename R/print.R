@@ -167,6 +167,50 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
         Reduce("+", lapply(samps, function(m) {m[[p]]})) # Sum samples together
     })
     names(samps_comb) <- params
+
+    # Between-model covariance correction (law of total variance).
+    # For each covariance param [draws, T, nt, nt], add
+    #   Σ_m w_m (μ̂_m − μ̂_mix)(μ̂_m − μ̂_mix)ᵀ
+    # to every draw so that colMeans() returns the correct ensemble posterior
+    # predictive covariance.  The mapping from covariance param to its
+    # corresponding mean param is fixed by the Stan model naming convention.
+    cov_to_mean <- list(H = "mu", H_forecasted = "rts_forecasted")
+    cov_params  <- intersect(params, names(cov_to_mean))
+
+    if (length(cov_params) > 0) {
+        for (p in cov_params) {
+            mean_param  <- cov_to_mean[[p]]
+            mean_samps  <- lapply(model_fit, function(m) {
+                rstan::extract(m, pars = mean_param)[[mean_param]]
+            })
+            # Per-model posterior predictive means: [T, nt]
+            mu_list <- lapply(mean_samps, function(m) {
+                apply(m, seq(2L, length(dim(m))), mean)
+            })
+            # Mixture mean: [T, nt]
+            mu_mix <- Reduce("+", mapply(function(mu, wi) wi * mu,
+                                         mu_list, weights, SIMPLIFY = FALSE))
+
+            nd <- length(dim(samps_comb[[p]]))
+            if (nd == 4L) {  # [draws, T, nt, nt]
+                T_len  <- dim(samps_comb[[p]])[2]
+                nt     <- dim(samps_comb[[p]])[3]
+                correction <- array(0, dim = c(T_len, nt, nt))
+                for (mi in seq_len(length(model_fit))) {
+                    for (t in seq_len(T_len)) {
+                        dd <- mu_list[[mi]][t, ] - mu_mix[t, ]
+                        correction[t, , ] <- correction[t, , ] + weights[mi] * outer(dd, dd)
+                    }
+                }
+                # Broadcast [T, nt, nt] correction across draws dimension
+                n_draws <- dim(samps_comb[[p]])[1]
+                corr_4d <- aperm(array(correction, dim = c(T_len, nt, nt, n_draws)),
+                                 c(4L, 1L, 2L, 3L))
+                samps_comb[[p]] <- samps_comb[[p]] + corr_4d
+            }
+        }
+    }
+
     return(samps_comb)
 }
 

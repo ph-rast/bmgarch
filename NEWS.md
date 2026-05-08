@@ -1,5 +1,13 @@
 # bmgarch (development version)
 
+* Fixed ensemble covariance underestimation in `.weighted_samples()`. The
+  between-model variance term required by the law of total variance,
+  `Σ_m w_m (μ̂_m − μ̂_mix)(μ̂_m − μ̂_mix)ᵀ`, is now added to the
+  weighted combination of `H` and `H_forecasted`. This corrects the
+  ensemble posterior predictive covariance for both backcasts and forecasts
+  whenever models with differing mean structures are combined. The fix is a
+  no-op for single-model objects.
+
 # bmgarch 2.0.0
 
 * All stan models are rewritten to match the new `rstan 2.26.0` array syntax.
