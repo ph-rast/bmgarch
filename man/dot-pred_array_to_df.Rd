@@ -17,7 +17,7 @@
 data.frame. Columns: period, type (backcast, forecast), param (var, mean, cor), TS (which time series, or which correlation for param = cor), summary columns.
 }
 \description{
-Helper function for as.data.frame.{fitted, forecast}. Converts predictive array to data.frame.
+Helper function for as.data.frame.\{fitted, forecast\}. Converts predictive array to data.frame.
 }
 \author{
 Stephen R. Martin

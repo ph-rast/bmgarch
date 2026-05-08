@@ -5,7 +5,9 @@
   ## set core options
   op = options()
   options(mc.cores = parallel::detectCores())
-  
+}
+
+.onAttach <- function(libname, pkgname) {
   ## Check for optional presence of cmdstanr
   if (!requireNamespace("cmdstanr", quietly = TRUE)) {
     packageStartupMessage(
