@@ -9,6 +9,7 @@
 #' @param meanstructure Character.
 #' @return bmgarch stan data list.
 #' @importFrom stats var
+#' @importFrom utils modifyList
 #' @keywords internal
 standat <- function(data, xC, P, Q, standardize_data, distribution, meanstructure){
 

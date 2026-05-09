@@ -15,3 +15,7 @@
 ^CRAN-RELEASE$
 ^doc$
 ^CRAN-SUBMISSION$
+^\.claude$
+^inst/stan/BEKKMGARCH$
+^inst/stan/CCCMGARCH$
+^inst/stan/DCCMGARCH$

@@ -1,6 +1,7 @@
 Package: bmgarch
 Title: Bayesian Multivariate GARCH Models
 Version: 2.0.0.9000
+Date: 2026-05-08
 Authors@R: c(
 	   person(given = "Philippe",
            family = "Rast",
@@ -44,6 +45,7 @@ Suggests:
     cmdstanr,
     posterior,
     testthat (>= 2.3.2)
+Additional_repositories: https://stan-dev.r-universe.dev
 BugReports: https://github.com/ph-rast/bmgarch/issues
 Biarch: true
 Config/roxygen2/version: 8.0.0

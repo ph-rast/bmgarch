@@ -1,4 +1,4 @@
-# bmgarch (development version)
+# bmgarch 2.1.0
 
 ## cmdstanr backend support
 

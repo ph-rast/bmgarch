@@ -1,5 +1,5 @@
 ##' @keywords internal
-##' @importFrom stats sd
+##' @importFrom stats sd setNames
 .colSDs <- function(x) {
     lapply(x, function(x) {
         dims <- dim(x)
