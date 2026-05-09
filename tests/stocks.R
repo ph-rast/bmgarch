@@ -27,7 +27,7 @@ fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan", "honda")],
                parameterization = "DCC",
                meanstructure = "VAR",
                iterations = 500,
-               sampling_algorithm = 'MCMC',
+               sampling_algorithm = 'VB',
                backend =  "cmdstanr",
                threads =  1,
                seed =  123,
@@ -46,3 +46,29 @@ plot(fit )
 fc <- forecast(fit,  ahead = 10 )
 fc
 plot(fc, type = 'var')
+
+
+fit1 <- bmgarch(data = stocks[1:100, c("toyota",  "nissan", "honda")],
+               Q =  1,
+               standardize_data = TRUE,
+               parameterization = "CCC",
+               meanstructure = "constant",
+               iterations = 500,
+               sampling_algorithm = 'VB',
+               backend =  "cmdstanr",
+               threads =  1,
+               seed =  123,
+               refresh =  0,
+               init =  0,
+               save_latent_dynamics = FALSE,
+               output_dir =  NULL)
+
+summary(fit1)
+
+modfits <- bmgarch_list(fit, fit1)
+
+mw <- model_weights(modfits, L = 50, method = 'stacking')
+mw
+
+w_fc <- forecast(modfits, ahead = 5, weights = mw )
+w_fc

@@ -6,11 +6,9 @@
 
 ##' @keywords internal
 .rel_eff <- function(ll, x) {
-    warmup <- x$model_fit@sim$warmup
-    iter <- x$model_fit@sim$iter
-    n_chains <- x$model_fit@sim$chains
-    loo::relative_eff( exp(ll),
-                      chain_id = rep(1:n_chains,  each = iter-warmup ))
+    ci <- .fit_chain_info(x$model_fit)
+    loo::relative_eff(exp(ll),
+                      chain_id = rep(seq_len(ci$n_chains), each = ci$n_post_warmup))
 }
 
 ##' Compute model weights for a list of candidate models based on leave-future-out

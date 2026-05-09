@@ -177,11 +177,40 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
     }
 }
 
+##' Extract named parameter list from either rstan or cmdstanr fit.
+##' Returns a named list matching the format of rstan::extract():
+##' each element is an array [draws, dim1, dim2, ...].
+##' @keywords internal
+.extract_param_list <- function(fit, params) {
+    if (inherits(fit, c("CmdStanMCMC", "CmdStanVB", "CmdStanMLE", "CmdStanGQ"))) {
+        lapply(setNames(params, params), function(p) {
+            dm    <- as.matrix(posterior::as_draws_matrix(fit$draws(variables = p)))
+            ndraws <- nrow(dm)
+            cols  <- colnames(dm)
+            if (length(cols) == 1 && !grepl("[", cols, fixed = TRUE)) {
+                return(as.numeric(dm))
+            }
+            idx_strs <- sub(paste0("^", p, "\\[(.*)\\]$"), "\\1", cols)
+            idx_mat  <- do.call(rbind, lapply(strsplit(idx_strs, ","), as.integer))
+            dims     <- apply(idx_mat, 2, max)
+            arr      <- array(NA_real_, dim = c(ndraws, dims))
+            for (j in seq_along(cols)) {
+                arr <- do.call("[<-", c(list(arr, seq_len(ndraws)),
+                                        as.list(idx_mat[j, ]),
+                                        list(dm[, j])))
+            }
+            arr
+        })
+    } else {
+        rstan::extract(fit, pars = params)
+    }
+}
+
 .weighted_samples <- function(model_fit, params, weights) {
     ##################
     # Extract method #
     ##################
-    samps <- lapply(model_fit, rstan::extract, pars = params)
+    samps <- lapply(model_fit, .extract_param_list, params = params)
     # Apply weights
     for(i in seq_len(length(samps))) { # Each model
         samps[[i]] <- lapply(samps[[i]], function(p) { # Each parameter
@@ -207,7 +236,7 @@ summary.bmgarch <- function(object, CrI = c(.025, .975), digits = 2, ...) {
         for (p in cov_params) {
             mean_param  <- cov_to_mean[[p]]
             mean_samps  <- lapply(model_fit, function(m) {
-                rstan::extract(m, pars = mean_param)[[mean_param]]
+                .extract_param_list(m, mean_param)[[mean_param]]
             })
             # Per-model posterior predictive means: [T, nt]
             mu_list <- lapply(mean_samps, function(m) {

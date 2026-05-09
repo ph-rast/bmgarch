@@ -14,7 +14,8 @@
                         standardize_data = FALSE,
                         distribution = object$distribution,
                         meanstructure = object$meanstructure,
-                        sampling_algorithm = object$sampling_algorithm)
+                        sampling_algorithm = object$sampling_algorithm,
+                        backend = object$backend)
 }
 
 ##' @keywords internal
@@ -33,8 +34,31 @@ if (!is.null(ids)) ll <- ll[, ids , drop = FALSE]
  }
  
 ##' @keywords internal
+.extract_param <- function(model_fit, param) {
+    if (inherits(model_fit, c("CmdStanMCMC", "CmdStanVB", "CmdStanMLE", "CmdStanGQ"))) {
+        as.matrix(posterior::as_draws_matrix(model_fit$draws(variables = param)))
+    } else {
+        rstan::extract(model_fit, pars = param)[[param]]
+    }
+}
+
+##' @keywords internal
+.fit_chain_info <- function(model_fit) {
+    if (inherits(model_fit, "CmdStanMCMC")) {
+        d <- dim(model_fit$draws())   # [iter_per_chain, n_chains, n_vars]
+        list(n_chains = d[2L], n_post_warmup = d[1L])
+    } else if (inherits(model_fit, c("CmdStanVB", "CmdStanMLE", "CmdStanGQ"))) {
+        n_draws <- nrow(posterior::as_draws_matrix(model_fit$draws()))
+        list(n_chains = 1L, n_post_warmup = n_draws)
+    } else {
+        list(n_chains = model_fit@sim$chains,
+             n_post_warmup = model_fit@sim$iter - model_fit@sim$warmup)
+    }
+}
+
+##' @keywords internal
 .log_lik <- function(x) {
-    rstan::extract(x$model_fit, pars = "log_lik")$log_lik
+    .extract_param(x$model_fit, "log_lik")
 }
 
 ##' @keywords internal
@@ -92,12 +116,11 @@ loo.bmgarch <- function(x, ..., type = 'lfo', L = NULL, M = 1, mode = "backward"
     ## "Classic" loo, based on backcasted log_lik
     if( type == 'loo' ) {
         if( is.null( L ) ) L <- 0
-        ll <- rstan::extract(object$model_fit, pars =  "log_lik")$log_lik
+        ll <- .extract_param(object$model_fit, "log_lik")
         LL <- ll[,  (L + 1):N]
         ## obtain chain id vector for relative_eff
-        n_chains <- object$model_fit@sim$chains
-        n_samples <- object$model_fit@sim$iter - object$model_fit@sim$warmup
-        chain_id <- rep(seq_len(n_chains ),  each = n_samples )
+        ci <- .fit_chain_info(object$model_fit)
+        chain_id <- rep(seq_len(ci$n_chains), each = ci$n_post_warmup)
         r_eff <- loo::relative_eff(exp(LL), chain_id = chain_id)
         backcast_loo <- loo::loo( LL, r_eff =  r_eff )
         outl$backcast_loo <- backcast_loo$estimates[,'Estimate']['elpd_loo']

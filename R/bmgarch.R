@@ -220,13 +220,14 @@ bmgarch <- function(data,
                                          chains = chains,
                                          init_r = .05, ...)
         } else if(backend == 'cmdstanr') {
-            model_fit <- stanmodel$sample(
-                                         data = stan_data,
-                                         iter_warmup = iterations %/% 2,
-                                         iter_sampling = iterations %/% 2,
-                                         chains = chains,
-                                         adapt_delta = .99,
-                                         ...)
+            sample_args <- modifyList(list(threads_per_chain = 1L), list(...))
+            model_fit <- do.call(stanmodel$sample,
+                                 c(list(data         = stan_data,
+                                        iter_warmup  = iterations %/% 2,
+                                        iter_sampling = iterations %/% 2,
+                                        chains       = chains,
+                                        adapt_delta  = .99),
+                                   sample_args))
         } else {
             stop("Invalid backend specified.")
         }
@@ -238,10 +239,10 @@ bmgarch <- function(data,
                                iter = iterations,
                                importance_resampling = TRUE, ...)
       } else if (backend == 'cmdstanr') {
-          model_fit <- stanmodel$variational(
-                                     data = stan_data,
-                                     iter = iterations,
-                                     ...)
+          vb_args <- modifyList(list(threads = 1L), list(...))
+          model_fit <- do.call(stanmodel$variational,
+                               c(list(data = stan_data, iter = iterations),
+                                 vb_args))
       } else {
         stop("Invalid backend specified.")
       }
@@ -281,7 +282,8 @@ bmgarch <- function(data,
                        xC = stan_data$xC,
                        meanstructure = stan_data$meanstructure,
                        std_data = standardize_data,
-                       sampling_algorithm = sampling_algorithm)
+                       sampling_algorithm = sampling_algorithm,
+                       backend = backend)
     class(return_fit) <- "bmgarch"
     return(return_fit)
 }
