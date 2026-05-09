@@ -52,6 +52,10 @@ test_that("rstan MCMC CCC model_weights works and sums to 1", {
 # ── cmdstanr backend – MCMC ───────────────────────────────────────────────────
 
 skip_if_not_installed("cmdstanr")
+skip_if(
+  tryCatch({ cmdstanr::cmdstan_path(); FALSE }, error = function(e) TRUE),
+  "CmdStan not installed"
+)
 
 fit_cmd_mcmc <- suppressWarnings(
   bmgarch(data             = data_small,

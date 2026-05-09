@@ -42,6 +42,7 @@ NeedsCompilation: yes
 SystemRequirements: GNU make
 Suggests:
     cmdstanr,
+    posterior,
     testthat (>= 2.3.2)
 BugReports: https://github.com/ph-rast/bmgarch/issues
 Biarch: true
