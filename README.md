@@ -63,7 +63,7 @@ Generalized Autoregressive Conditional Heteroskedasticity Models.
 *Psychological Methods*.
 <a href="https://doi.org/10.1037/met0000357" class="uri">https://doi.apa.org/10.1037/met0000357</a>;
 Preprint-doi:
-<a href="https://psyarxiv.com/j57pk" class="uri">https://psyarxiv.com/j57pk</a>
+<a href="https://osf.io/preprints/psyarxiv/j57pk" class="uri">https://osf.io/preprints/psyarxiv/j57pk</a>
 
 Examples:
 ---------
