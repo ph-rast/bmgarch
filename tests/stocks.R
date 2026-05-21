@@ -24,17 +24,18 @@ stan_data$T
 fit <- bmgarch(data = stocks[1:100, c("toyota",  "nissan", "honda")],
                Q =  1,
                standardize_data = TRUE,
-               parameterization = "DCC",
-               meanstructure = "VAR",
-               iterations = 500,
-               sampling_algorithm = 'VB',
-               backend =  "cmdstanr",
-               threads =  1,
-               seed =  123,
-               refresh =  0,
-               init =  0,
-               save_latent_dynamics = FALSE,
-               output_dir =  NULL)
+               parameterization = "BEKK",
+               meanstructure = "constant",
+               iterations = 50,
+               chains = 12,
+               sampling_algorithm = 'MCMC')
+#               backend =  "cmdstanr")
+#               threads =  1,
+#               seed =  123,
+#               refresh =  0,
+#               init =  0,
+#               save_latent_dynamics = FALSE,
+#               output_dir =  NULL)
 
 ## Stuck at this error:
 ## Error in as.vector(x, "character") : 
@@ -45,6 +46,14 @@ summary(fit )
 plot(fit )
 fc <- forecast(fit,  ahead = 10 )
 fc
+
+str(fc$backcast$cor)
+fc$backcast$cor[, , "honda_nissan"]
+
+fc$backcast$cor[, "mean", "honda_nissan"]
+fc$backcast$cor[, "2.5%", "honda_nissan"]
+
+
 plot(fc, type = 'var')
 
 

@@ -471,7 +471,7 @@ print.fitted.bmgarch <- function(x, ...) {
     return(invisible(object))
 }
 
-##' Helper function for as.data.frame.\{fitted, forecast\}. Converts predictive array to data.frame.
+##' Helper function for as.data.frame.fitted.bmgarch and as.data.frame.forecast.bmgarch. Converts predictive array to data.frame.
 ##' 
 ##' 
 ##' @title Convert predictive array to data.frame.
