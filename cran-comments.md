@@ -1,8 +1,26 @@
 ## Test environments
-* locally: Ubuntu 22.04 install, R 4.3.1
-* remotely: Ubuntu-latest, MacOS-latest and Windows-latest (on github actions-ci), Rhub
-  
+* locally: Manjaro Linux (kernel 6.6), R 4.6.0
+* remotely: Windows Server 2022 x64, R 4.6.0 (win-builder / check_win_release)
+* remotely: Ubuntu-latest (GitHub Actions CI)
+
 ## R CMD check results
+
+### Version 2.1.0
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+
+**win-builder (Windows Server 2022, R 4.6.0 release):** Status OK — no errors, warnings, or notes.
+
+**Local (Manjaro Linux, R 4.6.0):** 0 errors, 0 warnings, 1 note:
+
+* `checking compilation flags used`: non-portable flags (`-Werror=format-security`,
+  `-march=x86-64`, etc.) originate from the local system compiler configuration,
+  not the package. Not present on win-builder or CI.
+
+`cmdstanr` is a suggested package not on CRAN. Its availability via
+`Additional_repositories: https://stan-dev.r-universe.dev` was confirmed
+by the CRAN incoming check. All cmdstanr-dependent tests are guarded with
+`skip_if_not_installed("cmdstanr")` and a check that CmdStan is installed,
+so the package checks and tests pass cleanly without CmdStan present.
 
 ### Version 2.0.0
 0 errors ✔ | 0 warnings ✔ | 2 notes ✖
